@@ -1,0 +1,30 @@
+{
+  "name": "extensions-official",
+  "version": "1.0.0",
+  "description": "Community maintained Paperback extension repository",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Paperback-iOS/extensions-official.git"
+  },
+  "author": "Paperback Community",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Paperback-iOS/extensions-official/issues"
+  },
+  "homepage": "https://github.com/Paperback-iOS/extensions-official#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "eslint": "^7.27.0",
+    "eslint-plugin-modules-newline": "^0.0.6",
+    "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "paperback-cli": "^1.4.0",
+    "paperback-extensions-common": "^3.5.2"
+  }
+}

@@ -5,21 +5,16 @@ on:
       - '**'
       - '!main'
 jobs:
-  build:
+  delete:
+    if: github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x] 
-
     steps:
+      - name: Clean up
+        run: |
+          echo "Clean up for branch ${{ github.event.ref }}"
+
       - name: Checkout Branch
         uses: actions/checkout@v2
-      
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
 
       - name: Checkout existing bundles
         uses: actions/checkout@v2
@@ -28,7 +23,7 @@ jobs:
           ref: gh-pages
           path: bundles
 
-      - run: rm -rf bundles/${{ steps.extract_branch.outputs.branch }}
+      - run: rm -rf bundles/${{ github.event.ref }}
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.0

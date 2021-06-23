@@ -4,7 +4,8 @@
   "description": "Community maintained Paperback extension repository",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "bundle": "paperback bundle",
+    "serve": "paperback serve"
   },
   "repository": {
     "type": "git",

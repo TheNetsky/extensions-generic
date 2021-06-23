@@ -1,4 +1,14 @@
-bundles/
+bundles
+
+#compiled sources
+reference
+coverage
+docs
+
+.idea
+
+# mac stuff
+.DS_Store
 
 # Logs
 logs

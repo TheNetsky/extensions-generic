@@ -4,12 +4,15 @@ import {
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
-import {Madara} from '../Madara'
+import {
+    getExportVersion,
+    Madara
+} from '../Madara'
 
 const SKSCANS_DOMAIN = 'https://skscans.com'
 
 export const SKScansInfo: SourceInfo = {
-    version: '1.1.2',
+    version: getExportVersion('0.0.0'),
     name: 'SKScans',
     description: 'Extension that pulls manga from skscans.com',
     author: 'GameFuzzy',

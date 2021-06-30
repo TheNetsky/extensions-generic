@@ -4,12 +4,15 @@ import {
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
-import {Madara} from '../Madara'
+import {
+    getExportVersion,
+    Madara
+} from '../Madara'
 
 const LILYMANGA_DOMAIN = 'https://lilymanga.com'
 
 export const LilyMangaInfo: SourceInfo = {
-    version: '1.0.1',
+    version: getExportVersion('0.0.0'),
     name: 'LilyManga',
     description: 'Extension that pulls manga from LilyManga',
     author: 'PythonCoderAS',

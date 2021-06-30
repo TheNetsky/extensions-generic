@@ -18,6 +18,11 @@ import {
 
 import {Parser} from './MadaraParser'
 
+const BASE_VERSION = '2.0.0'
+export const getExportVersion = (EXTENSION_VERSION: string): string => {
+    return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
+}
+
 export abstract class Madara extends Source {
     requestManager = createRequestManager({
         requestsPerSecond: 3

@@ -4,12 +4,15 @@ import {
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
-import {Madara} from '../Madara'
+import {
+    getExportVersion,
+    Madara
+} from '../Madara'
 
 const ARANGSCANS_DOMAIN = 'https://arangscans.com'
 
 export const ArangScansInfo: SourceInfo = {
-    version: '1.1.3',
+    version: getExportVersion('0.0.0'),
     name: 'ArangScans',
     description: 'Extension that pulls manga from arangscans.com',
     author: 'GameFuzzy',

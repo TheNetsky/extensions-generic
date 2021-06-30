@@ -4,12 +4,15 @@ import {
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
-import {Madara} from '../Madara'
+import {
+    getExportVersion,
+    Madara
+} from '../Madara'
 
 const MANHUAPLUS_DOMAIN = 'https://manhuaplus.com'
 
 export const ManhuaPlusInfo: SourceInfo = {
-    version: '1.1.2',
+    version: getExportVersion('0.0.0'),
     name: 'ManhuaPlus',
     description: 'Extension that pulls manga from manhuaplus.com',
     author: 'GameFuzzy',

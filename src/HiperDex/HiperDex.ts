@@ -4,12 +4,15 @@ import {
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
-import {Madara} from '../Madara'
+import {
+    getExportVersion,
+    Madara
+} from '../Madara'
 
 const HIPERDEX_DOMAIN = 'https://hiperdex.com'
 
 export const HiperDexInfo: SourceInfo = {
-    version: '1.1.2',
+    version: getExportVersion('0.0.0'),
     name: 'HiperDex',
     description: 'Extension that pulls manga from hiperdex.com',
     author: 'GameFuzzy',

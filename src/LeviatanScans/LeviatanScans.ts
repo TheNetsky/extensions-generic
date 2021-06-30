@@ -4,12 +4,15 @@ import {
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
-import {Madara} from '../Madara'
+import {
+    getExportVersion,
+    Madara
+} from '../Madara'
 
 const LEVIATANSCANS_DOMAIN = 'https://leviatanscans.com'
 
 export const LeviatanScansInfo: SourceInfo = {
-    version: '1.1.2',
+    version: getExportVersion('0.0.0'),
     name: 'LeviatanScans',
     description: 'Extension that pulls manga from leviatanscans.com',
     author: 'GameFuzzy',

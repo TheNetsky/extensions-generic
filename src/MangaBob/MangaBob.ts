@@ -4,12 +4,15 @@ import {
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
-import {Madara} from '../Madara'
+import {
+    getExportVersion,
+    Madara
+} from '../Madara'
 
 const MANGABOB_DOMAIN = 'https://mangabob.com'
 
 export const MangaBobInfo: SourceInfo = {
-    version: '1.1.2',
+    version: getExportVersion('0.0.0'),
     name: 'MangaBob',
     description: 'Extension that pulls manga from mangabob.com',
     author: 'GameFuzzy',

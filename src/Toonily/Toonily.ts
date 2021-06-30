@@ -4,12 +4,15 @@ import {
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
-import {Madara} from '../Madara'
+import {
+    getExportVersion,
+    Madara
+} from '../Madara'
 
 const TOONILY_DOMAIN = 'https://toonily.com'
 
 export const ToonilyInfo: SourceInfo = {
-    version: '1.1.2',
+    version: getExportVersion('0.0.0'),
     name: 'Toonily',
     description: 'Extension that pulls manga from toonily.com',
     author: 'GameFuzzy',

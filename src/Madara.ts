@@ -324,8 +324,7 @@ export abstract class Madara extends Source {
     /**
      * Constructs requests to be sent to the search page.
      */
-    constructSearchRequest(page: number, query: any): any {
-        console.log(query.includeGenre)
+    constructSearchRequest(page: number, query: SearchRequest): any {
         return createRequestObject({
             url: new URLBuilder(this.baseUrl)
                 .addPathComponent(this.searchPagePathName)
@@ -333,8 +332,6 @@ export abstract class Madara extends Source {
                 .addQueryParameter('s', query?.title ?? '')
                 .addQueryParameter('post_type', 'wp-manga')
                 .addQueryParameter('genre', query?.includedTags?.map((x: any) => x.id))
-                .addQueryParameter('author', query?.author)
-                .addQueryParameter('artist', query?.artist)
                 .buildUrl({addTrailingSlash: true, includeUndefinedParameters: false}),
             method: 'GET',
             headers: this.constructHeaders(),

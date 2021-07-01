@@ -31,5 +31,5 @@ export const LeviatanScansESInfo: SourceInfo = {
 export class LeviatanScansES extends Madara {
     baseUrl: string = LEVIATANSCANSES_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
-    override sourceTraversalPathName = 'comics/manga'
+    override sourceTraversalPathName = 'comic/manga'
 }

@@ -16,7 +16,8 @@ import {
     TagSection,
 } from 'paperback-extensions-common'
 
-import {Parser} from './MadaraParser'
+import { Parser } from './MadaraParser'
+import { URLBuilder } from './MadaraHelper'
 
 const BASE_VERSION = '2.0.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
@@ -56,6 +57,12 @@ export abstract class Madara extends Source {
      * Set to true if your source has advanced search functionality built in.
      */
     hasAdvancedSearchPage = false
+
+    /**
+     * The path used for search pagination. Used in search function.
+     * Eg. for https://mangabob.com/page/2/?s&post_type=wp-manga it would be 'page'
+     */
+    searchPagePathName = 'page'
 
     /**
      * Different Madara sources might require a extra param in order for the images to be parsed.
@@ -160,20 +167,17 @@ export abstract class Madara extends Source {
 
     async searchRequest(query: SearchRequest, metadata: any): Promise<PagedResults> {
         // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
-        const page = metadata?.page ?? 0
+        const page = metadata?.page ?? 1
 
-        const request = this.constructAjaxRequest(page, 50, '', query.title ?? '')
+        const request = this.constructSearchRequest(page, query)
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
         const $ = this.cheerio.load(data.data)
         const manga = this.parser.parseSearchResults($, this)
-        let mData: any = {page: (page + 1)}
-        if (manga.length < 50) {
-            mData = undefined
-        }
+
         return createPagedResults({
             results: manga,
-            metadata: typeof mData?.page === 'undefined' ? undefined : mData
+            metadata: {page: (page + 1)}
         })
     }
 
@@ -182,7 +186,7 @@ export abstract class Madara extends Source {
         let page = 0
         let loadNextPage = true
         while (loadNextPage) {
-            const request = this.constructAjaxRequest(page, 50, '_latest_update', '')
+            const request = this.constructAjaxHomepageRequest(page, 50, '_latest_update')
 
             const data = await this.requestManager.schedule(request, 1)
             this.CloudFlareError(data.status)
@@ -210,7 +214,7 @@ export abstract class Madara extends Source {
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const sections = [
             {
-                request: this.constructAjaxRequest(0, 10, '_latest_update', ''),
+                request: this.constructAjaxHomepageRequest(0, 10, '_latest_update'),
                 section: createHomeSection({
                     id: '0',
                     title: 'RECENTLY UPDATED',
@@ -218,7 +222,7 @@ export abstract class Madara extends Source {
                 }),
             },
             {
-                request: this.constructAjaxRequest(0, 10, '_wp_manga_week_views_value', ''),
+                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_week_views_value'),
                 section: createHomeSection({
                     id: '1',
                     title: 'CURRENTLY TRENDING',
@@ -226,7 +230,7 @@ export abstract class Madara extends Source {
                 })
             },
             {
-                request: this.constructAjaxRequest(0, 10, '_wp_manga_views', ''),
+                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_views'),
                 section: createHomeSection({
                     id: '2',
                     title: 'MOST POPULAR',
@@ -274,7 +278,7 @@ export abstract class Madara extends Source {
                 break
             }
         }
-        const request = this.constructAjaxRequest(page, 50, sortBy, '')
+        const request = this.constructAjaxHomepageRequest(page, 50, sortBy)
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
         const $ = this.cheerio.load(data.data)
@@ -318,35 +322,49 @@ export abstract class Madara extends Source {
     }
 
     /**
+     * Constructs requests to be sent to the search page.
+     */
+    constructSearchRequest(page: number, query: any): any {
+        console.log(query.includeGenre)
+        return createRequestObject({
+            url: new URLBuilder(this.baseUrl)
+                .addPathComponent(this.searchPagePathName)
+                .addPathComponent(page.toString())
+                .addQueryParameter('s', query?.title ?? '')
+                .addQueryParameter('post_type', 'wp-manga')
+                .addQueryParameter('genre', query?.includedTags?.map((x: any) => x.id))
+                .addQueryParameter('author', query?.author)
+                .addQueryParameter('artist', query?.artist)
+                .buildUrl({addTrailingSlash: true, includeUndefinedParameters: false}),
+            method: 'GET',
+            headers: this.constructHeaders(),
+            cookies: [createCookie({name: 'wpmanga-adault', value: '1', domain: this.baseUrl})]
+        })
+    }
+
+    /**
      * Constructs requests to be sent to the Madara /admin-ajax.php endpoint.
      */
-    constructAjaxRequest(page: number, postsPerPage: number, meta_key: string, searchQuery: string): any {
-        const isSearch = searchQuery != ''
-        const data: any = {
-            'action': 'madara_load_more',
-            'page': page,
-            'vars[paged]': '1',
-            'vars[posts_per_page]': postsPerPage,
-        }
-        if (isSearch) {
-            data['vars[s]'] = searchQuery
-            data['template'] = 'madara-core/content/content-search'
-        } else {
-            data['template'] = 'madara-core/content/content-archive'
-            data['vars[orderby]'] = 'meta_value_num'
-            data['vars[sidebar]'] = 'right'
-            data['vars[post_type]'] = 'wp-manga'
-            data['vars[meta_key]'] = meta_key
-            data['vars[order]'] = 'desc'
-        }
-
+    constructAjaxHomepageRequest(page: number, postsPerPage: number, meta_key: string): any {
         return createRequestObject({
             url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
             method: 'POST',
             headers: this.constructHeaders({
                 'content-type': 'application/x-www-form-urlencoded'
             }),
-            data: data,
+            data: {
+                'action': 'madara_load_more',
+                'template': 'madara-core/content/content-archive',
+                'page': page,
+                'vars[paged]': '1',
+                'vars[posts_per_page]': postsPerPage,
+                'vars[orderby]': 'meta_value_num',
+                'vars[sidebar]': 'right',
+                'vars[post_type]': 'wp-manga',
+                'vars[order]': 'desc',
+                'vars[meta_key]': meta_key
+
+            },
             cookies: [createCookie({name: 'wpmanga-adault', value: '1', domain: this.baseUrl})]
         })
     }
@@ -403,5 +421,4 @@ export abstract class Madara extends Source {
             throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > \<\The name of this source\> and press Cloudflare Bypass')
         }
     }
-
 }

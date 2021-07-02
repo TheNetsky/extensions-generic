@@ -89,7 +89,7 @@ export class Parser {
             }))
         }
 
-        return this.sortChapters(chapters)
+        return chapters
     }
 
     parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string, selector: string): ChapterDetails {
@@ -210,13 +210,6 @@ export class Parser {
     }
 
     // UTILITY METHODS
-
-    // Chapter sorting
-    sortChapters(chapters: Chapter[]): Chapter[] {
-        const sortedChapters = chapters.filter((obj, index, arr) => arr.map(mapObj => mapObj.id).indexOf(obj.id) === index)
-        sortedChapters.sort((a, b) => (a.chapNum - b.chapNum) ? -1 : 1)
-        return sortedChapters
-    }
 
     getImageSrc(imageObj: Cheerio | undefined): string {
         let image

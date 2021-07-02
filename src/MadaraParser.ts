@@ -89,7 +89,7 @@ export class Parser {
             }))
         }
 
-        return this.sortChapters(chapters)
+        return chapters
     }
 
     parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string, selector: string): ChapterDetails {
@@ -136,6 +136,7 @@ export class Parser {
             const id = ($('a', $(obj)).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const title = createIconText({text: this.decodeHTMLEntity($('a', $(obj)).attr('title') ?? '')})
             const image = encodeURI(this.getImageSrc($('img', $(obj))))
+            const subtitle = createIconText({text: $('span.font-meta.chapter', obj).text().trim() })
 
             if (!id || !image || !title.text) {
                 if(id.includes(source.baseUrl.replace(/\/$/, ''))) continue
@@ -146,7 +147,8 @@ export class Parser {
             results.push(createMangaTile({
                 id: id,
                 title: title,
-                image: image
+                image: image,
+                subtitleText: subtitle
             }))
         }
         return results
@@ -159,6 +161,7 @@ export class Parser {
             const image = encodeURI(this.getImageSrc($('img', $(obj))) ?? '')
             const title = this.decodeHTMLEntity($('a', $('h3.h5', $(obj))).text())
             const id = $('a', $('h3.h5', $(obj))).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
+            const subtitle = $('span.font-meta.chapter', obj).first().text().trim()
 
             if (!id || !title || !image) {
                 throw new Error(`Failed to parse homepage sections for ${source.baseUrl}/`)
@@ -167,7 +170,8 @@ export class Parser {
             items.push(createMangaTile({
                 id: id,
                 title: createIconText({text: title}),
-                image: image
+                image: image,
+                subtitleText: createIconText({text: subtitle })
             }))
         }
         return items
@@ -210,13 +214,6 @@ export class Parser {
     }
 
     // UTILITY METHODS
-
-    // Chapter sorting
-    sortChapters(chapters: Chapter[]): Chapter[] {
-        const sortedChapters = chapters.filter((obj, index, arr) => arr.map(mapObj => mapObj.id).indexOf(obj.id) === index)
-        sortedChapters.sort((a, b) => (a.chapNum - b.chapNum) ? -1 : 1)
-        return sortedChapters
-    }
 
     getImageSrc(imageObj: Cheerio | undefined): string {
         let image

@@ -136,6 +136,7 @@ export class Parser {
             const id = ($('a', $(obj)).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const title = createIconText({text: this.decodeHTMLEntity($('a', $(obj)).attr('title') ?? '')})
             const image = encodeURI(this.getImageSrc($('img', $(obj))))
+            const subtitle = createIconText({text: $('span.font-meta.chapter', obj).text().trim() })
 
             if (!id || !image || !title.text) {
                 if(id.includes(source.baseUrl.replace(/\/$/, ''))) continue
@@ -146,7 +147,8 @@ export class Parser {
             results.push(createMangaTile({
                 id: id,
                 title: title,
-                image: image
+                image: image,
+                subtitleText: subtitle
             }))
         }
         return results

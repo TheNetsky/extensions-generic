@@ -74,7 +74,13 @@ export class Parser {
             const id = ($('a', $(obj)).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const chapNum = Number(id.match(/\D*(\d*\.?\d*)$/)?.pop())
             const chapName = $('a', $(obj)).first().text()
-            const releaseDate = $('i', $(obj)).length > 0 ? $('i', $(obj)).text() : $('.c-new-tag a', $(obj)).attr('title') ?? ''
+
+            let releaseDate: string
+            if ($('a.c-new-tag', obj).length) {
+                releaseDate = $('a.c-new-tag', obj).attr('title') ?? ''
+            } else {
+                releaseDate = $('i', obj).text().trim()
+            }
 
             if (typeof id === 'undefined') {
                 throw new Error(`Could not parse out ID when getting chapters for ${mangaId}`)
@@ -184,14 +190,14 @@ export class Parser {
 
         for (const obj of $('div.page-item-detail').toArray()) {
             const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '') ?? ''
+            
             let mangaTime: Date
-            if ($('.c-new-tag a', obj).length > 0) {
-                // Use blinking red NEW tag
-                mangaTime = source.convertTime($('.c-new-tag a', obj).attr('title') ?? '')
+            if ($('a.c-new-tag', obj).length) {
+                mangaTime = source.convertTime($('a.c-new-tag', obj).attr('title') ?? '')
             } else {
-                // Use span
-                mangaTime = source.convertTime($('span', $('.chapter-item', obj).first()).last().text() ?? '')
+                mangaTime = source.convertTime($('i', obj).text().trim())
             }
+
             passedReferenceTimeCurrent = mangaTime <= time
             if (!passedReferenceTimeCurrent || !passedReferenceTimePrior) {
                 if (ids.includes(id)) {

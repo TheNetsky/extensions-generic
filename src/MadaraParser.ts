@@ -79,7 +79,7 @@ export class Parser {
             if ($('a.c-new-tag', obj).length) {
                 releaseDate = $('a.c-new-tag', obj).attr('title') ?? ''
             } else {
-                releaseDate = $('span', $('.chapter-item', obj).first()).text().trim()
+                releaseDate = $('i', $(obj)).text().trim()
             }
 
             if (typeof id === 'undefined') {

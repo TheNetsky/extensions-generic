@@ -79,7 +79,7 @@ export class Parser {
             if ($('a.c-new-tag', obj).length) {
                 releaseDate = $('a.c-new-tag', obj).attr('title') ?? ''
             } else {
-                releaseDate = $('i', obj).text().trim()
+                releaseDate = $('span', $('.chapter-item', obj).first()).text().trim()
             }
 
             if (typeof id === 'undefined') {
@@ -195,7 +195,7 @@ export class Parser {
             if ($('a.c-new-tag', obj).length) {
                 mangaTime = source.convertTime($('a.c-new-tag', obj).attr('title') ?? '')
             } else {
-                mangaTime = source.convertTime($('i', obj).text().trim())
+                mangaTime = source.convertTime($('span', $('.chapter-item', obj).first()).text().trim())
             }
 
             passedReferenceTimeCurrent = mangaTime <= time

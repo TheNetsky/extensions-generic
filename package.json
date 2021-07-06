@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Paperback-iOS/extensions-official#readme",
   "devDependencies": {
+    "@types/cheerio": "^0.22.21",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
     "eslint": "^7.27.0",

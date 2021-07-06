@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
@@ -11,7 +12,8 @@ import {
     MangaUpdates,
     TagSection,
     RequestHeaders,
-    LanguageCode
+    LanguageCode,
+    Section
 } from 'paperback-extensions-common'
 import {
     parseTags,
@@ -24,8 +26,12 @@ import {
     UpdatedManga
 } from './MangaBoxParser'
 import { URLBuilder } from './MangaBoxHelper'
+import {
+    getImageServer,
+    imageServerSettings
+} from './MangaBoxSettings'
 
-const BASE_VERSION = '3.0.0'
+const BASE_VERSION = '3.0.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -127,6 +133,13 @@ export abstract class MangaBox extends Source {
         const request = createRequestObject({
             url: `${chapterId}`,
             method: 'GET',
+            cookies: [
+                createCookie({
+                    name: 'content_server',
+                    value: await getImageServer(this.stateManager),
+                    domain: chapterId.match(/(.*)\/.*\/.*$/g)![0] ?? this.baseUrl
+                })
+            ]
         })
 
         const response = await this.requestManager.schedule(request, 1)
@@ -309,5 +322,17 @@ export abstract class MangaBox extends Source {
         }
 
         return time
+    }
+
+    stateManager = createSourceStateManager({})
+
+    override async getSourceMenu(): Promise<Section> {
+        return Promise.resolve(createSection({
+            id: 'main',
+            header: 'Source Settings',
+            rows: () => Promise.resolve([
+                imageServerSettings(this.stateManager)
+            ])
+        }))
     }
 }

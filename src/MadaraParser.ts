@@ -75,12 +75,18 @@ export class Parser {
             const chapNum = Number(id.match(/\D*(\d*\.?\d*)$/)?.pop())
             const chapName = $('a', $(obj)).first().text()
 
-            let releaseDate: string
-            if ($('a.c-new-tag', obj).length) {
-                releaseDate = $('a.c-new-tag', obj).attr('title') ?? ''
+            let mangaTime: Date
+            const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title')
+            if (typeof timeSelector !== 'undefined') {
+                //Firstly check if there is a NEW tag, if so parse the time from this
+                mangaTime = source.convertTime(timeSelector ?? '')
             } else {
-                releaseDate = $('i', $(obj)).text().trim()
+                //Else get the date from the info box
+                mangaTime = source.convertTime($('span.chapter-release-date > i', obj).text().trim())
             }
+
+            //Check if the date is a valid date, else return the current date
+            if (!mangaTime.getTime()) mangaTime = new Date()
 
             if (typeof id === 'undefined') {
                 throw new Error(`Could not parse out ID when getting chapters for ${mangaId}`)
@@ -91,7 +97,7 @@ export class Parser {
                 langCode: source.languageCode ?? LanguageCode.UNKNOWN,
                 chapNum: Number.isNaN(chapNum) ? 0 : chapNum,
                 name: Number.isNaN(chapNum) ? chapName : undefined,
-                time: source.convertTime(releaseDate)
+                time: mangaTime
             }))
         }
 
@@ -192,11 +198,16 @@ export class Parser {
             const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '') ?? ''
             
             let mangaTime: Date
-            if ($('a.c-new-tag', obj).length) {
-                mangaTime = source.convertTime($('a.c-new-tag', obj).attr('title') ?? '')
+            const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title')
+            if (typeof timeSelector !== 'undefined') {
+                //Firstly check if there is a NEW tag, if so parse the time from this
+                mangaTime = source.convertTime(timeSelector ?? '')
             } else {
-                mangaTime = source.convertTime($('span', $('.chapter-item', obj).first()).text().trim())
+                //Else get the date from the span
+                mangaTime = source.convertTime($('span.post-on.font-meta', obj).first().text().trim())
             }
+            //Check if the date is valid, if it isn't we should skip it
+            if (!mangaTime.getTime()) continue
 
             passedReferenceTimeCurrent = mangaTime <= time
             if (!passedReferenceTimeCurrent || !passedReferenceTimePrior) {

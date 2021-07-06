@@ -329,7 +329,7 @@ export abstract class Madara extends Source {
             url: new URLBuilder(this.baseUrl)
                 .addPathComponent(this.searchPagePathName)
                 .addPathComponent(page.toString())
-                .addQueryParameter('s', query?.title ?? '')
+                .addQueryParameter('s', encodeURIComponent(query?.title ?? ''))
                 .addQueryParameter('post_type', 'wp-manga')
                 .addQueryParameter('genre', query?.includedTags?.map((x: any) => x.id))
                 .buildUrl({addTrailingSlash: true, includeUndefinedParameters: false}),

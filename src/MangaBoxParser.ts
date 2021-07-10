@@ -121,14 +121,13 @@ export const parseUpdatedManga = ($: CheerioStatic, time: Date, ids: string[], s
 
     for (const manga of $(source.mangaListSelector).toArray()) {
         const id = $('a', manga).first().attr('href')
-        const mangaDate = source.convertTime($(source.mangaListTimeSelector, manga).text().replace('Updated :', '').replace('-', '').trim() ?? '')
+        const mangaDate = source.convertTime($(source.mangaListTimeSelector, manga).first().text().replace('Updated :', '').replace('-', '').trim() ?? '')
         if (!id) continue
-        if (mangaDate > time) {
-            if (ids.includes(id)) {
-                updatedManga.push(id)
-            }
-        } else {
+        if (mangaDate < time) {
             loadMore = false
+        }
+        if (ids.includes(id)) {
+            updatedManga.push(id)
         }
     }
     return {

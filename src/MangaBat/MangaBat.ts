@@ -33,4 +33,5 @@ export class MangaBat extends MangaBox {
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override mangaListPath = 'manga-list-all'
     override mangaListSelector = 'div.list-story-item'
+    override mangaListTimeSelector = 'span.text-nowrap.item-time'
 }

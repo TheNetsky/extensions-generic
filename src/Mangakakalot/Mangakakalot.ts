@@ -80,9 +80,7 @@ export class Mangakakalot extends MangaBox {
             }
         }
 
-        if (updatedManga.length > 0) {
-            mangaUpdatesFoundCallback(createMangaUpdates({ids: updatedManga}))
-        }
+        mangaUpdatesFoundCallback(createMangaUpdates({ids: updatedManga}))
     }
 
     override async getTags(): Promise<TagSection[]> {

@@ -31,7 +31,7 @@ import {
     imageServerSettings
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '3.0.3'
+const BASE_VERSION = '3.0.4'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -176,6 +176,7 @@ export abstract class MangaBox extends Source {
             updatedManga.ids = []
             page++
         }
+        mangaUpdatesFoundCallback(createMangaUpdates({ids: []}))
     }
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {

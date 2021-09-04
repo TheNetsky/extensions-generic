@@ -1024,7 +1024,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const MANHUAPLUS_DOMAIN = 'https://manhuaplus.com';
 exports.ManhuaPlusInfo = {
-    version: Madara_1.getExportVersion('0.0.1'),
+    version: Madara_1.getExportVersion('0.0.2'),
     name: 'ManhuaPlus',
     description: 'Extension that pulls manga from manhuaplus.com',
     author: 'GameFuzzy',
@@ -1045,7 +1045,7 @@ class ManhuaPlus extends Madara_1.Madara {
         this.baseUrl = MANHUAPLUS_DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
-        this.chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img';
+        this.chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > p > img';
     }
 }
 exports.ManhuaPlus = ManhuaPlus;

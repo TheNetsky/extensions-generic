@@ -745,7 +745,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const MADARADEX_DOMAIN = 'https://madaradex.org';
 exports.MadaraDexInfo = {
-    version: Madara_1.getExportVersion('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.1'),
     name: 'MadaraDex',
     description: 'Extension that pulls from the best site known as madaradex.org',
     author: 'Netsky',
@@ -772,6 +772,11 @@ class MadaraDex extends Madara_1.Madara {
         this.hasAdvancedSearchPage = true;
         this.userAgentRandomizer = '';
         this.sourceTraversalPathName = 'title';
+        this.searchMangaSelector = 'div.c-tabs-item > div.row';
+        this.requestManager = createRequestManager({
+            requestsPerSecond: 5,
+            requestTimeout: 25000,
+        });
     }
 }
 exports.MadaraDex = MadaraDex;

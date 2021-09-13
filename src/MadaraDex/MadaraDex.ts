@@ -12,7 +12,7 @@ import {
 const MADARADEX_DOMAIN = 'https://madaradex.org'
 
 export const MadaraDexInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'MadaraDex',
     description: 'Extension that pulls from the best site known as madaradex.org',
     author: 'Netsky',
@@ -37,5 +37,10 @@ export class MadaraDex extends Madara {
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override hasAdvancedSearchPage = true
     override userAgentRandomizer = ''
-    override sourceTraversalPathName = 'title';
+    override sourceTraversalPathName = 'title'
+    override searchMangaSelector = 'div.c-tabs-item > div.row'
+    override requestManager = createRequestManager({
+        requestsPerSecond: 5,
+        requestTimeout: 25000,
+    })
 }

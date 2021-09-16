@@ -38,7 +38,6 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string, source: any
     const arrayTags: Tag[] = []
     for (const tagCheerio of $('li:contains(Genre) a, td:contains(Genre) + td a', panel).toArray()) {
         const id = source.parseTagUrl($(tagCheerio).attr('href'))
-        console.log(id)
         const label = $(tagCheerio).text()
         if (!id || !label) continue
         if (['ADULT', 'SMUT', 'MATURE'].includes(label.toUpperCase())) hentai = true

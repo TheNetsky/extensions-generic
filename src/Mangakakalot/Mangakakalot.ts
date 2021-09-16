@@ -103,11 +103,11 @@ export class Mangakakalot extends MangaBox {
         return tagSections
     }
 
-    override async searchRequest(query: SearchRequest, metadata: any): Promise<PagedResults> {
+    override async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         const page: number = metadata?.page ?? 1
         let results: MangaTile[] = []
 
-        if (query.includedTags) {
+        if (query.includedTags && query.includedTags?.length != 0) {
             const request = createRequestObject({
                 url: new URLBuilder(this.baseUrl)
                     .addPathComponent('manga_list')

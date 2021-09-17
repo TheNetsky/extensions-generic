@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="current Mocha test file" type="NodeJSConfigurationType" singleton="false" application-parameters="$UnixSeparators($FilePathRelativeToProjectRoot$)$  --require ts-node/register --no-timeouts --trace-warnings --colors" path-to-node="wsl://Arch@/usr/sbin/node" path-to-js-file="node_modules/mocha/bin/_mocha" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

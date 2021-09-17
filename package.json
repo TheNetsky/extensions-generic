@@ -1,5 +1,5 @@
 {
-  "name": "extensions-official",
+  "name": "extensions-nepnep",
   "version": "1.0.0",
   "description": "Community maintained Paperback extension repository",
   "main": "index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Paperback-iOS/extensions-official.git"
+    "url": "git+https://github.com/Paperback-iOS/extensions-generic.git"
   },
   "author": "Paperback Community",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/Paperback-iOS/extensions-official/issues"
+    "url": "https://github.com/Paperback-iOS/extensions-generic/issues"
   },
-  "homepage": "https://github.com/Paperback-iOS/extensions-official#readme",
+  "homepage": "https://github.com/Paperback-iOS/extensions-generic#readme",
   "devDependencies": {
     "@types/chai": "^4.2.19",
     "@types/chai-as-promised": "^7.1.4",

@@ -9,7 +9,7 @@ import {
     Madara
 } from '../Madara'
 
-const XUNSCANS_DOMAIN = 'https://reader.xunscans.xyz'
+const XUNSCANS_DOMAIN = 'https://xunscans.xyz'
 
 export const XuNScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),

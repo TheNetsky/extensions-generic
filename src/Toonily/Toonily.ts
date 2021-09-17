@@ -42,4 +42,5 @@ export class Toonily extends Madara {
     override hasAdvancedSearchPage = true
     override sourceTraversalPathName = 'webtoon'
     override userAgentRandomizer = ''
+    override alternativeChapterAjaxEndpoint = true
 }

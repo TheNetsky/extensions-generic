@@ -19,7 +19,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.0.1'
+const BASE_VERSION = '2.0.2'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -65,6 +65,11 @@ export abstract class Madara extends Source {
     searchPagePathName = 'page'
 
     /**
+     * Some sites use the alternate URL for getting chapters through ajax
+     */
+    alternativeChapterAjaxEndpoint = false
+
+    /**
      * Different Madara sources might require a extra param in order for the images to be parsed.
      * Eg. for https://arangscans.com/manga/tesla-note/chapter-3/?style=list "?style=list" would be the param
      * added to the end of the URL. This will set the page in list style and is needed in order for the
@@ -107,7 +112,7 @@ export abstract class Madara extends Source {
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
+            url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
             method: 'POST',
             headers: this.constructHeaders({
                 'content-type': 'application/x-www-form-urlencoded'
@@ -165,7 +170,7 @@ export abstract class Madara extends Source {
         return this.parser.parseTags($, this.hasAdvancedSearchPage)
     }
 
-    async searchRequest(query: SearchRequest, metadata: any): Promise<PagedResults> {
+    async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
         const page = metadata?.page ?? 1
 

@@ -65,6 +65,11 @@ export abstract class Madara extends Source {
     searchPagePathName = 'page'
 
     /**
+     * Some sites use the alternate URL for getting chapters through ajax
+     */
+    alternativeChapterAjaxEndpoint = false
+
+    /**
      * Different Madara sources might require a extra param in order for the images to be parsed.
      * Eg. for https://arangscans.com/manga/tesla-note/chapter-3/?style=list "?style=list" would be the param
      * added to the end of the URL. This will set the page in list style and is needed in order for the
@@ -107,7 +112,7 @@ export abstract class Madara extends Source {
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
+            url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
             method: 'POST',
             headers: this.constructHeaders({
                 'content-type': 'application/x-www-form-urlencoded'

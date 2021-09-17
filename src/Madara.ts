@@ -19,7 +19,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.0.1'
+const BASE_VERSION = '2.0.2'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -165,7 +165,7 @@ export abstract class Madara extends Source {
         return this.parser.parseTags($, this.hasAdvancedSearchPage)
     }
 
-    async searchRequest(query: SearchRequest, metadata: any): Promise<PagedResults> {
+    async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
         const page = metadata?.page ?? 1
 

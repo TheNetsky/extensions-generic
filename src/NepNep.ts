@@ -124,7 +124,9 @@ export abstract class NepNep extends Source {
     }
 
     override async getSearchFields(): Promise<SearchField[]> {
-        return this.parser.parseSearchFields()
+        // Uncomment when this actually works in-app
+        //return this.parser.parseSearchFields()
+        return []
     }
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {

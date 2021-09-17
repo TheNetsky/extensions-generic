@@ -312,7 +312,7 @@ export class Parser {
         return tagSections
     }
     
-    parseSearchFields(data: any): SearchField[] {
+    parseSearchFields(): SearchField[] {
         const searchFields: SearchField[] = [
             createSearchField({ id: 'author', name: 'Author', placeholder: 'Miyazaki' }),
             createSearchField({ id: 'year', name: 'Year', placeholder: '2000-2010' }),

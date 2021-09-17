@@ -124,14 +124,7 @@ export abstract class NepNep extends Source {
     }
 
     override async getSearchFields(): Promise<SearchField[]> {
-        const request = createRequestObject({
-            url: `${this.baseUrl}/search/`,
-            headers,
-            method,
-        })
-
-        const response = await this.requestManager.schedule(request, 1)
-        return this.parser.parseSearchFields(response.data)
+        return this.parser.parseSearchFields()
     }
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {

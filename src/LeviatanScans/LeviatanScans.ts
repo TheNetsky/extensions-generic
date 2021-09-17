@@ -2,7 +2,8 @@ import {
     ContentRating,
     LanguageCode,
     SourceInfo,
-    TagType
+    TagType,
+    Chapter
 } from 'paperback-extensions-common'
 import {
     getExportVersion,
@@ -31,5 +32,25 @@ export const LeviatanScansInfo: SourceInfo = {
 export class LeviatanScans extends Madara {
     baseUrl: string = LEVIATANSCANS_DOMAIN
     override languageCode: LanguageCode = LanguageCode.ENGLISH
-    override sourceTraversalPathName = 'el/manga'
+    override sourceTraversalPathName = 'alli/manga'
+
+    override async getChapters(mangaId: string): Promise<Chapter[]> {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
+            method: 'POST',
+            headers: this.constructHeaders({
+                'content-type': 'application/x-www-form-urlencoded'
+            }),
+            data: {
+                'action': 'manga_get_chapters',
+                'manga': await this.getNumericId(mangaId)
+            }
+        })
+
+        const data = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(data.status)
+        const $ = this.cheerio.load(data.data)
+
+        return this.parser.parseChapterList($, mangaId, this)
+    }
 }

@@ -2,7 +2,8 @@ import {
     ContentRating,
     LanguageCode,
     SourceInfo,
-    TagType
+    TagType,
+    Chapter
 } from 'paperback-extensions-common'
 import {
     getExportVersion,
@@ -42,4 +43,24 @@ export class Toonily extends Madara {
     override hasAdvancedSearchPage = true
     override sourceTraversalPathName = 'webtoon'
     override userAgentRandomizer = ''
+
+    override async getChapters(mangaId: string): Promise<Chapter[]> {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
+            method: 'POST',
+            headers: this.constructHeaders({
+                'content-type': 'application/x-www-form-urlencoded'
+            }),
+            data: {
+                'action': 'manga_get_chapters',
+                'manga': await this.getNumericId(mangaId)
+            }
+        })
+
+        const data = await this.requestManager.schedule(request, 1)
+        this.CloudFlareError(data.status)
+        const $ = this.cheerio.load(data.data)
+
+        return this.parser.parseChapterList($, mangaId, this)
+    }
 }

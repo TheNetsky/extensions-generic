@@ -1,5 +1,6 @@
 {
   "name": "extensions-nepnep",
+  "repositoryName": "Extensions NepNep",
   "version": "1.0.0",
   "description": "Community maintained Paperback extension repository",
   "main": "index.js",

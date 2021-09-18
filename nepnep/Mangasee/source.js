@@ -302,11 +302,36 @@ module.exports={"amp":"&","apos":"'","gt":">","lt":"<","quot":"\""}
  * Request objects hold information for a particular source (see sources for example)
  * This allows us to to use a generic api to make the calls against any source
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.urlEncodeObject = exports.convertTime = exports.Source = void 0;
 class Source {
     constructor(cheerio) {
         this.cheerio = cheerio;
+    }
+    /**
+     * @deprecated use {@link Source.getSearchResults getSearchResults} instead
+     */
+    searchRequest(query, metadata) {
+        return this.getSearchResults(query, metadata);
+    }
+    /**
+     * @deprecated use {@link Source.getSearchTags} instead
+     */
+    getTags() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            // @ts-ignore
+            return (_a = this.getSearchTags) === null || _a === void 0 ? void 0 : _a.call(this);
+        });
     }
 }
 exports.Source = Source;
@@ -350,6 +375,17 @@ exports.urlEncodeObject = urlEncodeObject;
 
 },{}],11:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Tracker = void 0;
+class Tracker {
+    constructor(cheerio) {
+        this.cheerio = cheerio;
+    }
+}
+exports.Tracker = Tracker;
+
+},{}],12:[function(require,module,exports){
+"use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -362,8 +398,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./Source"), exports);
+__exportStar(require("./Tracker"), exports);
 
-},{"./Source":10}],12:[function(require,module,exports){
+},{"./Source":10,"./Tracker":11}],13:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -380,43 +417,45 @@ __exportStar(require("./base"), exports);
 __exportStar(require("./models"), exports);
 __exportStar(require("./APIWrapper"), exports);
 
-},{"./APIWrapper":1,"./base":11,"./models":49}],13:[function(require,module,exports){
+},{"./APIWrapper":1,"./base":12,"./models":55}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
-},{}],14:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],15:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],16:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],17:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],18:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],19:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],20:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],21:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],22:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],23:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],24:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],25:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],26:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],27:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],28:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],29:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],30:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],16:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],17:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],18:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],19:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],20:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],21:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],22:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],23:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],24:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],25:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],26:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],27:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],28:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],29:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],30:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],31:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],32:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -443,8 +482,9 @@ __exportStar(require("./Select"), exports);
 __exportStar(require("./Switch"), exports);
 __exportStar(require("./WebViewButton"), exports);
 __exportStar(require("./FormRow"), exports);
+__exportStar(require("./Stepper"), exports);
 
-},{"./Button":16,"./Form":17,"./FormRow":18,"./Header":19,"./InputField":20,"./Label":21,"./Link":22,"./MultilineLabel":23,"./NavigationButton":24,"./OAuthButton":25,"./Section":26,"./Select":27,"./Switch":28,"./WebViewButton":29}],31:[function(require,module,exports){
+},{"./Button":17,"./Form":18,"./FormRow":19,"./Header":20,"./InputField":21,"./Label":22,"./Link":23,"./MultilineLabel":24,"./NavigationButton":25,"./OAuthButton":26,"./Section":27,"./Select":28,"./Stepper":29,"./Switch":30,"./WebViewButton":31}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HomeSectionType = void 0;
@@ -456,7 +496,7 @@ var HomeSectionType;
     HomeSectionType["featured"] = "featured";
 })(HomeSectionType = exports.HomeSectionType || (exports.HomeSectionType = {}));
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageCode = void 0;
@@ -504,7 +544,7 @@ var LanguageCode;
     LanguageCode["VIETNAMESE"] = "vn";
 })(LanguageCode = exports.LanguageCode || (exports.LanguageCode = {}));
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaStatus = void 0;
@@ -517,27 +557,37 @@ var MangaStatus;
     MangaStatus[MangaStatus["HIATUS"] = 4] = "HIATUS";
 })(MangaStatus = exports.MangaStatus || (exports.MangaStatus = {}));
 
-},{}],34:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],35:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],36:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],37:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],38:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],39:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],40:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],41:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],42:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],43:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],44:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],37:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],38:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],39:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],40:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],41:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],42:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],43:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],44:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],45:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],46:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SearchOperator = void 0;
+var SearchOperator;
+(function (SearchOperator) {
+    SearchOperator["AND"] = "AND";
+    SearchOperator["OR"] = "OR";
+})(SearchOperator = exports.SearchOperator || (exports.SearchOperator = {}));
+
+},{}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentRating = void 0;
@@ -551,9 +601,11 @@ var ContentRating;
     ContentRating["ADULT"] = "ADULT";
 })(ContentRating = exports.ContentRating || (exports.ContentRating = {}));
 
-},{}],45:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],49:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TagType = void 0;
@@ -571,11 +623,15 @@ var TagType;
     TagType["RED"] = "danger";
 })(TagType = exports.TagType || (exports.TagType = {}));
 
-},{}],47:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],48:[function(require,module,exports){
-arguments[4][13][0].apply(exports,arguments)
-},{"dup":13}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],52:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],53:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],54:[function(require,module,exports){
+arguments[4][14][0].apply(exports,arguments)
+},{"dup":14}],55:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -605,13 +661,17 @@ __exportStar(require("./ResponseObject"), exports);
 __exportStar(require("./RequestManager"), exports);
 __exportStar(require("./RequestHeaders"), exports);
 __exportStar(require("./SourceInfo"), exports);
-__exportStar(require("./TrackObject"), exports);
-__exportStar(require("./OAuth"), exports);
 __exportStar(require("./SourceStateManager"), exports);
 __exportStar(require("./RequestInterceptor"), exports);
 __exportStar(require("./DynamicUI"), exports);
+__exportStar(require("./TrackedManga"), exports);
+__exportStar(require("./SourceManga"), exports);
+__exportStar(require("./TrackedMangaChapterReadAction"), exports);
+__exportStar(require("./TrackerActionQueue"), exports);
+__exportStar(require("./SearchField"), exports);
+__exportStar(require("./RawData"), exports);
 
-},{"./Chapter":13,"./ChapterDetails":14,"./Constants":15,"./DynamicUI":30,"./HomeSection":31,"./Languages":32,"./Manga":33,"./MangaTile":34,"./MangaUpdate":35,"./OAuth":36,"./PagedResults":37,"./RequestHeaders":38,"./RequestInterceptor":39,"./RequestManager":40,"./RequestObject":41,"./ResponseObject":42,"./SearchRequest":43,"./SourceInfo":44,"./SourceStateManager":45,"./SourceTag":46,"./TagSection":47,"./TrackObject":48}],50:[function(require,module,exports){
+},{"./Chapter":14,"./ChapterDetails":15,"./Constants":16,"./DynamicUI":32,"./HomeSection":33,"./Languages":34,"./Manga":35,"./MangaTile":36,"./MangaUpdate":37,"./PagedResults":38,"./RawData":39,"./RequestHeaders":40,"./RequestInterceptor":41,"./RequestManager":42,"./RequestObject":43,"./ResponseObject":44,"./SearchField":45,"./SearchRequest":46,"./SourceInfo":47,"./SourceManga":48,"./SourceStateManager":49,"./SourceTag":50,"./TagSection":51,"./TrackedManga":52,"./TrackedMangaChapterReadAction":53,"./TrackerActionQueue":54}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Mangasee = exports.MangaseeInfo = exports.MANGASEE_DOMAIN = void 0;
@@ -646,7 +706,7 @@ class Mangasee extends NepNep_1.NepNep {
 }
 exports.Mangasee = Mangasee;
 
-},{"../NepNep":51,"paperback-extensions-common":12}],51:[function(require,module,exports){
+},{"../NepNep":57,"paperback-extensions-common":13}],57:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -766,13 +826,9 @@ class NepNep extends paperback_extensions_common_1.Source {
     }
     getSearchFields() {
         return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${this.baseUrl}/search/`,
-                headers,
-                method,
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            return this.parser.parseSearchFields(response.data);
+            // Uncomment when this actually works in-app
+            //return this.parser.parseSearchFields()
+            return [];
         });
     }
     getHomePageSections(sectionCallback) {
@@ -822,7 +878,7 @@ class NepNep extends paperback_extensions_common_1.Source {
 }
 exports.NepNep = NepNep;
 
-},{"./Parser":52,"paperback-extensions-common":12}],52:[function(require,module,exports){
+},{"./Parser":58,"paperback-extensions-common":13}],58:[function(require,module,exports){
 "use strict";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
@@ -1077,7 +1133,7 @@ class Parser {
         ];
         return tagSections;
     }
-    parseSearchFields(data) {
+    parseSearchFields() {
         const searchFields = [
             createSearchField({ id: 'author', name: 'Author', placeholder: 'Miyazaki' }),
             createSearchField({ id: 'year', name: 'Year', placeholder: '2000-2010' }),
@@ -1154,5 +1210,5 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"entities":5,"paperback-extensions-common":12}]},{},[50])(50)
+},{"entities":5,"paperback-extensions-common":13}]},{},[56])(56)
 });

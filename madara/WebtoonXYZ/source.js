@@ -6,11 +6,36 @@
  * Request objects hold information for a particular source (see sources for example)
  * This allows us to to use a generic api to make the calls against any source
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.urlEncodeObject = exports.convertTime = exports.Source = void 0;
 class Source {
     constructor(cheerio) {
         this.cheerio = cheerio;
+    }
+    /**
+     * @deprecated use {@link Source.getSearchResults getSearchResults} instead
+     */
+    searchRequest(query, metadata) {
+        return this.getSearchResults(query, metadata);
+    }
+    /**
+     * @deprecated use {@link Source.getSearchTags} instead
+     */
+    getTags() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            // @ts-ignore
+            return (_a = this.getSearchTags) === null || _a === void 0 ? void 0 : _a.call(this);
+        });
     }
 }
 exports.Source = Source;
@@ -96,7 +121,7 @@ __exportStar(require("./base"), exports);
 __exportStar(require("./models"), exports);
 __exportStar(require("./APIWrapper"), exports);
 
-},{"./APIWrapper":1,"./base":4,"./models":45}],6:[function(require,module,exports){
+},{"./APIWrapper":1,"./base":4,"./models":47}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
@@ -253,6 +278,10 @@ arguments[4][6][0].apply(exports,arguments)
 },{"dup":6}],35:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
 },{"dup":6}],36:[function(require,module,exports){
+arguments[4][6][0].apply(exports,arguments)
+},{"dup":6}],37:[function(require,module,exports){
+arguments[4][6][0].apply(exports,arguments)
+},{"dup":6}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchOperator = void 0;
@@ -262,7 +291,7 @@ var SearchOperator;
     SearchOperator["OR"] = "OR";
 })(SearchOperator = exports.SearchOperator || (exports.SearchOperator = {}));
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentRating = void 0;
@@ -276,11 +305,11 @@ var ContentRating;
     ContentRating["ADULT"] = "ADULT";
 })(ContentRating = exports.ContentRating || (exports.ContentRating = {}));
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"dup":6}],39:[function(require,module,exports){
+},{"dup":6}],41:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"dup":6}],40:[function(require,module,exports){
+},{"dup":6}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TagType = void 0;
@@ -298,15 +327,15 @@ var TagType;
     TagType["RED"] = "danger";
 })(TagType = exports.TagType || (exports.TagType = {}));
 
-},{}],41:[function(require,module,exports){
-arguments[4][6][0].apply(exports,arguments)
-},{"dup":6}],42:[function(require,module,exports){
-arguments[4][6][0].apply(exports,arguments)
-},{"dup":6}],43:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
 },{"dup":6}],44:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
 },{"dup":6}],45:[function(require,module,exports){
+arguments[4][6][0].apply(exports,arguments)
+},{"dup":6}],46:[function(require,module,exports){
+arguments[4][6][0].apply(exports,arguments)
+},{"dup":6}],47:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -343,8 +372,10 @@ __exportStar(require("./TrackedManga"), exports);
 __exportStar(require("./SourceManga"), exports);
 __exportStar(require("./TrackedMangaChapterReadAction"), exports);
 __exportStar(require("./TrackerActionQueue"), exports);
+__exportStar(require("./SearchField"), exports);
+__exportStar(require("./RawData"), exports);
 
-},{"./Chapter":6,"./ChapterDetails":7,"./Constants":8,"./DynamicUI":24,"./HomeSection":25,"./Languages":26,"./Manga":27,"./MangaTile":28,"./MangaUpdate":29,"./PagedResults":30,"./RequestHeaders":31,"./RequestInterceptor":32,"./RequestManager":33,"./RequestObject":34,"./ResponseObject":35,"./SearchRequest":36,"./SourceInfo":37,"./SourceManga":38,"./SourceStateManager":39,"./SourceTag":40,"./TagSection":41,"./TrackedManga":42,"./TrackedMangaChapterReadAction":43,"./TrackerActionQueue":44}],46:[function(require,module,exports){
+},{"./Chapter":6,"./ChapterDetails":7,"./Constants":8,"./DynamicUI":24,"./HomeSection":25,"./Languages":26,"./Manga":27,"./MangaTile":28,"./MangaUpdate":29,"./PagedResults":30,"./RawData":31,"./RequestHeaders":32,"./RequestInterceptor":33,"./RequestManager":34,"./RequestObject":35,"./ResponseObject":36,"./SearchField":37,"./SearchRequest":38,"./SourceInfo":39,"./SourceManga":40,"./SourceStateManager":41,"./SourceTag":42,"./TagSection":43,"./TrackedManga":44,"./TrackedMangaChapterReadAction":45,"./TrackerActionQueue":46}],48:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -363,7 +394,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.0.1';
+const BASE_VERSION = '2.0.2';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -395,6 +426,10 @@ class Madara extends paperback_extensions_common_1.Source {
          * Eg. for https://mangabob.com/page/2/?s&post_type=wp-manga it would be 'page'
          */
         this.searchPagePathName = 'page';
+        /**
+         * Some sites use the alternate URL for getting chapters through ajax
+         */
+        this.alternativeChapterAjaxEndpoint = false;
         /**
          * Different Madara sources might require a extra param in order for the images to be parsed.
          * Eg. for https://arangscans.com/manga/tesla-note/chapter-3/?style=list "?style=list" would be the param
@@ -434,7 +469,7 @@ class Madara extends paperback_extensions_common_1.Source {
     getChapters(mangaId) {
         return __awaiter(this, void 0, void 0, function* () {
             const request = createRequestObject({
-                url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
+                url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
                 method: 'POST',
                 headers: this.constructHeaders({
                     'content-type': 'application/x-www-form-urlencoded'
@@ -488,7 +523,7 @@ class Madara extends paperback_extensions_common_1.Source {
             return this.parser.parseTags($, this.hasAdvancedSearchPage);
         });
     }
-    searchRequest(query, metadata) {
+    getSearchResults(query, metadata) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
@@ -737,7 +772,7 @@ class Madara extends paperback_extensions_common_1.Source {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":47,"./MadaraParser":48,"paperback-extensions-common":5}],47:[function(require,module,exports){
+},{"./MadaraHelper":49,"./MadaraParser":50,"paperback-extensions-common":5}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -781,7 +816,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -1016,7 +1051,7 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"paperback-extensions-common":5}],49:[function(require,module,exports){
+},{"paperback-extensions-common":5}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebtoonXYZ = exports.WebtoonXYZInfo = void 0;
@@ -1054,5 +1089,5 @@ class WebtoonXYZ extends Madara_1.Madara {
 }
 exports.WebtoonXYZ = WebtoonXYZ;
 
-},{"../Madara":46,"paperback-extensions-common":5}]},{},[49])(49)
+},{"../Madara":48,"paperback-extensions-common":5}]},{},[51])(51)
 });

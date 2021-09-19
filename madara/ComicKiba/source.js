@@ -428,7 +428,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.0.2';
+const BASE_VERSION = '2.0.3';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -489,6 +489,9 @@ class Madara extends paperback_extensions_common_1.Source {
     }
     getMangaDetails(mangaId) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!isNaN(Number(mangaId))) {
+                throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
+            }
             const request = createRequestObject({
                 url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
                 method: 'GET',
@@ -502,6 +505,9 @@ class Madara extends paperback_extensions_common_1.Source {
     }
     getChapters(mangaId) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!isNaN(Number(mangaId))) {
+                throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
+            }
             const request = createRequestObject({
                 url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
                 method: 'POST',

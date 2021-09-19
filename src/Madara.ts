@@ -19,7 +19,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.0.2'
+const BASE_VERSION = '2.0.3'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -96,6 +96,10 @@ export abstract class Madara extends Source {
 
     parser = new Parser()
     async getMangaDetails(mangaId: string): Promise<Manga> {
+        if (!isNaN(Number(mangaId))) {
+            throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.')
+        }
+        
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
             method: 'GET',
@@ -111,6 +115,10 @@ export abstract class Madara extends Source {
 
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
+        if (!isNaN(Number(mangaId))) {
+            throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.')
+        }
+
         const request = createRequestObject({
             url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
             method: 'POST',

@@ -41,4 +41,5 @@ export class HiperDex extends Madara {
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override hasAdvancedSearchPage = true
     override userAgentRandomizer = ''
+    override alternativeChapterAjaxEndpoint = true
 }

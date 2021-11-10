@@ -12,7 +12,7 @@ import {
 const MANHUAUS_DOMAIN = 'https://manhuaus.com'
 
 export const ManhuausInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'Manhuaus',
     description: 'Extension that pulls manga from manhuaus.com',
     author: 'GameFuzzy',
@@ -33,4 +33,5 @@ export class Manhuaus extends Madara {
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override hasAdvancedSearchPage = true
     override chapterDetailsSelector = 'li.blocks-gallery-item > figure > img'
+    override alternativeChapterAjaxEndpoint = true
 }

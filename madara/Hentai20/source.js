@@ -377,6 +377,48 @@ __exportStar(require("./RawData"), exports);
 
 },{"./Chapter":6,"./ChapterDetails":7,"./Constants":8,"./DynamicUI":24,"./HomeSection":25,"./Languages":26,"./Manga":27,"./MangaTile":28,"./MangaUpdate":29,"./PagedResults":30,"./RawData":31,"./RequestHeaders":32,"./RequestInterceptor":33,"./RequestManager":34,"./RequestObject":35,"./ResponseObject":36,"./SearchField":37,"./SearchRequest":38,"./SourceInfo":39,"./SourceManga":40,"./SourceStateManager":41,"./SourceTag":42,"./TagSection":43,"./TrackedManga":44,"./TrackedMangaChapterReadAction":45,"./TrackerActionQueue":46}],48:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Hentai20 = exports.Hentai20Info = void 0;
+const paperback_extensions_common_1 = require("paperback-extensions-common");
+const Madara_1 = require("../Madara");
+const HENTAI20_DOMAIN = 'https://hentai20.com';
+exports.Hentai20Info = {
+    version: Madara_1.getExportVersion('0.0.0'),
+    name: 'Hentai20',
+    description: 'Extension that pulls manga from hentai20.com',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: paperback_extensions_common_1.ContentRating.ADULT,
+    websiteBaseURL: HENTAI20_DOMAIN,
+    sourceTags: [
+        {
+            text: 'Notifications',
+            type: paperback_extensions_common_1.TagType.GREEN
+        },
+        {
+            text: '18+',
+            type: paperback_extensions_common_1.TagType.YELLOW
+        },
+        {
+            text: 'Cloudflare',
+            type: paperback_extensions_common_1.TagType.RED
+        }
+    ]
+};
+class Hentai20 extends Madara_1.Madara {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = HENTAI20_DOMAIN;
+        this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
+        this.hasAdvancedSearchPage = true;
+        this.userAgentRandomizer = '';
+    }
+}
+exports.Hentai20 = Hentai20;
+
+},{"../Madara":49,"paperback-extensions-common":5}],49:[function(require,module,exports){
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -778,7 +820,7 @@ class Madara extends paperback_extensions_common_1.Source {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":49,"./MadaraParser":50,"paperback-extensions-common":5}],49:[function(require,module,exports){
+},{"./MadaraHelper":50,"./MadaraParser":51,"paperback-extensions-common":5}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -822,7 +864,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -1052,40 +1094,5 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"paperback-extensions-common":5}],51:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Manhuaus = exports.ManhuausInfo = void 0;
-const paperback_extensions_common_1 = require("paperback-extensions-common");
-const Madara_1 = require("../Madara");
-const MANHUAUS_DOMAIN = 'https://manhuaus.com';
-exports.ManhuausInfo = {
-    version: Madara_1.getExportVersion('0.0.1'),
-    name: 'Manhuaus',
-    description: 'Extension that pulls manga from manhuaus.com',
-    author: 'GameFuzzy',
-    authorWebsite: 'http://github.com/gamefuzzy',
-    icon: 'icon.png',
-    contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: MANHUAUS_DOMAIN,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: paperback_extensions_common_1.TagType.GREEN
-        }
-    ]
-};
-class Manhuaus extends Madara_1.Madara {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = MANHUAUS_DOMAIN;
-        this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.hasAdvancedSearchPage = true;
-        this.chapterDetailsSelector = 'li.blocks-gallery-item > figure > img';
-        this.alternativeChapterAjaxEndpoint = true;
-    }
-}
-exports.Manhuaus = Manhuaus;
-
-},{"../Madara":48,"paperback-extensions-common":5}]},{},[51])(51)
+},{"paperback-extensions-common":5}]},{},[48])(48)
 });

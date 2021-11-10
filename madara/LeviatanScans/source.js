@@ -383,7 +383,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const LEVIATANSCANS_DOMAIN = 'https://leviatanscans.com';
 exports.LeviatanScansInfo = {
-    version: Madara_1.getExportVersion('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.1'),
     name: 'LeviatanScans',
     description: 'Extension that pulls manga from leviatanscans.com',
     author: 'GameFuzzy',
@@ -403,7 +403,7 @@ class LeviatanScans extends Madara_1.Madara {
         super(...arguments);
         this.baseUrl = LEVIATANSCANS_DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.sourceTraversalPathName = 'alli/manga';
+        this.sourceTraversalPathName = 'am/manga';
         this.alternativeChapterAjaxEndpoint = true;
     }
 }

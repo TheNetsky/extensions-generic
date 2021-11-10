@@ -378,19 +378,19 @@ __exportStar(require("./RawData"), exports);
 },{"./Chapter":6,"./ChapterDetails":7,"./Constants":8,"./DynamicUI":24,"./HomeSection":25,"./Languages":26,"./Manga":27,"./MangaTile":28,"./MangaUpdate":29,"./PagedResults":30,"./RawData":31,"./RequestHeaders":32,"./RequestInterceptor":33,"./RequestManager":34,"./RequestObject":35,"./ResponseObject":36,"./SearchField":37,"./SearchRequest":38,"./SourceInfo":39,"./SourceManga":40,"./SourceStateManager":41,"./SourceTag":42,"./TagSection":43,"./TrackedManga":44,"./TrackedMangaChapterReadAction":45,"./TrackerActionQueue":46}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LeviatanScansES = exports.LeviatanScansESInfo = void 0;
+exports.MacBold = exports.MacBoldInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const LEVIATANSCANSES_DOMAIN = 'https://es.leviatanscans.com';
-exports.LeviatanScansESInfo = {
+const MACBOLD_DOMAIN = 'https://macbold.com';
+exports.MacBoldInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
-    name: 'LeviatanScansES',
-    description: 'Extension that pulls manga from es.leviatanscans.com',
-    author: 'GameFuzzy',
-    authorWebsite: 'http://github.com/gamefuzzy',
+    name: 'MacBold',
+    description: 'Extension that pulls manga from macbold.com',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: LEVIATANSCANSES_DOMAIN,
+    contentRating: paperback_extensions_common_1.ContentRating.MATURE,
+    websiteBaseURL: MACBOLD_DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -398,15 +398,17 @@ exports.LeviatanScansESInfo = {
         }
     ]
 };
-class LeviatanScansES extends Madara_1.Madara {
+class MacBold extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = LEVIATANSCANSES_DOMAIN;
+        this.baseUrl = MACBOLD_DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.sourceTraversalPathName = 'comic/manga';
+        this.hasAdvancedSearchPage = true;
+        this.userAgentRandomizer = '';
+        this.alternativeChapterAjaxEndpoint = true;
     }
 }
-exports.LeviatanScansES = LeviatanScansES;
+exports.MacBold = MacBold;
 
 },{"../Madara":49,"paperback-extensions-common":5}],49:[function(require,module,exports){
 "use strict";

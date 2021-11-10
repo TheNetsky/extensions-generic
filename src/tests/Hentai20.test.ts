@@ -2,14 +2,14 @@ import cheerio from 'cheerio'
 import { APIWrapper,
     SearchRequest,
     Source } from 'paperback-extensions-common'
-import { LeviatanScansES } from '../LeviatanScansES/LeviatanScansES'
+import { Hentai20 } from '../Hentai20/Hentai20'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
-describe('LeviatanScansES Tests', () => {
+describe('Hentai20 Tests', () => {
 
     const wrapper: APIWrapper = new APIWrapper()
-    const source: Source = new LeviatanScansES(cheerio)
+    const source: Source = new Hentai20(cheerio)
     const expect = chai.expect
     chai.use(chaiAsPromised)
 
@@ -18,7 +18,7 @@ describe('LeviatanScansES Tests', () => {
      * Try to choose a manga which is updated frequently, so that the historical checking test can 
      * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
      */
-    const mangaId = 'el-retorno-del-maestro-demoniaco' // El Retorno del Maestro Demoniaco
+    const mangaId = 'water-overflow-12' // Water Overflow
 
     it('Retrieve Manga Details', async () => {
         const details = await wrapper.getMangaDetails(source, mangaId)
@@ -62,7 +62,7 @@ describe('LeviatanScansES Tests', () => {
 
     it('Testing search', async () => {
         const testSearch: SearchRequest = {
-            title: 'El Retorno del Maestro Demoniaco',
+            title: 'Solo Bug Player',
             parameters: {}
         }
 

@@ -2,6 +2,7 @@
   "name": "extensions-official",
   "version": "1.0.0",
   "description": "Community maintained Paperback extension repository",
+  "repositoryName": "MangaBox Extensions",
   "main": "index.js",
   "scripts": {
     "bundle": "paperback bundle",

@@ -436,7 +436,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.0.4';
+const BASE_VERSION = '2.0.5';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -916,13 +916,13 @@ class Parser {
         });
     }
     parseChapterList($, mangaId, source) {
-        var _a, _b;
+        var _a, _b, _c;
         const chapters = [];
         // For each available chapter..
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = ($('a', $(obj)).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
             const chapNum = Number((_a = id.match(/\D*(\d*\.?\d*)$/)) === null || _a === void 0 ? void 0 : _a.pop());
-            const chapName = $('a', $(obj)).first().text();
+            const chapName = (_b = $('a', $(obj)).first().text().trim()) !== null && _b !== void 0 ? _b : '';
             let mangaTime;
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
@@ -942,9 +942,9 @@ class Parser {
             chapters.push(createChapter({
                 id: id,
                 mangaId: mangaId,
-                langCode: (_b = source.languageCode) !== null && _b !== void 0 ? _b : paperback_extensions_common_1.LanguageCode.UNKNOWN,
+                langCode: (_c = source.languageCode) !== null && _c !== void 0 ? _c : paperback_extensions_common_1.LanguageCode.UNKNOWN,
                 chapNum: Number.isNaN(chapNum) ? 0 : chapNum,
-                name: Number.isNaN(chapNum) ? chapName : undefined,
+                name: chapName ? chapName : undefined,
                 time: mangaTime
             }));
         }

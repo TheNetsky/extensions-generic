@@ -66,7 +66,7 @@ export class Parser {
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = ($('a', $(obj)).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const chapNum = Number(id.match(/\D*(\d*\.?\d*)$/)?.pop())
-            const chapName = $('a', $(obj)).first().text()
+            const chapName = $('a', $(obj)).first().text().trim() ?? ''
 
             let mangaTime: Date
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title')
@@ -89,7 +89,7 @@ export class Parser {
                 mangaId: mangaId,
                 langCode: source.languageCode ?? LanguageCode.UNKNOWN,
                 chapNum: Number.isNaN(chapNum) ? 0 : chapNum,
-                name: Number.isNaN(chapNum) ? chapName : undefined,
+                name: chapName ? chapName : undefined,
                 time: mangaTime
             }))
         }

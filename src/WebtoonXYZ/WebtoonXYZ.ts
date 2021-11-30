@@ -12,7 +12,7 @@ import {
 const WEBTOON_DOMAIN = 'https://www.webtoon.xyz'
 
 export const WebtoonXYZInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'WebtoonXYZ',
     description: 'Extension that pulls manga from Webtoon.XYZ',
     author: 'GameFuzzy',
@@ -37,4 +37,5 @@ export class WebtoonXYZ extends Madara {
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override sourceTraversalPathName = 'read'
     override userAgentRandomizer = ''
+    override alternativeChapterAjaxEndpoint = true
 }

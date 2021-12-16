@@ -61,11 +61,12 @@ export class Parser {
 
     parseChapterList($: CheerioSelector, mangaId: string, source: any): Chapter[] {
         const chapters: Chapter[] = []
+        let sortingIndex = 0
 
         // For each available chapter..
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = ($('a', $(obj)).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
-            const chapNum = Number(id.match(/\D*(\d*\.?\d*)$/)?.pop())
+            const chapNum = Number(id.match(/\D*(\d*\-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'))
             const chapName = $('a', $(obj)).first().text().trim() ?? ''
 
             let mangaTime: Date
@@ -90,8 +91,11 @@ export class Parser {
                 langCode: source.languageCode ?? LanguageCode.UNKNOWN,
                 chapNum: Number.isNaN(chapNum) ? 0 : chapNum,
                 name: chapName ? chapName : undefined,
-                time: mangaTime
+                time: mangaTime,
+                // @ts-ignore
+                sortingIndex
             }))
+            sortingIndex--
         }
 
         return chapters

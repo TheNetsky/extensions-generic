@@ -19,7 +19,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.0.6'
+const BASE_VERSION = '2.0.7'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -95,6 +95,11 @@ export abstract class Madara extends Source {
     userAgentRandomizer = `Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/78.0${Math.floor(Math.random() * 100000)}`
 
     parser = new Parser()
+
+    override getMangaShareUrl(mangaId: string): string {
+        return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`
+    }
+
     async getMangaDetails(mangaId: string): Promise<Manga> {
         if (!isNaN(Number(mangaId))) {
             throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.')

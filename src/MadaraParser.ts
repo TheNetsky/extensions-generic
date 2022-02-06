@@ -30,9 +30,9 @@ export class Parser {
             const label = $(obj).text()
             const id = $(obj).attr('href')?.split('/')[4] ?? label
             if (label.toLowerCase().includes('smut')) hentai = true
-            genres.push(createTag({label: label, id: id}))
+            genres.push(createTag({ label: label, id: id }))
         }
-        const tagSections: TagSection[] = [createTagSection({id: '0', label: 'genres', tags: genres})]
+        const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: genres })]
 
         // If we cannot parse out the data-id for this title, we cannot complete subsequent requests
         if (!numericId) {
@@ -41,7 +41,7 @@ export class Parser {
 
         // If we do not have a valid image, something is wrong with the generic parsing logic. A source should always remedy this with
         // a custom implementation.
-        if(!image) {
+        if (!image) {
             throw new Error(`Could not parse out a valid image while parsing manga details for manga: ${mangaId}`)
         }
 
@@ -122,33 +122,33 @@ export class Parser {
 
     parseTags($: CheerioSelector, advancedSearch: boolean): TagSection[] {
         const genres: Tag[] = []
-        if(advancedSearch) {
+        if (advancedSearch) {
             for (const obj of $('.checkbox-group div label').toArray()) {
                 const label = $(obj).text().trim()
                 const id = $(obj).attr('for') ?? label
-                genres.push(createTag({label: label, id: id}))
+                genres.push(createTag({ label: label, id: id }))
             }
         }
         else {
             for (const obj of $('.menu-item-object-wp-manga-genre a', $('.second-menu')).toArray()) {
                 const label = $(obj).text().trim()
                 const id = $(obj).attr('href')?.split('/')[4] ?? label
-                genres.push(createTag({label: label, id: id}))
+                genres.push(createTag({ label: label, id: id }))
             }
         }
-        return [createTagSection({id: '0', label: 'genres', tags: genres})]
+        return [createTagSection({ id: '0', label: 'genres', tags: genres })]
     }
 
     parseSearchResults($: CheerioSelector, source: any): MangaTile[] {
         const results: MangaTile[] = []
         for (const obj of $(source.searchMangaSelector).toArray()) {
             const id = ($('a', $(obj)).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
-            const title = createIconText({text: this.decodeHTMLEntity($('a', $(obj)).attr('title') ?? '')})
+            const title = createIconText({ text: this.decodeHTMLEntity($('a', $(obj)).attr('title') ?? '') })
             const image = encodeURI(this.getImageSrc($('img', $(obj))))
-            const subtitle = createIconText({text: $('span.font-meta.chapter', obj).text().trim() })
+            const subtitle = createIconText({ text: $('span.font-meta.chapter', obj).text().trim() })
 
             if (!id || !image || !title.text) {
-                if(id.includes(source.baseUrl.replace(/\/$/, ''))) continue
+                if (id.includes(source.baseUrl.replace(/\/$/, ''))) continue
                 // Something went wrong with our parsing, return a detailed error
                 throw new Error(`Failed to parse searchResult for ${source.baseUrl} using ${source.searchMangaSelector} as a loop selector`)
             }
@@ -178,9 +178,9 @@ export class Parser {
 
             items.push(createMangaTile({
                 id: id,
-                title: createIconText({text: title}),
+                title: createIconText({ text: title }),
                 image: image,
-                subtitleText: createIconText({text: subtitle })
+                subtitleText: createIconText({ text: subtitle })
             }))
         }
         return items
@@ -193,7 +193,7 @@ export class Parser {
 
         for (const obj of $('div.page-item-detail').toArray()) {
             const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '') ?? ''
-            
+
             let mangaTime: Date
             const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title')
             if (typeof timeSelector !== 'undefined') {
@@ -219,9 +219,9 @@ export class Parser {
             passedReferenceTimePrior = passedReferenceTimeCurrent
         }
         if (!passedReferenceTimeCurrent || !passedReferenceTimePrior) {
-            return {updates: updatedManga, loadNextPage: true}
+            return { updates: updatedManga, loadNextPage: true }
         } else {
-            return {updates: updatedManga, loadNextPage: false}
+            return { updates: updatedManga, loadNextPage: false }
         }
 
 
@@ -231,7 +231,7 @@ export class Parser {
 
     getImageSrc(imageObj: Cheerio | undefined): string {
         let image
-        if(typeof imageObj?.attr('data-src') != 'undefined') {
+        if (typeof imageObj?.attr('data-src') != 'undefined') {
             image = imageObj?.attr('data-src')
         }
         else if (typeof imageObj?.attr('data-lazy-src') != 'undefined') {

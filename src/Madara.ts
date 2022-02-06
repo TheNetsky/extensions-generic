@@ -19,7 +19,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.0.6'
+const BASE_VERSION = '2.0.7'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -95,11 +95,16 @@ export abstract class Madara extends Source {
     userAgentRandomizer = `Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/78.0${Math.floor(Math.random() * 100000)}`
 
     parser = new Parser()
+
+    override getMangaShareUrl(mangaId: string): string {
+        return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`
+    }
+
     async getMangaDetails(mangaId: string): Promise<Manga> {
         if (!isNaN(Number(mangaId))) {
             throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.')
         }
-        
+
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
             method: 'GET',
@@ -143,7 +148,7 @@ export abstract class Madara extends Source {
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
             method: 'GET',
             headers: this.constructHeaders(),
-            cookies: [createCookie({name: 'wpmanga-adault', value: '1', domain: this.baseUrl})],
+            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })],
             param: this.chapterDetailsParam
         })
 
@@ -157,7 +162,7 @@ export abstract class Madara extends Source {
 
     override async getTags(): Promise<TagSection[]> {
         let request
-        if(this.hasAdvancedSearchPage) {
+        if (this.hasAdvancedSearchPage) {
             request = createRequestObject({
                 url: `${this.baseUrl}/?s=&post_type=wp-manga`,
                 method: 'GET',
@@ -190,7 +195,7 @@ export abstract class Madara extends Source {
 
         return createPagedResults({
             results: manga,
-            metadata: {page: (page + 1)}
+            metadata: { page: (page + 1) }
         })
     }
 
@@ -216,7 +221,7 @@ export abstract class Madara extends Source {
                 }))
             }
         }
-        mangaUpdatesFoundCallback(createMangaUpdates({ids: []}))
+        mangaUpdatesFoundCallback(createMangaUpdates({ ids: [] }))
     }
 
     /**
@@ -298,7 +303,7 @@ export abstract class Madara extends Source {
         const $ = this.cheerio.load(data.data)
         const items: MangaTile[] = this.parser.parseHomeSection($, this)
         // Set up to go to the next page. If we are on the last page, remove the logic.
-        let mData: any = {page: (page + 1)}
+        let mData: any = { page: (page + 1) }
         if (items.length < 50) {
             mData = undefined
         }
@@ -346,10 +351,10 @@ export abstract class Madara extends Source {
                 .addQueryParameter('s', encodeURIComponent(query?.title ?? ''))
                 .addQueryParameter('post_type', 'wp-manga')
                 .addQueryParameter('genre', query?.includedTags?.map((x: any) => x.id))
-                .buildUrl({addTrailingSlash: true, includeUndefinedParameters: false}),
+                .buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
             method: 'GET',
             headers: this.constructHeaders(),
-            cookies: [createCookie({name: 'wpmanga-adault', value: '1', domain: this.baseUrl})]
+            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
         })
     }
 
@@ -376,14 +381,14 @@ export abstract class Madara extends Source {
                 'vars[meta_key]': meta_key
 
             },
-            cookies: [createCookie({name: 'wpmanga-adault', value: '1', domain: this.baseUrl})]
+            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
         })
     }
 
     /**
      * Parses a time string from a Madara source into a Date object.
      */
-    protected convertTime(timeAgo: string): Date {
+    convertTime(timeAgo: string): Date {
         let time: Date
         let trimmed = Number((/\d*/.exec(timeAgo) ?? [])[0])
         trimmed = (trimmed == 0 && timeAgo.includes('a')) ? 1 : trimmed
@@ -404,7 +409,7 @@ export abstract class Madara extends Source {
 
     constructHeaders(headers?: any, refererPath?: string): any {
         headers = headers ?? {}
-        if(this.userAgentRandomizer !== '') {
+        if (this.userAgentRandomizer !== '') {
             headers['user-agent'] = this.userAgentRandomizer
         }
         headers['referer'] = `${this.baseUrl}${refererPath ?? ''}`
@@ -412,7 +417,7 @@ export abstract class Madara extends Source {
     }
 
     override globalRequestHeaders(): RequestHeaders {
-        if(this.userAgentRandomizer !== '') {
+        if (this.userAgentRandomizer !== '') {
             return {
                 'referer': `${this.baseUrl}/`,
                 'user-agent': this.userAgentRandomizer,
@@ -428,7 +433,7 @@ export abstract class Madara extends Source {
     }
 
     CloudFlareError(status: any) {
-        if(status == 503) {
+        if (status == 503) {
             throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > \<\The name of this source\> and press Cloudflare Bypass')
         }
     }

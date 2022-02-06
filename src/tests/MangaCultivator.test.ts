@@ -2,14 +2,14 @@ import cheerio from 'cheerio'
 import { APIWrapper,
     SearchRequest,
     Source } from 'paperback-extensions-common'
-import { Toonily } from '../Toonily/Toonily'
+import { MangaCultivator } from '../MangaCultivator/MangaCultivator'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
-describe('Toonily Tests', () => {
+describe('MangaCultivator Tests', () => {
 
     const wrapper: APIWrapper = new APIWrapper()
-    const source: Source = new Toonily(cheerio)
+    const source: Source = new MangaCultivator(cheerio)
     const expect = chai.expect
     chai.use(chaiAsPromised)
 
@@ -18,7 +18,7 @@ describe('Toonily Tests', () => {
      * Try to choose a manga which is updated frequently, so that the historical checking test can 
      * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
      */
-    const mangaId = 'my-landlady-noona' // my-landlady-noona
+    const mangaId = 'martial-peak' // martial-peak
 
     it('Retrieve Manga Details', async () => {
         const details = await wrapper.getMangaDetails(source, mangaId)
@@ -62,7 +62,7 @@ describe('Toonily Tests', () => {
 
     it('Testing search', async () => {
         const testSearch: SearchRequest = {
-            title: 'Solo Leveling',
+            title: 'the',
             parameters: {}
         }
 

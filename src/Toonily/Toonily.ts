@@ -9,14 +9,16 @@ import {
     Madara
 } from '../Madara'
 
+import { ToonilyParser } from './ToonilyParser'
+
 const TOONILY_DOMAIN = 'https://toonily.com'
 
 export const ToonilyInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'Toonily',
     description: 'Extension that pulls manga from toonily.com',
-    author: 'GameFuzzy',
-    authorWebsite: 'http://github.com/gamefuzzy',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.ADULT,
     websiteBaseURL: TOONILY_DOMAIN,
@@ -43,4 +45,7 @@ export class Toonily extends Madara {
     override sourceTraversalPathName = 'webtoon'
     override userAgentRandomizer = ''
     override alternativeChapterAjaxEndpoint = true
+
+    override readonly parser: ToonilyParser = new ToonilyParser();
+
 }

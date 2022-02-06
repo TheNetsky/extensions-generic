@@ -377,6 +377,40 @@ __exportStar(require("./RawData"), exports);
 
 },{"./Chapter":6,"./ChapterDetails":7,"./Constants":8,"./DynamicUI":24,"./HomeSection":25,"./Languages":26,"./Manga":27,"./MangaTile":28,"./MangaUpdate":29,"./PagedResults":30,"./RawData":31,"./RequestHeaders":32,"./RequestInterceptor":33,"./RequestManager":34,"./RequestObject":35,"./ResponseObject":36,"./SearchField":37,"./SearchRequest":38,"./SourceInfo":39,"./SourceManga":40,"./SourceStateManager":41,"./SourceTag":42,"./TagSection":43,"./TrackedManga":44,"./TrackedMangaChapterReadAction":45,"./TrackerActionQueue":46}],48:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ColoredManga = exports.ColoredMangaInfo = void 0;
+const paperback_extensions_common_1 = require("paperback-extensions-common");
+const Madara_1 = require("../Madara");
+const COLOREDMANGA_DOMAIN = 'https://coloredmanga.com';
+exports.ColoredMangaInfo = {
+    version: Madara_1.getExportVersion('0.0.0'),
+    name: 'ColoredManga',
+    description: 'Extension that pulls manga from coloredmanga.com',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: paperback_extensions_common_1.ContentRating.MATURE,
+    websiteBaseURL: COLOREDMANGA_DOMAIN,
+    sourceTags: [
+        {
+            text: 'Notifications',
+            type: paperback_extensions_common_1.TagType.GREEN
+        }
+    ]
+};
+class ColoredManga extends Madara_1.Madara {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = COLOREDMANGA_DOMAIN;
+        this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
+        this.hasAdvancedSearchPage = true;
+        this.alternativeChapterAjaxEndpoint = true;
+    }
+}
+exports.ColoredManga = ColoredManga;
+
+},{"../Madara":49,"paperback-extensions-common":5}],49:[function(require,module,exports){
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -781,7 +815,7 @@ class Madara extends paperback_extensions_common_1.Source {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":49,"./MadaraParser":50,"paperback-extensions-common":5}],49:[function(require,module,exports){
+},{"./MadaraHelper":50,"./MadaraParser":51,"paperback-extensions-common":5}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -825,7 +859,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -1059,106 +1093,5 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"paperback-extensions-common":5}],51:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Toonily = exports.ToonilyInfo = void 0;
-const paperback_extensions_common_1 = require("paperback-extensions-common");
-const Madara_1 = require("../Madara");
-const ToonilyParser_1 = require("./ToonilyParser");
-const TOONILY_DOMAIN = 'https://toonily.com';
-exports.ToonilyInfo = {
-    version: Madara_1.getExportVersion('0.0.1'),
-    name: 'Toonily',
-    description: 'Extension that pulls manga from toonily.com',
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: paperback_extensions_common_1.ContentRating.ADULT,
-    websiteBaseURL: TOONILY_DOMAIN,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: paperback_extensions_common_1.TagType.GREEN
-        },
-        {
-            text: '18+',
-            type: paperback_extensions_common_1.TagType.YELLOW
-        },
-        {
-            text: 'Cloudflare',
-            type: paperback_extensions_common_1.TagType.RED
-        }
-    ]
-};
-class Toonily extends Madara_1.Madara {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = TOONILY_DOMAIN;
-        this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.hasAdvancedSearchPage = true;
-        this.sourceTraversalPathName = 'webtoon';
-        this.userAgentRandomizer = '';
-        this.alternativeChapterAjaxEndpoint = true;
-        this.parser = new ToonilyParser_1.ToonilyParser();
-    }
-}
-exports.Toonily = Toonily;
-
-},{"../Madara":48,"./ToonilyParser":52,"paperback-extensions-common":5}],52:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ToonilyParser = void 0;
-const MadaraParser_1 = require("../MadaraParser");
-class ToonilyParser extends MadaraParser_1.Parser {
-    filterUpdatedManga($, time, ids, source) {
-        var _a, _b;
-        let passedReferenceTimePrior = false;
-        let passedReferenceTimeCurrent = false;
-        const updatedManga = [];
-        for (const obj of $('div.page-item-detail').toArray()) {
-            const id = (_b = (_a = $('a', $('h3.h5', obj)).attr('href')) === null || _a === void 0 ? void 0 : _a.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')) !== null && _b !== void 0 ? _b : '';
-            let mangaTime;
-            const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title');
-            if (typeof timeSelector !== 'undefined') {
-                //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = source.convertTime(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
-            }
-            else {
-                //New Toonily layout, since it no longer has date, we check if it has the text "UP" meaning it's new!
-                if ($('span.post-on.font-meta', obj).first().text().trim().toLocaleUpperCase() == 'UP') {
-                    mangaTime = new Date();
-                }
-                else {
-                    //Else get the date from the span
-                    mangaTime = source.convertTime($('span.post-on.font-meta', obj).first().text().trim());
-                }
-            }
-            //Check if the date is valid, if it isn't we should skip it
-            if (!mangaTime.getTime())
-                continue;
-            passedReferenceTimeCurrent = mangaTime <= time;
-            if (!passedReferenceTimeCurrent || !passedReferenceTimePrior) {
-                if (ids.includes(id)) {
-                    updatedManga.push(id);
-                }
-            }
-            else
-                break;
-            if (typeof id === 'undefined') {
-                throw new Error(`Failed to parse homepage sections for ${source.baseUrl}}/`);
-            }
-            passedReferenceTimePrior = passedReferenceTimeCurrent;
-        }
-        if (!passedReferenceTimeCurrent || !passedReferenceTimePrior) {
-            return { updates: updatedManga, loadNextPage: true };
-        }
-        else {
-            return { updates: updatedManga, loadNextPage: false };
-        }
-    }
-}
-exports.ToonilyParser = ToonilyParser;
-
-},{"../MadaraParser":50}]},{},[51])(51)
+},{"paperback-extensions-common":5}]},{},[48])(48)
 });

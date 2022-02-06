@@ -1022,7 +1022,7 @@ class Parser {
             else
                 break;
             if (typeof id === 'undefined') {
-                throw new Error(`Failed to parse homepage sections for ${source.baseUrl}/${source.homePage}/`);
+                throw new Error(`Failed to parse homepage sections for ${source.baseUrl}/`);
             }
             passedReferenceTimePrior = passedReferenceTimeCurrent;
         }
@@ -1065,12 +1065,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Toonily = exports.ToonilyInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
+const ToonilyParser_1 = require("./ToonilyParser");
 const TOONILY_DOMAIN = 'https://toonily.com';
 exports.ToonilyInfo = {
-    version: Madara_1.getExportVersion('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.1'),
     name: 'Toonily',
     description: 'Extension that pulls manga from toonily.com',
-    author: 'GameFuzzy',
+    author: 'GameFuzzy & Netsky',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
@@ -1099,9 +1100,65 @@ class Toonily extends Madara_1.Madara {
         this.sourceTraversalPathName = 'webtoon';
         this.userAgentRandomizer = '';
         this.alternativeChapterAjaxEndpoint = true;
+        this.parser = new ToonilyParser_1.ToonilyParser();
     }
 }
 exports.Toonily = Toonily;
 
-},{"../Madara":48,"paperback-extensions-common":5}]},{},[51])(51)
+},{"../Madara":48,"./ToonilyParser":52,"paperback-extensions-common":5}],52:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ToonilyParser = void 0;
+const MadaraParser_1 = require("../MadaraParser");
+class ToonilyParser extends MadaraParser_1.Parser {
+    filterUpdatedManga($, time, ids, source) {
+        var _a, _b;
+        let passedReferenceTimePrior = false;
+        let passedReferenceTimeCurrent = false;
+        const updatedManga = [];
+        for (const obj of $('div.page-item-detail').toArray()) {
+            const id = (_b = (_a = $('a', $('h3.h5', obj)).attr('href')) === null || _a === void 0 ? void 0 : _a.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')) !== null && _b !== void 0 ? _b : '';
+            let mangaTime;
+            const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title');
+            if (typeof timeSelector !== 'undefined') {
+                //Firstly check if there is a NEW tag, if so parse the time from this
+                mangaTime = source.convertTime(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
+            }
+            else {
+                //New Toonily layout, since it no longer has date, we check if it has the text "UP" meaning it's new!
+                if ($('span.post-on.font-meta', obj).first().text().trim().toLocaleUpperCase() == 'UP') {
+                    mangaTime = new Date();
+                }
+                else {
+                    //Else get the date from the span
+                    mangaTime = source.convertTime($('span.post-on.font-meta', obj).first().text().trim());
+                }
+            }
+            //Check if the date is valid, if it isn't we should skip it
+            if (!mangaTime.getTime())
+                continue;
+            passedReferenceTimeCurrent = mangaTime <= time;
+            if (!passedReferenceTimeCurrent || !passedReferenceTimePrior) {
+                if (ids.includes(id)) {
+                    updatedManga.push(id);
+                }
+            }
+            else
+                break;
+            if (typeof id === 'undefined') {
+                throw new Error(`Failed to parse homepage sections for ${source.baseUrl}}/`);
+            }
+            passedReferenceTimePrior = passedReferenceTimeCurrent;
+        }
+        if (!passedReferenceTimeCurrent || !passedReferenceTimePrior) {
+            return { updates: updatedManga, loadNextPage: true };
+        }
+        else {
+            return { updates: updatedManga, loadNextPage: false };
+        }
+    }
+}
+exports.ToonilyParser = ToonilyParser;
+
+},{"../MadaraParser":50}]},{},[51])(51)
 });

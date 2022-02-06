@@ -18,7 +18,7 @@ describe('Toonily Tests', () => {
      * Try to choose a manga which is updated frequently, so that the historical checking test can 
      * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
      */
-    const mangaId = 'solo-leveling-005' // Solo Leveling
+    const mangaId = 'my-landlady-noona' // my-landlady-noona
 
     it('Retrieve Manga Details', async () => {
         const details = await wrapper.getMangaDetails(source, mangaId)
@@ -83,5 +83,13 @@ describe('Toonily Tests', () => {
         expect(homePages[0], 'No recently updated section available').to.exist
         expect(homePages[1], 'No currently trending available').to.exist
         expect(homePages[2], 'No most popular available').to.exist
+    })
+
+    it('Testing Notifications', async () => {
+        const updates = await wrapper.filterUpdatedManga(source, new Date('2022-2-5'), [mangaId])
+        console.log(updates)
+        expect(updates, 'No server response').to.exist
+        expect(updates, 'Empty server response').to.not.be.empty
+        expect(updates[0], 'No updates').to.not.be.empty
     })
 })

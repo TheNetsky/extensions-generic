@@ -214,7 +214,7 @@ export class Parser {
             } else break
 
             if (typeof id === 'undefined') {
-                throw new Error(`Failed to parse homepage sections for ${source.baseUrl}/${source.homePage}/`)
+                throw new Error(`Failed to parse homepage sections for ${source.baseUrl}/`)
             }
             passedReferenceTimePrior = passedReferenceTimeCurrent
         }

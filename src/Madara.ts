@@ -388,7 +388,7 @@ export abstract class Madara extends Source {
     /**
      * Parses a time string from a Madara source into a Date object.
      */
-    protected convertTime(timeAgo: string): Date {
+    convertTime(timeAgo: string): Date {
         let time: Date
         let trimmed = Number((/\d*/.exec(timeAgo) ?? [])[0])
         trimmed = (trimmed == 0 && timeAgo.includes('a')) ? 1 : trimmed

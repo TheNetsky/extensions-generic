@@ -1,6 +1,6 @@
 {
   "name": "extensions-official",
-  "repositoryName": "Madara Extensions",
+  "repositoryName": "Extensions Madara (Netsky Fork)",
   "version": "1.0.0",
   "description": "Community maintained Paperback extension repository",
   "main": "index.js",

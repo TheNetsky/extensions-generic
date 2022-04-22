@@ -394,7 +394,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.0.7';
+const BASE_VERSION = '2.0.8';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -403,7 +403,18 @@ class Madara extends paperback_extensions_common_1.Source {
     constructor() {
         super(...arguments);
         this.requestManager = createRequestManager({
-            requestsPerSecond: 3
+            requestsPerSecond: 3,
+            requestTimeout: 15000,
+            interceptor: {
+                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
+                    var _a;
+                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), Object.assign(Object.assign({}, (this.userAgentRandomizer && { 'user-agent': this.userAgentRandomizer })), { 'referer': `${this.baseUrl}/` }));
+                    return request;
+                }),
+                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
+                    return response;
+                })
+            }
         });
         /**
          * The path that precedes a manga page not including the Madara URL.
@@ -463,8 +474,7 @@ class Madara extends paperback_extensions_common_1.Source {
             }
             const request = createRequestObject({
                 url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-                method: 'GET',
-                headers: this.constructHeaders({})
+                method: 'GET'
             });
             const data = yield this.requestManager.schedule(request, 1);
             this.CloudFlareError(data.status);
@@ -480,9 +490,9 @@ class Madara extends paperback_extensions_common_1.Source {
             const request = createRequestObject({
                 url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
                 method: 'POST',
-                headers: this.constructHeaders({
+                headers: {
                     'content-type': 'application/x-www-form-urlencoded'
-                }),
+                },
                 data: {
                     'action': 'manga_get_chapters',
                     'manga': yield this.getNumericId(mangaId)
@@ -499,7 +509,6 @@ class Madara extends paperback_extensions_common_1.Source {
             const request = createRequestObject({
                 url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
                 method: 'GET',
-                headers: this.constructHeaders(),
                 cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })],
                 param: this.chapterDetailsParam
             });
@@ -515,15 +524,13 @@ class Madara extends paperback_extensions_common_1.Source {
             if (this.hasAdvancedSearchPage) {
                 request = createRequestObject({
                     url: `${this.baseUrl}/?s=&post_type=wp-manga`,
-                    method: 'GET',
-                    headers: this.constructHeaders()
+                    method: 'GET'
                 });
             }
             else {
                 request = createRequestObject({
                     url: `${this.baseUrl}/`,
-                    method: 'GET',
-                    headers: this.constructHeaders()
+                    method: 'GET'
                 });
             }
             const data = yield this.requestManager.schedule(request, 1);
@@ -661,16 +668,14 @@ class Madara extends paperback_extensions_common_1.Source {
     getCloudflareBypassRequest() {
         return createRequestObject({
             url: `${this.baseUrl}`,
-            method: 'GET',
-            headers: this.constructHeaders()
+            method: 'GET'
         });
     }
     getNumericId(mangaId) {
         return __awaiter(this, void 0, void 0, function* () {
             const request = createRequestObject({
                 url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-                method: 'GET',
-                headers: this.constructHeaders()
+                method: 'GET'
             });
             const data = yield this.requestManager.schedule(request, 1);
             this.CloudFlareError(data.status);
@@ -696,7 +701,6 @@ class Madara extends paperback_extensions_common_1.Source {
                 .addQueryParameter('genre', (_b = query === null || query === void 0 ? void 0 : query.includedTags) === null || _b === void 0 ? void 0 : _b.map((x) => x.id))
                 .buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
             method: 'GET',
-            headers: this.constructHeaders(),
             cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
         });
     }
@@ -707,9 +711,9 @@ class Madara extends paperback_extensions_common_1.Source {
         return createRequestObject({
             url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
             method: 'POST',
-            headers: this.constructHeaders({
+            headers: {
                 'content-type': 'application/x-www-form-urlencoded'
-            }),
+            },
             data: {
                 'action': 'madara_load_more',
                 'template': 'madara-core/content/content-archive',
@@ -749,29 +753,6 @@ class Madara extends paperback_extensions_common_1.Source {
             time = new Date(timeAgo);
         }
         return time;
-    }
-    constructHeaders(headers, refererPath) {
-        headers = headers !== null && headers !== void 0 ? headers : {};
-        if (this.userAgentRandomizer !== '') {
-            headers['user-agent'] = this.userAgentRandomizer;
-        }
-        headers['referer'] = `${this.baseUrl}${refererPath !== null && refererPath !== void 0 ? refererPath : ''}`;
-        return headers;
-    }
-    globalRequestHeaders() {
-        if (this.userAgentRandomizer !== '') {
-            return {
-                'referer': `${this.baseUrl}/`,
-                'user-agent': this.userAgentRandomizer,
-                'accept': 'image/jpeg,image/png,image/*;q=0.8'
-            };
-        }
-        else {
-            return {
-                'referer': `${this.baseUrl}/`,
-                'accept': 'image/jpeg,image/png,image/*;q=0.8'
-            };
-        }
     }
     CloudFlareError(status) {
         if (status == 503) {
@@ -817,10 +798,6 @@ class MadaraDex extends Madara_1.Madara {
         this.userAgentRandomizer = '';
         this.sourceTraversalPathName = 'title';
         this.searchMangaSelector = 'div.c-tabs-item > div.row';
-        this.requestManager = createRequestManager({
-            requestsPerSecond: 5,
-            requestTimeout: 25000,
-        });
     }
 }
 exports.MadaraDex = MadaraDex;

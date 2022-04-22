@@ -9,10 +9,12 @@ import {
     Madara
 } from '../Madara'
 
+import { TeenManhuaParser } from './TeenManhuaParser'
+
 const TEENMANHUA_DOMAIN = 'https://teenmanhua.com'
 
 export const TeenManhuaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'TeenManhua',
     description: 'Extension that pulls manga from teenmanhua.com',
     author: 'Netsky',
@@ -33,4 +35,6 @@ export class TeenManhua extends Madara {
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override hasAdvancedSearchPage = true
     override alternativeChapterAjaxEndpoint = true
+
+    override readonly parser: TeenManhuaParser = new TeenManhuaParser();
 }

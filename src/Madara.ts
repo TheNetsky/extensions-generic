@@ -10,24 +10,44 @@ import {
     MangaTile,
     MangaUpdates,
     PagedResults,
-    RequestHeaders,
     SearchRequest,
     Source,
     TagSection,
+    Request,
+    Response
 } from 'paperback-extensions-common'
 
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.0.7'
+const BASE_VERSION = '2.0.8'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
 export abstract class Madara extends Source {
     requestManager = createRequestManager({
-        requestsPerSecond: 3
-    })
+        requestsPerSecond: 3,
+        requestTimeout: 15000,
+        interceptor: {
+            interceptRequest: async (request: Request): Promise<Request> => {
+
+                request.headers = {
+                    ...(request.headers ?? {}),
+                    ...{
+                        ...(this.userAgentRandomizer && { 'user-agent': this.userAgentRandomizer }),
+                        'referer': `${this.baseUrl}/`
+                    }
+                }
+
+                return request
+            },
+
+            interceptResponse: async (response: Response): Promise<Response> => {
+                return response
+            }
+        }
+    });
 
     /**
      * The Madara URL of the website. Eg. https://webtoon.xyz
@@ -107,8 +127,7 @@ export abstract class Madara extends Source {
 
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-            method: 'GET',
-            headers: this.constructHeaders({})
+            method: 'GET'
         })
 
         const data = await this.requestManager.schedule(request, 1)
@@ -127,9 +146,9 @@ export abstract class Madara extends Source {
         const request = createRequestObject({
             url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
             method: 'POST',
-            headers: this.constructHeaders({
+            headers: {
                 'content-type': 'application/x-www-form-urlencoded'
-            }),
+            },
             data: {
                 'action': 'manga_get_chapters',
                 'manga': await this.getNumericId(mangaId)
@@ -147,7 +166,6 @@ export abstract class Madara extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
             method: 'GET',
-            headers: this.constructHeaders(),
             cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })],
             param: this.chapterDetailsParam
         })
@@ -165,15 +183,13 @@ export abstract class Madara extends Source {
         if (this.hasAdvancedSearchPage) {
             request = createRequestObject({
                 url: `${this.baseUrl}/?s=&post_type=wp-manga`,
-                method: 'GET',
-                headers: this.constructHeaders()
+                method: 'GET'
             })
         }
         else {
             request = createRequestObject({
                 url: `${this.baseUrl}/`,
-                method: 'GET',
-                headers: this.constructHeaders()
+                method: 'GET'
             })
         }
 
@@ -317,16 +333,14 @@ export abstract class Madara extends Source {
     override getCloudflareBypassRequest() {
         return createRequestObject({
             url: `${this.baseUrl}`,
-            method: 'GET',
-            headers: this.constructHeaders()
+            method: 'GET'
         })
     }
 
     async getNumericId(mangaId: string): Promise<string> {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-            method: 'GET',
-            headers: this.constructHeaders()
+            method: 'GET'
         })
 
         const data = await this.requestManager.schedule(request, 1)
@@ -353,7 +367,6 @@ export abstract class Madara extends Source {
                 .addQueryParameter('genre', query?.includedTags?.map((x: any) => x.id))
                 .buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
             method: 'GET',
-            headers: this.constructHeaders(),
             cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
         })
     }
@@ -365,9 +378,9 @@ export abstract class Madara extends Source {
         return createRequestObject({
             url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
             method: 'POST',
-            headers: this.constructHeaders({
+            headers: {
                 'content-type': 'application/x-www-form-urlencoded'
-            }),
+            },
             data: {
                 'action': 'madara_load_more',
                 'template': 'madara-core/content/content-archive',
@@ -405,31 +418,6 @@ export abstract class Madara extends Source {
         }
 
         return time
-    }
-
-    constructHeaders(headers?: any, refererPath?: string): any {
-        headers = headers ?? {}
-        if (this.userAgentRandomizer !== '') {
-            headers['user-agent'] = this.userAgentRandomizer
-        }
-        headers['referer'] = `${this.baseUrl}${refererPath ?? ''}`
-        return headers
-    }
-
-    override globalRequestHeaders(): RequestHeaders {
-        if (this.userAgentRandomizer !== '') {
-            return {
-                'referer': `${this.baseUrl}/`,
-                'user-agent': this.userAgentRandomizer,
-                'accept': 'image/jpeg,image/png,image/*;q=0.8'
-            }
-        }
-        else {
-            return {
-                'referer': `${this.baseUrl}/`,
-                'accept': 'image/jpeg,image/png,image/*;q=0.8'
-            }
-        }
     }
 
     CloudFlareError(status: any) {

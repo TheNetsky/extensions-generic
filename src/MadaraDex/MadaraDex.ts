@@ -39,8 +39,4 @@ export class MadaraDex extends Madara {
     override userAgentRandomizer = ''
     override sourceTraversalPathName = 'title'
     override searchMangaSelector = 'div.c-tabs-item > div.row'
-    override requestManager = createRequestManager({
-        requestsPerSecond: 5,
-        requestTimeout: 25000,
-    })
 }

@@ -223,12 +223,10 @@ export class Parser {
         } else {
             return { updates: updatedManga, loadNextPage: false }
         }
-
-
     }
 
-    // UTILITY METHODS
 
+    // UTILITY METHODS
     getImageSrc(imageObj: Cheerio | undefined): string {
         let image
         if (typeof imageObj?.attr('data-src') != 'undefined') {

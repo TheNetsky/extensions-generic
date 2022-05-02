@@ -10,15 +10,31 @@ import {
 
 //ID's of all the novels on the site
 const novelIDArray = [
-    '21st-century-archmage',
-    'leveling-with-the-gods',
-    'the-boundless-necromancer',
-    'return-of-the-frozen-player-novel',
-    'swordmasters-youngest-son',
     'hyper-luck',
+    'villain-hides-his-true-colors',
+    'starting-from-the-dragon-tribe',
+    '21st-century-archmage',
+    'hard-carry-support',
+    'the-boundless-necromancer',
+    'mightiest-melee-magician',
+    'barbarian-quest-novel',
+    'necromancer-academys-genius-summoner',
+    'depths-of-the-otherworldly-labyrinth',
+    'hunter-academys-battle-god',
+    'swordmasters-youngest-son',
+    'max-talent-player',
+    'im-not-a-regressor',
+    'i-obtained-a-mythic-item',
+    'the-demon-prince-goes-to-the-academy',
+    'how-to-survive-at-the-academy',
+    'is-this-hero-for-real-novel',
+    'star-slaying-swordsman-novel',
     'the-divine-hunter',
+    'return-of-the-frozen-player-novel',
+    'i-returned-as-a-god',
+    'leveling-with-the-gods',
     'the-song-of-sword-and-magic',
-    'the-tutorial-is-too-hard-novel'
+    'the-tutorial-is-too-hard-novel',
 ]
 
 export class ReaperScansParser extends Parser {

@@ -14,7 +14,7 @@ import { ReaperScansParser } from './ReaperScansParser'
 const REAPERSCANS_DOMAIN = 'https://reaperscans.com'
 
 export const ReaperScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ReaperScans',
     description: 'Extension that pulls manga from reaperscans.com',
     author: 'Netsky',

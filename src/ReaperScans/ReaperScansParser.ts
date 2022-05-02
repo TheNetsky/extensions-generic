@@ -34,7 +34,7 @@ const novelIDArray = [
     'i-returned-as-a-god',
     'leveling-with-the-gods',
     'the-song-of-sword-and-magic',
-    'the-tutorial-is-too-hard-novel',
+    'the-tutorial-is-too-hard-novel'
 ]
 
 export class ReaperScansParser extends Parser {

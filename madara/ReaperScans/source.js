@@ -1049,7 +1049,7 @@ const Madara_1 = require("../Madara");
 const ReaperScansParser_1 = require("./ReaperScansParser");
 const REAPERSCANS_DOMAIN = 'https://reaperscans.com';
 exports.ReaperScansInfo = {
-    version: Madara_1.getExportVersion('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.1'),
     name: 'ReaperScans',
     description: 'Extension that pulls manga from reaperscans.com',
     author: 'Netsky',
@@ -1084,13 +1084,29 @@ exports.ReaperScansParser = void 0;
 const MadaraParser_1 = require("../MadaraParser");
 //ID's of all the novels on the site
 const novelIDArray = [
-    '21st-century-archmage',
-    'leveling-with-the-gods',
-    'the-boundless-necromancer',
-    'return-of-the-frozen-player-novel',
-    'swordmasters-youngest-son',
     'hyper-luck',
+    'villain-hides-his-true-colors',
+    'starting-from-the-dragon-tribe',
+    '21st-century-archmage',
+    'hard-carry-support',
+    'the-boundless-necromancer',
+    'mightiest-melee-magician',
+    'barbarian-quest-novel',
+    'necromancer-academys-genius-summoner',
+    'depths-of-the-otherworldly-labyrinth',
+    'hunter-academys-battle-god',
+    'swordmasters-youngest-son',
+    'max-talent-player',
+    'im-not-a-regressor',
+    'i-obtained-a-mythic-item',
+    'the-demon-prince-goes-to-the-academy',
+    'how-to-survive-at-the-academy',
+    'is-this-hero-for-real-novel',
+    'star-slaying-swordsman-novel',
     'the-divine-hunter',
+    'return-of-the-frozen-player-novel',
+    'i-returned-as-a-god',
+    'leveling-with-the-gods',
     'the-song-of-sword-and-magic',
     'the-tutorial-is-too-hard-novel'
 ];

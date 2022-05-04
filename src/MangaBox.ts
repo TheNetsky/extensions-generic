@@ -13,8 +13,11 @@ import {
     TagSection,
     RequestHeaders,
     LanguageCode,
-    Section
+    Section,
+    Request,
+    Response
 } from 'paperback-extensions-common'
+
 import {
     parseTags,
     isLastPage,
@@ -25,21 +28,54 @@ import {
     parseMangaDetails,
     UpdatedManga
 } from './MangaBoxParser'
+
 import { URLBuilder } from './MangaBoxHelper'
+
 import {
     getImageServer,
     imageServerSettings
 } from './MangaBoxSettings'
 
-const BASE_VERSION = '3.0.5'
+
+const BASE_VERSION = '3.0.6'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
 export abstract class MangaBox extends Source {
     requestManager = createRequestManager({
-        requestsPerSecond: 3
-    })
+        requestsPerSecond: 3,
+        requestTimeout: 15000,
+        interceptor: {
+            interceptRequest: async (request: Request): Promise<Request> => {
+
+                request.headers = {
+                    ...(request.headers ?? {}),
+                    ...{
+                        'referer': `${this.baseUrl}/`
+                    }
+                }
+
+                return request
+            },
+
+            interceptResponse: async (response: Response): Promise<Response> => {
+                return response
+            }
+        }
+    });
+
+    stateManager = createSourceStateManager({})
+
+    override async getSourceMenu(): Promise<Section> {
+        return Promise.resolve(createSection({
+            id: 'main',
+            header: 'Source Settings',
+            rows: () => Promise.resolve([
+                imageServerSettings(this.stateManager)
+            ])
+        }))
+    }
 
     /**
      * The base URL of the website. Eg. https://manganato.com
@@ -67,17 +103,6 @@ export abstract class MangaBox extends Source {
     descriptionSelector = 'div#noidungm, div#panel-story-info-description'
 
     /**
-     * Function to parse tag URL.
-     */
-    parseTagUrl(url: string): string|undefined {
-        return url.split('-').pop()
-    }
-
-    override getMangaShareUrl(mangaId: string): string {
-        return `${mangaId}`
-    }
-
-    /**
      * Selector for chapter list.
      */
     chapterListSelector = 'div.chapter-list div.row, ul.row-content-chapter li'
@@ -103,8 +128,19 @@ export abstract class MangaBox extends Source {
      */
     mangaListTimeSelector = 'span.genres-item-time'
 
+    /**
+     * Function to parse tag URL.
+     */
+    parseTagUrl(url: string): string | undefined {
+        return url.split('-').pop()
+    }
+
     mangaListPagination(url: URLBuilder, page: number): URLBuilder {
         return url.addPathComponent(page.toString())
+    }
+
+    override getMangaShareUrl(mangaId: string): string {
+        return `${mangaId}`
     }
 
     async getMangaDetails(mangaId: string): Promise<Manga> {
@@ -176,7 +212,7 @@ export abstract class MangaBox extends Source {
             updatedManga.ids = []
             page++
         }
-        mangaUpdatesFoundCallback(createMangaUpdates({ids: []}))
+        mangaUpdatesFoundCallback(createMangaUpdates({ ids: [] }))
     }
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
@@ -300,12 +336,6 @@ export abstract class MangaBox extends Source {
         return parseTags($)
     }
 
-    override globalRequestHeaders(): RequestHeaders {
-        return {
-            referer: this.baseUrl
-        }
-    }
-
     protected convertTime(timeAgo: string): Date {
         let time: Date
         let trimmed = Number((/\d*/.exec(timeAgo) ?? [])[0])
@@ -325,15 +355,4 @@ export abstract class MangaBox extends Source {
         return time
     }
 
-    stateManager = createSourceStateManager({})
-
-    override async getSourceMenu(): Promise<Section> {
-        return Promise.resolve(createSection({
-            id: 'main',
-            header: 'Source Settings',
-            rows: () => Promise.resolve([
-                imageServerSettings(this.stateManager)
-            ])
-        }))
-    }
 }

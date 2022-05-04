@@ -726,7 +726,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MangaBoxParser_1 = require("./MangaBoxParser");
 const MangaBoxHelper_1 = require("./MangaBoxHelper");
 const MangaBoxSettings_1 = require("./MangaBoxSettings");
-const BASE_VERSION = '3.0.5';
+const BASE_VERSION = '3.0.6';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -735,8 +735,22 @@ class MangaBox extends paperback_extensions_common_1.Source {
     constructor() {
         super(...arguments);
         this.requestManager = createRequestManager({
-            requestsPerSecond: 3
+            requestsPerSecond: 3,
+            requestTimeout: 15000,
+            interceptor: {
+                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
+                    var _a;
+                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), {
+                        'referer': `${this.baseUrl}/`
+                    });
+                    return request;
+                }),
+                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
+                    return response;
+                })
+            }
         });
+        this.stateManager = createSourceStateManager({});
         /**
          * Main selector for getMangaDetails.
          */
@@ -770,7 +784,17 @@ class MangaBox extends paperback_extensions_common_1.Source {
          * Selector for the time updated in manga list
          */
         this.mangaListTimeSelector = 'span.genres-item-time';
-        this.stateManager = createSourceStateManager({});
+    }
+    getSourceMenu() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.resolve(createSection({
+                id: 'main',
+                header: 'Source Settings',
+                rows: () => Promise.resolve([
+                    MangaBoxSettings_1.imageServerSettings(this.stateManager)
+                ])
+            }));
+        });
     }
     /**
      * Function to parse tag URL.
@@ -778,11 +802,11 @@ class MangaBox extends paperback_extensions_common_1.Source {
     parseTagUrl(url) {
         return url.split('-').pop();
     }
-    getMangaShareUrl(mangaId) {
-        return `${mangaId}`;
-    }
     mangaListPagination(url, page) {
         return url.addPathComponent(page.toString());
+    }
+    getMangaShareUrl(mangaId) {
+        return `${mangaId}`;
     }
     getMangaDetails(mangaId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -969,11 +993,6 @@ class MangaBox extends paperback_extensions_common_1.Source {
             return MangaBoxParser_1.parseTags($);
         });
     }
-    globalRequestHeaders() {
-        return {
-            referer: this.baseUrl
-        };
-    }
     convertTime(timeAgo) {
         var _a;
         let time;
@@ -995,17 +1014,6 @@ class MangaBox extends paperback_extensions_common_1.Source {
             time = new Date(timeAgo);
         }
         return time;
-    }
-    getSourceMenu() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return Promise.resolve(createSection({
-                id: 'main',
-                header: 'Source Settings',
-                rows: () => Promise.resolve([
-                    MangaBoxSettings_1.imageServerSettings(this.stateManager)
-                ])
-            }));
-        });
     }
 }
 exports.MangaBox = MangaBox;

@@ -383,7 +383,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const COMICKIBA_DOMAIN = 'https://comickiba.com';
 exports.ComicKibaInfo = {
-    version: Madara_1.getExportVersion('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.1'),
     name: 'ComicKiba',
     description: 'Extension that pulls manga from comickiba.com',
     author: 'GameFuzzy',
@@ -405,6 +405,7 @@ class ComicKiba extends Madara_1.Madara {
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.chapterDetailsSelector = 'li.blocks-gallery-item img:nth-child(1), div.reading-content p > img, .read-container .reading-content img';
+        this.alternativeChapterAjaxEndpoint = true;
     }
 }
 exports.ComicKiba = ComicKiba;

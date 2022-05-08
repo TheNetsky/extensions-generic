@@ -12,7 +12,7 @@ import {
 const COMICKIBA_DOMAIN = 'https://comickiba.com'
 
 export const ComicKibaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ComicKiba',
     description: 'Extension that pulls manga from comickiba.com',
     author: 'GameFuzzy',
@@ -33,4 +33,5 @@ export class ComicKiba extends Madara {
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override hasAdvancedSearchPage = true
     override chapterDetailsSelector = 'li.blocks-gallery-item img:nth-child(1), div.reading-content p > img, .read-container .reading-content img'
+    override alternativeChapterAjaxEndpoint = true
 }

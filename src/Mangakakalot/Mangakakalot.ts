@@ -37,7 +37,7 @@ export const MangakakalotInfo: SourceInfo = {
     websiteBaseURL: MANGAKAKALOT_DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
+            text: 'Partial-Notifications',
             type: TagType.GREEN
         }
     ]

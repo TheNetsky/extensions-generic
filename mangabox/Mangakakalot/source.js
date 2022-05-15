@@ -1292,7 +1292,7 @@ exports.MangakakalotInfo = {
     websiteBaseURL: MANGAKAKALOT_DOMAIN,
     sourceTags: [
         {
-            text: 'Notifications',
+            text: 'Partial-Notifications',
             type: paperback_extensions_common_1.TagType.GREEN
         }
     ]

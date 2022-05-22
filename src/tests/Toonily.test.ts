@@ -85,6 +85,14 @@ describe('Toonily Tests', () => {
         expect(homePages[2], 'No most popular available').to.exist
     })
 
+    it('Testing home page results for hot titles', async () => {
+        const results = await wrapper.getViewMoreItems(source, '3', {}, 1)
+
+        expect(results, 'This section does not exist').to.exist
+        expect(results, 'No results whatsoever for this section').to.be.not.empty
+
+    })
+
     it('Testing Notifications', async () => {
         const updates = await wrapper.filterUpdatedManga(source, new Date('2022-2-5'), [mangaId])
         console.log(updates)

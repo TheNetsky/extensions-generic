@@ -32,6 +32,5 @@ export class WDScans extends Madara {
     baseUrl: string = WDSCANS_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override hasAdvancedSearchPage = true
-    override userAgentRandomizer = ''
     override alternativeChapterAjaxEndpoint = true
 }

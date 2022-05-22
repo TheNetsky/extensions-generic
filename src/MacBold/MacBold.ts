@@ -32,6 +32,5 @@ export class MacBold extends Madara {
     baseUrl: string = MACBOLD_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override hasAdvancedSearchPage = true
-    override userAgentRandomizer = ''
     override alternativeChapterAjaxEndpoint = true
 }

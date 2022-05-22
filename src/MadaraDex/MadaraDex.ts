@@ -36,7 +36,6 @@ export class MadaraDex extends Madara {
     baseUrl: string = MADARADEX_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override hasAdvancedSearchPage = true
-    override userAgentRandomizer = ''
     override sourceTraversalPathName = 'title'
     override searchMangaSelector = 'div.c-tabs-item > div.row'
 }

@@ -42,24 +42,25 @@ export class ReaperScansParser extends Parser {
     override parseSearchResults($: CheerioSelector, source: ReaperScans): MangaTile[] {
         const results: MangaTile[] = []
         for (const obj of $(source.searchMangaSelector).toArray()) {
-            const id = ($('a', $(obj)).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
-            const title = createIconText({ text: this.decodeHTMLEntity($('a', $(obj)).attr('title') ?? '') })
-            const image = encodeURI(this.getImageSrc($('img', $(obj))))
-            const subtitle = createIconText({ text: $('span.font-meta.chapter', obj).text().trim() })
+            const id = ($('a', obj).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
+            const title = $('a', obj).attr('title') ?? ''
+            const image = encodeURI(this.getImageSrc($('img', obj)))
+            const subtitle = $('span.font-meta.chapter', obj).text().trim()
 
-            if (!id || !image || !title.text) {
+            if (!id || !title) {
                 if (id.includes(source.baseUrl.replace(/\/$/, ''))) continue
                 // Something went wrong with our parsing, return a detailed error
-                throw new Error(`Failed to parse searchResult for ${source.baseUrl} using ${source.searchMangaSelector} as a loop selector`)
+                console.log(`Failed to parse searchResult for ${source.baseUrl} using ${source.searchMangaSelector} as a loop selector`)
+                continue
             }
 
             if (novelIDArray.includes(id)) continue //Filter out the novels
 
             results.push(createMangaTile({
                 id: id,
-                title: title,
-                image: image,
-                subtitleText: subtitle
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
             }))
         }
         return results
@@ -69,22 +70,24 @@ export class ReaperScansParser extends Parser {
         const items: MangaTile[] = []
 
         for (const obj of $('div.page-item-detail').toArray()) {
-            const image = encodeURI(this.getImageSrc($('img', $(obj))) ?? '')
-            const title = this.decodeHTMLEntity($('a', $('h3.h5', $(obj))).text())
-            const id = $('a', $('h3.h5', $(obj))).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
+            const image = encodeURI(this.getImageSrc($('img', obj)) ?? '')
+            const title = $('a', $('h3.h5', obj)).text()
+            const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const subtitle = $('span.font-meta.chapter', obj).first().text().trim()
 
-            if (!id || !title || !image) {
-                throw new Error(`Failed to parse homepage sections for ${source.baseUrl}/`)
+            if (!id || !title) {
+                console.log(`Failed to parse homepage sections for ${source.baseUrl}/`)
+                continue
             }
+
 
             if (novelIDArray.includes(id)) continue //Filter out the novels
 
             items.push(createMangaTile({
                 id: id,
-                title: createIconText({ text: title }),
-                image: image,
-                subtitleText: createIconText({ text: subtitle })
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
             }))
         }
         return items

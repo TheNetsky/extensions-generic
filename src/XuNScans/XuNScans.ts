@@ -32,5 +32,4 @@ export class XuNScans extends Madara {
     baseUrl: string = XUNSCANS_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override hasAdvancedSearchPage = true
-    override userAgentRandomizer = ''
 }

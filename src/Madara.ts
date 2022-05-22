@@ -20,7 +20,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.0.8'
+const BASE_VERSION = '2.1.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -35,7 +35,7 @@ export abstract class Madara extends Source {
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
-                        ...(this.userAgentRandomizer && { 'user-agent': this.userAgentRandomizer }),
+                        ...(this.userAgent && { 'user-agent': this.userAgent }),
                         'referer': `${this.baseUrl}/`
                     }
                 }
@@ -105,14 +105,9 @@ export abstract class Madara extends Source {
     chapterDetailsSelector = 'div.page-break > img'
 
     /**
-     * Set to false if your source has individual buttons for each page as opposed to a 'LOAD MORE' button
-     */
-    loadMoreSearchManga = true
-
-    /**
-    * Helps with CloudFlare for some sources, makes it worse for others; override with empty string if the latter is true
+    * Set custom User-Agent
     */
-    userAgentRandomizer = `Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/78.0${Math.floor(Math.random() * 100000)}`
+    userAgent = ''
 
     parser = new Parser()
 
@@ -252,7 +247,7 @@ export abstract class Madara extends Source {
                 request: this.constructAjaxHomepageRequest(0, 10, '_latest_update'),
                 section: createHomeSection({
                     id: '0',
-                    title: 'RECENTLY UPDATED',
+                    title: 'Recently Updated',
                     view_more: true,
                 }),
             },
@@ -260,7 +255,7 @@ export abstract class Madara extends Source {
                 request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_week_views_value'),
                 section: createHomeSection({
                     id: '1',
-                    title: 'CURRENTLY TRENDING',
+                    title: 'Currently Trending',
                     view_more: true,
                 })
             },
@@ -268,14 +263,21 @@ export abstract class Madara extends Source {
                 request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_views'),
                 section: createHomeSection({
                     id: '2',
-                    title: 'MOST POPULAR',
+                    title: 'Most Popular',
+                    view_more: true,
+                })
+            },
+            {
+                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_status', 'end'),
+                section: createHomeSection({
+                    id: '3',
+                    title: 'Completed',
                     view_more: true,
                 })
             },
         ]
 
         const promises: Promise<void>[] = []
-
         for (const section of sections) {
             // Let the app load empty sections
             sectionCallback(section.section)
@@ -289,6 +291,7 @@ export abstract class Madara extends Source {
                     sectionCallback(section.section)
                 }),
             )
+
         }
 
         // Make sure the function completes
@@ -298,22 +301,27 @@ export abstract class Madara extends Source {
     override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         // We only have one homepage section ID, so we don't need to worry about handling that any
         const page = metadata?.page ?? 0   // Default to page 0
-        let sortBy = ''
+        let sortBy: any[] = []
         switch (homepageSectionId) {
             case '0': {
-                sortBy = '_latest_update'
+                sortBy = ['_latest_update']
                 break
             }
             case '1': {
-                sortBy = '_wp_manga_week_views_value'
+                sortBy = ['_wp_manga_week_views_value']
                 break
             }
             case '2': {
-                sortBy = '_wp_manga_views'
+                sortBy = ['_wp_manga_views']
+                break
+            }
+            case '3': {
+                sortBy = ['_wp_manga_status', 'end']
                 break
             }
         }
-        const request = this.constructAjaxHomepageRequest(page, 50, sortBy)
+
+        const request = this.constructAjaxHomepageRequest(page, 50, sortBy[0], sortBy[1])
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
         const $ = this.cheerio.load(data.data)
@@ -333,7 +341,10 @@ export abstract class Madara extends Source {
     override getCloudflareBypassRequest() {
         return createRequestObject({
             url: `${this.baseUrl}`,
-            method: 'GET'
+            method: 'GET',
+            headers: {
+                referer: this.userAgent
+            }
         })
     }
 
@@ -374,7 +385,7 @@ export abstract class Madara extends Source {
     /**
      * Constructs requests to be sent to the Madara /admin-ajax.php endpoint.
      */
-    constructAjaxHomepageRequest(page: number, postsPerPage: number, meta_key: string): any {
+    constructAjaxHomepageRequest(page: number, postsPerPage: number, meta_key: string, meta_value?: string): any {
         return createRequestObject({
             url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
             method: 'POST',
@@ -391,8 +402,8 @@ export abstract class Madara extends Source {
                 'vars[sidebar]': 'right',
                 'vars[post_type]': 'wp-manga',
                 'vars[order]': 'desc',
-                'vars[meta_key]': meta_key
-
+                'vars[meta_key]': meta_key,
+                'vars[meta_value]': meta_value
             },
             cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
         })
@@ -401,28 +412,37 @@ export abstract class Madara extends Source {
     /**
      * Parses a time string from a Madara source into a Date object.
      */
-    convertTime(timeAgo: string): Date {
+    parseDate = (date: string): Date => {
+        date = date.toUpperCase()
         let time: Date
-        let trimmed = Number((/\d*/.exec(timeAgo) ?? [])[0])
-        trimmed = (trimmed == 0 && timeAgo.includes('a')) ? 1 : trimmed
-        if (timeAgo.includes('mins') || timeAgo.includes('minutes') || timeAgo.includes('minute')) {
-            time = new Date(Date.now() - trimmed * 60000)
-        } else if (timeAgo.includes('hours') || timeAgo.includes('hour')) {
-            time = new Date(Date.now() - trimmed * 3600000)
-        } else if (timeAgo.includes('days') || timeAgo.includes('day')) {
-            time = new Date(Date.now() - trimmed * 86400000)
-        } else if (timeAgo.includes('year') || timeAgo.includes('years')) {
-            time = new Date(Date.now() - trimmed * 31556952000)
+        const number = Number((/\d*/.exec(date) ?? [])[0])
+        if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
+            time = new Date(Date.now())
+        } else if (date.includes('YEAR') || date.includes('YEARS')) {
+            time = new Date(Date.now() - (number * 31556952000))
+        } else if (date.includes('MONTH') || date.includes('MONTHS')) {
+            time = new Date(Date.now() - (number * 2592000000))
+        } else if (date.includes('WEEK') || date.includes('WEEKS')) {
+            time = new Date(Date.now() - (number * 604800000))
+        } else if (date.includes('YESTERDAY')) {
+            time = new Date(Date.now() - 86400000)
+        } else if (date.includes('DAY') || date.includes('DAYS')) {
+            time = new Date(Date.now() - (number * 86400000))
+        } else if (date.includes('HOUR') || date.includes('HOURS')) {
+            time = new Date(Date.now() - (number * 3600000))
+        } else if (date.includes('MINUTE') || date.includes('MINUTES')) {
+            time = new Date(Date.now() - (number * 60000))
+        } else if (date.includes('SECOND') || date.includes('SECONDS')) {
+            time = new Date(Date.now() - (number * 1000))
         } else {
-            time = new Date(timeAgo)
+            time = new Date(date)
         }
-
         return time
     }
 
     CloudFlareError(status: any) {
         if (status == 503) {
-            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > \<\The name of this source\> and press Cloudflare Bypass')
+            throw new Error('CLOUDFLARE BYPASS ERROR:\nPlease go to Settings > Sources > <The name of this source> and press Cloudflare Bypass')
         }
     }
 }

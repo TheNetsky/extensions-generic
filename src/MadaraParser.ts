@@ -11,6 +11,8 @@ import {
     TagSection
 } from 'paperback-extensions-common'
 
+import entities = require('entities')
+
 export class Parser {
 
     parseMangaDetails($: CheerioSelector, mangaId: string): Manga {
@@ -20,16 +22,15 @@ export class Parser {
         const artist = this.decodeHTMLEntity($('div.artist-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown')
         const summary = this.decodeHTMLEntity($('div.description-summary').first().text()).replace('Show more', '').trim()
         const image = encodeURI(this.getImageSrc($('div.summary_image img').first()))
-        const rating = $('span.total_votes').text().replace('Your Rating', '')
         const isOngoing = $('div.summary-content', $('div.post-content_item').last()).text().toLowerCase().trim() == 'ongoing'
         const genres: Tag[] = []
-        let hentai = $('.manga-title-badges.adult').length > 0
 
         // Grab genres and check for smut tag
         for (const obj of $('div.genres-content a').toArray()) {
             const label = $(obj).text()
             const id = $(obj).attr('href')?.split('/')[4] ?? label
-            if (label.toLowerCase().includes('smut')) hentai = true
+
+            if (!label || !id) continue
             genres.push(createTag({ label: label, id: id }))
         }
         const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: genres })]
@@ -39,23 +40,15 @@ export class Parser {
             throw new Error(`Could not parse out the data-id for ${mangaId} - This method might need overridden in the implementing source`)
         }
 
-        // If we do not have a valid image, something is wrong with the generic parsing logic. A source should always remedy this with
-        // a custom implementation.
-        if (!image) {
-            throw new Error(`Could not parse out a valid image while parsing manga details for manga: ${mangaId}`)
-        }
-
         return createManga({
             id: mangaId,
             titles: [title],
-            image: image,
+            image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
             author: author,
             artist: artist,
             tags: tagSections,
             desc: summary,
-            status: isOngoing ? MangaStatus.ONGOING : MangaStatus.COMPLETED,
-            rating: Number(rating),
-            hentai: hentai
+            status: isOngoing ? MangaStatus.ONGOING : MangaStatus.COMPLETED
         })
     }
 
@@ -65,18 +58,18 @@ export class Parser {
 
         // For each available chapter..
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
-            const id = ($('a', $(obj)).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
-            const chapNum = Number(id.match(/\D*(\d*\-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'))
-            const chapName = $('a', $(obj)).first().text().trim() ?? ''
+            const id = ($('a', obj).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
+            const chapNum = Number(id.match(/(\d*\.?-?\d+)/)?.pop()?.replace(/-/g, '.'))
+            const chapName = $('a', obj).first().text().trim() ?? ''
 
             let mangaTime: Date
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title')
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = source.convertTime(timeSelector ?? '')
+                mangaTime = source.parseDate(timeSelector ?? '')
             } else {
                 //Else get the date from the info box
-                mangaTime = source.convertTime($('span.chapter-release-date > i', obj).text().trim())
+                mangaTime = source.parseDate($('span.chapter-release-date > i', obj).text().trim())
             }
 
             //Check if the date is a valid date, else return the current date
@@ -85,12 +78,13 @@ export class Parser {
             if (typeof id === 'undefined') {
                 throw new Error(`Could not parse out ID when getting chapters for ${mangaId}`)
             }
+
             chapters.push(createChapter({
                 id: id,
                 mangaId: mangaId,
                 langCode: source.languageCode ?? LanguageCode.UNKNOWN,
-                chapNum: Number.isNaN(chapNum) ? 0 : chapNum,
-                name: chapName ? chapName : undefined,
+                chapNum: isNaN(chapNum) ? 0 : chapNum,
+                name: chapName ? this.decodeHTMLEntity(chapName) : undefined,
                 time: mangaTime,
                 // @ts-ignore
                 sortingIndex
@@ -112,6 +106,7 @@ export class Parser {
 
             pages.push(page)
         }
+
         return createChapterDetails({
             id: chapterId,
             mangaId: mangaId,
@@ -128,8 +123,7 @@ export class Parser {
                 const id = $(obj).attr('for') ?? label
                 genres.push(createTag({ label: label, id: id }))
             }
-        }
-        else {
+        } else {
             for (const obj of $('.menu-item-object-wp-manga-genre a', $('.second-menu')).toArray()) {
                 const label = $(obj).text().trim()
                 const id = $(obj).attr('href')?.split('/')[4] ?? label
@@ -142,24 +136,26 @@ export class Parser {
     parseSearchResults($: CheerioSelector, source: any): MangaTile[] {
         const results: MangaTile[] = []
         for (const obj of $(source.searchMangaSelector).toArray()) {
-            const id = ($('a', $(obj)).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
-            const title = createIconText({ text: this.decodeHTMLEntity($('a', $(obj)).attr('title') ?? '') })
-            const image = encodeURI(this.getImageSrc($('img', $(obj))))
-            const subtitle = createIconText({ text: $('span.font-meta.chapter', obj).text().trim() })
+            const id = ($('a', obj).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
+            const title = $('a', obj).attr('title') ?? ''
+            const image = encodeURI(this.getImageSrc($('img', obj)))
+            const subtitle = $('span.font-meta.chapter', obj).text().trim()
 
-            if (!id || !image || !title.text) {
+            if (!id || !title) {
                 if (id.includes(source.baseUrl.replace(/\/$/, ''))) continue
                 // Something went wrong with our parsing, return a detailed error
-                throw new Error(`Failed to parse searchResult for ${source.baseUrl} using ${source.searchMangaSelector} as a loop selector`)
+                console.log(`Failed to parse searchResult for ${source.baseUrl} using ${source.searchMangaSelector} as a loop selector`)
+                continue
             }
 
             results.push(createMangaTile({
                 id: id,
-                title: title,
-                image: image,
-                subtitleText: subtitle
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
             }))
         }
+
         return results
     }
 
@@ -167,20 +163,21 @@ export class Parser {
         const items: MangaTile[] = []
 
         for (const obj of $('div.page-item-detail').toArray()) {
-            const image = encodeURI(this.getImageSrc($('img', $(obj))) ?? '')
-            const title = this.decodeHTMLEntity($('a', $('h3.h5', $(obj))).text())
-            const id = $('a', $('h3.h5', $(obj))).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
+            const image = encodeURI(this.getImageSrc($('img', obj)) ?? '')
+            const title = $('a', $('h3.h5', obj)).text()
+            const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const subtitle = $('span.font-meta.chapter', obj).first().text().trim()
 
-            if (!id || !title || !image) {
-                throw new Error(`Failed to parse homepage sections for ${source.baseUrl}/`)
+            if (!id || !title) {
+                console.log(`Failed to parse homepage sections for ${source.baseUrl}/`)
+                continue
             }
 
             items.push(createMangaTile({
                 id: id,
-                title: createIconText({ text: title }),
-                image: image,
-                subtitleText: createIconText({ text: subtitle })
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
             }))
         }
         return items
@@ -198,10 +195,10 @@ export class Parser {
             const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title')
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = source.convertTime(timeSelector ?? '')
+                mangaTime = source.parseDate(timeSelector ?? '')
             } else {
                 //Else get the date from the span
-                mangaTime = source.convertTime($('span.post-on.font-meta', obj).first().text().trim())
+                mangaTime = source.parseDate($('span.post-on.font-meta', obj).first().text().trim())
             }
             //Check if the date is valid, if it isn't we should skip it
             if (!mangaTime.getTime()) continue
@@ -229,13 +226,13 @@ export class Parser {
     // UTILITY METHODS
     getImageSrc(imageObj: Cheerio | undefined): string {
         let image
-        if (typeof imageObj?.attr('data-src') != 'undefined') {
+        if ((typeof imageObj?.attr('data-src')) != 'undefined') {
             image = imageObj?.attr('data-src')
         }
-        else if (typeof imageObj?.attr('data-lazy-src') != 'undefined') {
+        else if ((typeof imageObj?.attr('data-lazy-src')) != 'undefined') {
             image = imageObj?.attr('data-lazy-src')
         }
-        else if (typeof imageObj?.attr('srcset') != 'undefined') {
+        else if ((typeof imageObj?.attr('srcset')) != 'undefined') {
             image = imageObj?.attr('srcset')?.split(' ')[0] ?? ''
         }
         else {
@@ -244,9 +241,7 @@ export class Parser {
         return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')))
     }
 
-    decodeHTMLEntity(str: string): string {
-        return str.replace(/&#(\d+);/g, (_match, dec) => {
-            return String.fromCharCode(dec)
-        })
+    protected decodeHTMLEntity(str: string): string {
+        return entities.decodeHTML(str)
     }
 }

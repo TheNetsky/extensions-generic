@@ -1000,7 +1000,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.1.1';
+const BASE_VERSION = '2.1.2';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1324,7 +1324,7 @@ class Madara extends paperback_extensions_common_1.Source {
             url: `${this.baseUrl}`,
             method: 'GET',
             headers: {
-                referer: this.userAgent
+                'user-agent': this.userAgent
             }
         });
     }

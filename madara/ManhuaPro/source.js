@@ -965,7 +965,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.1.0';
+const BASE_VERSION = '2.1.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1448,14 +1448,17 @@ class Parser {
         });
     }
     parseChapterList($, mangaId, source) {
-        var _a, _b, _c, _d;
+        var _a, _b;
         const chapters = [];
         let sortingIndex = 0;
         // For each available chapter..
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = ($('a', obj).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
-            const chapNum = Number((_b = (_a = id.match(/(\d*\.?-?\d+)/)) === null || _a === void 0 ? void 0 : _a.pop()) === null || _b === void 0 ? void 0 : _b.replace(/-/g, '.'));
-            const chapName = (_c = $('a', obj).first().text().trim()) !== null && _c !== void 0 ? _c : '';
+            const chapName = (_a = $('a', obj).first().text().trim()) !== null && _a !== void 0 ? _a : '';
+            const chapNumRegex = id.match(/\D*(\d*-?\d*)\D*$/);
+            let chapNum = 0;
+            if (chapNumRegex && chapNumRegex[1])
+                chapNum = Number(chapNumRegex[1]);
             let mangaTime;
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
@@ -1475,7 +1478,7 @@ class Parser {
             chapters.push(createChapter({
                 id: id,
                 mangaId: mangaId,
-                langCode: (_d = source.languageCode) !== null && _d !== void 0 ? _d : paperback_extensions_common_1.LanguageCode.UNKNOWN,
+                langCode: (_b = source.languageCode) !== null && _b !== void 0 ? _b : paperback_extensions_common_1.LanguageCode.UNKNOWN,
                 chapNum: isNaN(chapNum) ? 0 : chapNum,
                 name: chapName ? this.decodeHTMLEntity(chapName) : undefined,
                 time: mangaTime,

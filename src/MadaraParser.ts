@@ -59,8 +59,11 @@ export class Parser {
         // For each available chapter..
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = ($('a', obj).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
-            const chapNum = Number(id.match(/(\d*\.?-?\d+)/)?.pop()?.replace(/-/g, '.'))
             const chapName = $('a', obj).first().text().trim() ?? ''
+
+            const chapNumRegex = id.match(/\D*(\d*-?\d*)\D*$/)
+            let chapNum = 0
+            if (chapNumRegex && chapNumRegex[1]) chapNum = Number(chapNumRegex[1])
 
             let mangaTime: Date
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title')

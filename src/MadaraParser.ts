@@ -61,9 +61,7 @@ export class Parser {
             const id = ($('a', obj).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const chapName = $('a', obj).first().text().trim() ?? ''
 
-            const chapNumRegex = id.match(/\D*(\d*-?\d*)\D*$/)
-            let chapNum = 0
-            if (chapNumRegex && chapNumRegex[1]) chapNum = Number(chapNumRegex[1])
+            const chapNum = Number(id.match(/\D*(\d*\-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'))
 
             let mangaTime: Date
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title')

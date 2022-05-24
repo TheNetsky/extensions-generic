@@ -20,7 +20,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.1.2'
+const BASE_VERSION = '2.1.3'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -343,7 +343,7 @@ export abstract class Madara extends Source {
             url: `${this.baseUrl}`,
             method: 'GET',
             headers: {
-                'user-agent': this.userAgent
+                ...(this.userAgent && { 'user-agent': this.userAgent }),
             }
         })
     }

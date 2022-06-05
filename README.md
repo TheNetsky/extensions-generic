@@ -14,3 +14,4 @@ Join the [Discord](https://discord.gg/rmf6jQpMU9) for support and more sources!
 | MangaBox   | Update MangaBox sources for Paperback     |  [Click me!](https://thenetsky.github.io/extensions-generic/mangabox/)    |
 | NepNep   | Update NepNep sources for Paperback     |  [Click me!](https://thenetsky.github.io/extensions-generic/nepnep/)    |
 | Guya   | Update Guya sources for Paperback     |  [Click me!](https://thenetsky.github.io/extensions-generic/guya/)    |
+| Bentai (NSFW)  | Update Bentai sources for Paperback     |  [Click me!](https://thenetsky.github.io/extensions-generic/bentai/)    |

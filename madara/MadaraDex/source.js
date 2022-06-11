@@ -1364,7 +1364,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MadaraDex = exports.MadaraDexInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const MADARADEX_DOMAIN = 'https://madaradex.org';
+const DOMAIN = 'https://madaradex.org';
 exports.MadaraDexInfo = {
     version: Madara_1.getExportVersion('0.0.1'),
     name: 'MadaraDex',
@@ -1373,7 +1373,7 @@ exports.MadaraDexInfo = {
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
-    websiteBaseURL: MADARADEX_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1388,7 +1388,7 @@ exports.MadaraDexInfo = {
 class MadaraDex extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = MADARADEX_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.sourceTraversalPathName = 'title';

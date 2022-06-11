@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Manga1st = exports.Manga1stInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const MANGA1ST_DOMAIN = 'https://manga1st.online';
+const DOMAIN = 'https://manga1st.online';
 exports.Manga1stInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'Manga1st',
-    description: 'Extension that pulls manga from manga1st.online',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
-    websiteBaseURL: MANGA1ST_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1654,7 +1654,7 @@ exports.Manga1stInfo = {
 class Manga1st extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = MANGA1ST_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;

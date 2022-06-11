@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WDScans = exports.WDScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const WDSCANS_DOMAIN = 'https://wdscans.com';
+const DOMAIN = 'https://wdscans.com';
 exports.WDScansInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'WickedDragon Scans',
-    description: 'Extension that pulls manga from wdscans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'NotMarek',
     authorWebsite: 'http://github.com/notmarek',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: WDSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1654,7 +1654,7 @@ exports.WDScansInfo = {
 class WDScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = WDSCANS_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.alternativeChapterAjaxEndpoint = true;

@@ -952,16 +952,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComicKiba = exports.ComicKibaInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const COMICKIBA_DOMAIN = 'https://comickiba.com';
+const DOMAIN = 'https://comickiba.com';
 exports.ComicKibaInfo = {
     version: Madara_1.getExportVersion('0.0.1'),
     name: 'ComicKiba',
-    description: 'Extension that pulls manga from comickiba.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: COMICKIBA_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -972,7 +972,7 @@ exports.ComicKibaInfo = {
 class ComicKiba extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = COMICKIBA_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.chapterDetailsSelector = 'li.blocks-gallery-item img:nth-child(1), div.reading-content p > img, .read-container .reading-content img';

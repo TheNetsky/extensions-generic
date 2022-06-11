@@ -952,16 +952,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MacBold = exports.MacBoldInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const MACBOLD_DOMAIN = 'https://macbold.com';
+const DOMAIN = 'https://macbold.com';
 exports.MacBoldInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'MacBold',
-    description: 'Extension that pulls manga from macbold.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.MATURE,
-    websiteBaseURL: MACBOLD_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -972,7 +972,7 @@ exports.MacBoldInfo = {
 class MacBold extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = MACBOLD_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.alternativeChapterAjaxEndpoint = true;

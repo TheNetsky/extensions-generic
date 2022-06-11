@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaTX = exports.MangaTXInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const MANGATX_DOMAIN = 'https://mangatx.com';
+const DOMAIN = 'https://mangatx.com';
 exports.MangaTXInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'MangaTX',
-    description: 'Extension that pulls manga from mangatx.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.MATURE,
-    websiteBaseURL: MANGATX_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1654,7 +1654,7 @@ exports.MangaTXInfo = {
 class MangaTX extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = MANGATX_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
     }

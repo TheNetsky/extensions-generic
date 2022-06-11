@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Manhuaus = exports.ManhuausInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const MANHUAUS_DOMAIN = 'https://manhuaus.com';
+const DOMAIN = 'https://manhuaus.com';
 exports.ManhuausInfo = {
     version: Madara_1.getExportVersion('0.0.2'),
     name: 'Manhuaus',
-    description: 'Extension that pulls manga from manhuaus.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: MANHUAUS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1654,7 +1654,7 @@ exports.ManhuausInfo = {
 class Manhuaus extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = MANHUAUS_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > figure.wp-block-gallery > figure.wp-block-image > img';

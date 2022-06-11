@@ -949,18 +949,18 @@ __exportStar(require("./RawData"), exports);
 },{"./Chapter":14,"./ChapterDetails":15,"./Constants":16,"./DynamicUI":32,"./HomeSection":33,"./Languages":34,"./Manga":35,"./MangaTile":36,"./MangaUpdate":37,"./PagedResults":38,"./RawData":39,"./RequestHeaders":40,"./RequestInterceptor":41,"./RequestManager":42,"./RequestObject":43,"./ResponseObject":44,"./SearchField":45,"./SearchRequest":46,"./SourceInfo":47,"./SourceManga":48,"./SourceStateManager":49,"./SourceTag":50,"./TagSection":51,"./TrackedManga":52,"./TrackedMangaChapterReadAction":53,"./TrackerActionQueue":54}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Hentai20 = exports.Hentai20Info = void 0;
+exports.KissManga = exports.KissMangaInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://hentai20.com';
-exports.Hentai20Info = {
+const DOMAIN = 'https://1stkissmanga.io';
+exports.KissMangaInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
-    name: 'Hentai20',
+    name: '1stKissManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: paperback_extensions_common_1.ContentRating.ADULT,
+    contentRating: paperback_extensions_common_1.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
@@ -968,25 +968,20 @@ exports.Hentai20Info = {
             type: paperback_extensions_common_1.TagType.GREEN
         },
         {
-            text: '18+',
-            type: paperback_extensions_common_1.TagType.YELLOW
-        },
-        {
             text: 'Cloudflare',
             type: paperback_extensions_common_1.TagType.RED
         }
     ]
 };
-class Hentai20 extends Madara_1.Madara {
+class KissManga extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.hasAdvancedSearchPage = true;
-        this.userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1';
+        this.alternativeChapterAjaxEndpoint = true;
     }
 }
-exports.Hentai20 = Hentai20;
+exports.KissManga = KissManga;
 
 },{"../Madara":57,"paperback-extensions-common":13}],57:[function(require,module,exports){
 "use strict";

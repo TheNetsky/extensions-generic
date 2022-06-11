@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SKScans = exports.SKScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const SKSCANS_DOMAIN = 'https://skscans.com';
+const DOMAIN = 'https://skscans.com';
 exports.SKScansInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'SKScans',
-    description: 'Extension that pulls manga from skscans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: SKSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1654,7 +1654,7 @@ exports.SKScansInfo = {
 class SKScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = SKSCANS_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
     }
 }

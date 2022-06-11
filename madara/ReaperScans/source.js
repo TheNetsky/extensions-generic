@@ -1635,16 +1635,16 @@ exports.ReaperScans = exports.ReaperScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const ReaperScansParser_1 = require("./ReaperScansParser");
-const REAPERSCANS_DOMAIN = 'https://reaperscans.com';
+const DOMAIN = 'https://reaperscans.com';
 exports.ReaperScansInfo = {
     version: Madara_1.getExportVersion('0.0.1'),
     name: 'ReaperScans',
-    description: 'Extension that pulls manga from reaperscans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: REAPERSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1655,7 +1655,7 @@ exports.ReaperScansInfo = {
 class ReaperScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = REAPERSCANS_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.alternativeChapterAjaxEndpoint = true;

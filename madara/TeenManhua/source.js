@@ -1635,16 +1635,16 @@ exports.TeenManhua = exports.TeenManhuaInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const TeenManhuaParser_1 = require("./TeenManhuaParser");
-const TEENMANHUA_DOMAIN = 'https://teenmanhua.com';
+const DOMAIN = 'https://teenmanhua.com';
 exports.TeenManhuaInfo = {
     version: Madara_1.getExportVersion('0.0.1'),
     name: 'TeenManhua',
-    description: 'Extension that pulls manga from teenmanhua.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: TEENMANHUA_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1655,7 +1655,7 @@ exports.TeenManhuaInfo = {
 class TeenManhua extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = TEENMANHUA_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.alternativeChapterAjaxEndpoint = true;

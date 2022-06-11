@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlatinumScans = exports.PlatinumScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const PLATINUMSCANS_DOMAIN = 'https://platinumscans.com';
+const DOMAIN = 'https://platinumscans.com';
 exports.PlatinumScansInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'PlatinumScans',
-    description: 'Extension that pulls manga from platinumscans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: PLATINUMSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1654,7 +1654,7 @@ exports.PlatinumScansInfo = {
 class PlatinumScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = PLATINUMSCANS_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.alternativeChapterAjaxEndpoint = false;
     }

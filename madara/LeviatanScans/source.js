@@ -952,16 +952,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LeviatanScans = exports.LeviatanScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const LEVIATANSCANS_DOMAIN = 'https://leviatanscans.com';
+const DOMAIN = 'https://leviatanscans.com';
 exports.LeviatanScansInfo = {
-    version: Madara_1.getExportVersion('0.0.1'),
+    version: Madara_1.getExportVersion('0.0.2'),
     name: 'LeviatanScans',
-    description: 'Extension that pulls manga from leviatanscans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: LEVIATANSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -972,9 +972,9 @@ exports.LeviatanScansInfo = {
 class LeviatanScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = LEVIATANSCANS_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.sourceTraversalPathName = 'omg/manga';
+        this.sourceTraversalPathName = 'hm/manga';
         this.alternativeChapterAjaxEndpoint = true;
     }
 }

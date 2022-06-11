@@ -952,16 +952,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HiperDex = exports.HiperDexInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const HIPERDEX_DOMAIN = 'https://hiperdex.com';
+const DOMAIN = 'https://hiperdex.com';
 exports.HiperDexInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'HiperDex',
-    description: 'Extension that pulls manga from hiperdex.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
-    websiteBaseURL: HIPERDEX_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -980,7 +980,7 @@ exports.HiperDexInfo = {
 class HiperDex extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = HIPERDEX_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1';

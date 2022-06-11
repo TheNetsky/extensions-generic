@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManhuaPro = exports.ManhuaProInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const MANHUAPRO_DOMAIN = 'https://manhuapro.com';
+const DOMAIN = 'https://manhuapro.com';
 exports.ManhuaProInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'ManhuaPro',
-    description: 'Extension that pulls manga from manhuapro.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: MANHUAPRO_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1654,7 +1654,7 @@ exports.ManhuaProInfo = {
 class ManhuaPro extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = MANHUAPRO_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.alternativeChapterAjaxEndpoint = false;
     }

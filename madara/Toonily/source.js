@@ -1635,16 +1635,16 @@ exports.Toonily = exports.ToonilyInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const ToonilyParser_1 = require("./ToonilyParser");
-const TOONILY_DOMAIN = 'https://toonily.com';
+const DOMAIN = 'https://toonily.com';
 exports.ToonilyInfo = {
     version: Madara_1.getExportVersion('0.0.1'),
     name: 'Toonily',
-    description: 'Extension that pulls manga from toonily.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
-    websiteBaseURL: TOONILY_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1663,7 +1663,7 @@ exports.ToonilyInfo = {
 class Toonily extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = TOONILY_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.sourceTraversalPathName = 'webtoon';

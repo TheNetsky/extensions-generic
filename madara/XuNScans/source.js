@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.XuNScans = exports.XuNScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const XUNSCANS_DOMAIN = 'https://xunscans.xyz';
+const DOMAIN = 'https://xunscans.xyz';
 exports.XuNScansInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'XuNScans',
-    description: 'Extension that pulls manga from xunscans.xyz',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Nuno Costa',
     authorWebsite: 'http://github.com/nuno99costa',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.MATURE,
-    websiteBaseURL: XUNSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1654,7 +1654,7 @@ exports.XuNScansInfo = {
 class XuNScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = XUNSCANS_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
     }

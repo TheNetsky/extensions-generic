@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResetScans = exports.ResetScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const RESETSCANS_DOMAIN = 'https://reset-scans.com';
+const DOMAIN = 'https://reset-scans.com';
 exports.ResetScansInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'ResetScans',
-    description: 'Extension that pulls manga from reset-scans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'darkdemon',
     authorWebsite: 'http://github.com/daarkdemon',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: RESETSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1654,7 +1654,7 @@ exports.ResetScansInfo = {
 class ResetScans extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = RESETSCANS_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;

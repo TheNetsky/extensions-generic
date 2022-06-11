@@ -952,16 +952,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.IsekaiScan = exports.IsekaiScanInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const ISEKAISCAN_DOMAIN = 'https://isekaiscan.com';
+const DOMAIN = 'https://isekaiscan.com';
 exports.IsekaiScanInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'IsekaiScan',
-    description: 'Extension that pulls manga from isekaiscan.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: ISEKAISCAN_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -972,7 +972,7 @@ exports.IsekaiScanInfo = {
 class IsekaiScan extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = ISEKAISCAN_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;

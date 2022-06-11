@@ -1634,16 +1634,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebtoonXYZ = exports.WebtoonXYZInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const WEBTOON_DOMAIN = 'https://www.webtoon.xyz';
+const DOMAIN = 'https://www.webtoon.xyz';
 exports.WebtoonXYZInfo = {
     version: Madara_1.getExportVersion('0.0.1'),
     name: 'WebtoonXYZ',
-    description: 'Extension that pulls manga from Webtoon.XYZ',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.ADULT,
-    websiteBaseURL: WEBTOON_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -1658,7 +1658,7 @@ exports.WebtoonXYZInfo = {
 class WebtoonXYZ extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = WEBTOON_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.sourceTraversalPathName = 'read';
         this.userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1';

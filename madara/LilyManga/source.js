@@ -952,16 +952,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LilyManga = exports.LilyMangaInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const LILYMANGA_DOMAIN = 'https://lilymanga.com';
+const DOMAIN = 'https://lilymanga.com';
 exports.LilyMangaInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
     name: 'LilyManga',
-    description: 'Extension that pulls manga from lilymanga.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: paperback_extensions_common_1.ContentRating.MATURE,
-    websiteBaseURL: LILYMANGA_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -972,7 +972,7 @@ exports.LilyMangaInfo = {
 class LilyManga extends Madara_1.Madara {
     constructor() {
         super(...arguments);
-        this.baseUrl = LILYMANGA_DOMAIN;
+        this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
         this.alternativeChapterAjaxEndpoint = true;

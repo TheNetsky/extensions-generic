@@ -14,15 +14,15 @@ import {
 
 export const parseMangaDetails = ($: CheerioStatic, mangaId: string, source: any): Manga => {
 
-    const title = $("div#content h5").first().text() ?? ''
-    const image = styleToUrl($("div.media a").first(),source) ?? 'https://i.imgur.com/GYUxEX8.png'
-    const description = decodeHTMLEntity($("div.col-lg-9").first().text().trim()).substringAfterFirst("Description ").substringBeforeLast("Volume")
+    const title = $('div#content h5').first().text() ?? ''
+    const image = styleToUrl($('div.media a').first(),source) ?? 'https://i.imgur.com/GYUxEX8.png'
+    const description = decodeHTMLEntity($('div.col-lg-9').first().text().trim()).substringAfterFirst('Description ').substringBeforeLast(' Volume')
     let hentai = false
 
     const arrayTags: Tag[] = []
     const country = $(source.countryOfOriginSelector).first().text().trim()
     const ishentai = $(source.isHentaiSelector).first().text().trim()
-    country !== "" ? arrayTags.push({id: "country", label: countryOfOriginToSeriesType(country)}) : null
+    country !== '' ? arrayTags.push({id: 'country', label: countryOfOriginToSeriesType(country)}) : null
     if (ishentai.toLocaleLowerCase().includes('yes')) hentai = true
     const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => createTag(x)) })]
 
@@ -38,16 +38,16 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string, source: any
     })
 }
 export const countryOfOriginToSeriesType = (country: string): string =>{
-    let info = ""
+    let info = ''
     switch (country.toLowerCase()){
-    case "south korea":
-       info = "Manhwa"
+    case 'south korea':
+       info = 'Manhwa'
        break
-    case "japan":
-       info = "Manga"
+    case 'japan':
+       info = 'Manga'
        break
-    case "china":
-        info = "Manhwa"
+    case 'china':
+        info = 'Manhwa'
        break
     }
     return info
@@ -55,9 +55,9 @@ export const countryOfOriginToSeriesType = (country: string): string =>{
 export const parseChapters = ($: CheerioStatic, mangaId: string, source: any): Chapter[] => {
     const chapters: Chapter[] = []
 
-    for (const chapter of $("div.col-lg-9 div.flex").toArray()) {
-        const urlElement = $("a.item-author",chapter)
-        const chapNu = urlElement.attr("href")?.split("/") ?? ''
+    for (const chapter of $('div.col-lg-9 div.flex').toArray()) {
+        const urlElement = $('a.item-author',chapter)
+        const chapNu = urlElement.attr('href')?.split('/') ?? ''
         const chapNum = chapNu[chapNu.length - 1]
         const id = idCleaner(urlElement.attr('href') ?? '',source) ?? ''
         const dateinfo = $('a.item-company', chapter).first().text()?.trim() ?? ''
@@ -138,12 +138,12 @@ export const parseMangaList = ($: CheerioStatic, source: any, collectedIds?: str
     if(typeof collectedIds === 'undefined') {
         collectedIds = []
     }
-    for (const manga of $("div.list-item").toArray()) {
-        var info = $("a.list-title",manga).first()
+    for (const manga of $('div.list-item').toArray()) {
+        var info = $('a.list-title',manga).first()
         const title = $(info).text() ?? ''
         const id = idCleaner($(info).attr('href') ?? '',source) ?? ''
         const image = styleToUrl($('a.media-content', manga).first(),source) ?? 'https://i.imgur.com/GYUxEX8.png'
-        if (!id || !title || !image) {
+        if (!id || !title) {
             throw(`Failed to parse homepage sections for ${source.baseUrl}/`)
         }
         if (!collectedIds.includes(id)) {
@@ -172,8 +172,8 @@ export const decodeHTMLEntity = (str: string): string => {
     })
 }
 export const styleToUrl = (Element:Cheerio,source: any): any =>{
-  return Element.attr("style")?.substringAfterFirst("(").substringBeforeLast(")").let((it: any)=>{
-   if(it.startsWith("http")){
+  return Element.attr('style')?.substringAfterFirst('(').substringBeforeLast(')').let((it: any)=>{
+   if(it.startsWith('http')){
      return it
    } else {
     return source.baseUrl + it

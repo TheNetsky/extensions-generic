@@ -22,7 +22,7 @@ import {
     parseChapters,
     parseMangaDetails,
 } from './GenkanParser'
-const BASE_VERSION = '1.0.0'
+const BASE_VERSION = '1.0.1'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -30,13 +30,14 @@ export const getExportVersion = (EXTENSION_VERSION: string): string => {
 export abstract class Genkan extends Source {
     readonly requestManager = createRequestManager({
         requestsPerSecond: 3,
-        requestTimeout: 15000,
+        requestTimeout: 30000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
 
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
+                        ...(this.userAgent && { 'user-agent': this.userAgent }),
                         'referer': `${this.baseUrl}/`
                     }
                 }
@@ -52,10 +53,11 @@ export abstract class Genkan extends Source {
     abstract baseUrl: string
     abstract languageCode: LanguageCode
      
-    DefaultUrlDirectory = "comics"
-    SerieslDirectory = "comics"
-    countryOfOriginSelector = ".card.mt-2 .list-item:contains(Country of Origin) .no-wrap"
+    DefaultUrlDirectory = 'comics'
+    SerieslDirectory = 'comics'
+    countryOfOriginSelector = '.card.mt-2 .list-item:contains(Country of Origin) .no-wrap'
     isHentaiSelector = '.card.mt-2 .list-item:contains(Mature (18+)) .no-wrap'
+    userAgent = ''
 
     parseTagUrl(url: string): string|undefined {
         return url.split('-').pop()
@@ -222,15 +224,15 @@ export abstract class Genkan extends Source {
     }
     protected normalizeSearchQuery(query: any) {
         var query = query.toLowerCase();
-        query = query.replace(/[àáạảãâầấậẩẫăằắặẳẵ]+/g, "a");
-        query = query.replace(/[èéẹẻẽêềếệểễ]+/g, "e");
-        query = query.replace(/[ìíịỉĩ]+/g, "i");
-        query = query.replace(/[òóọỏõôồốộổỗơờớợởỡ]+/g, "o");
-        query = query.replace(/[ùúụủũưừứựửữ]+/g, "u");
-        query = query.replace(/[ỳýỵỷỹ]+/g, "y");
-        query = query.replace(/[đ]+/g, "d");
-        query = query.replace(/ /g,"+");
-        query = query.replace(/%20/g, "+");
+        query = query.replace(/[àáạảãâầấậẩẫăằắặẳẵ]+/g, 'a');
+        query = query.replace(/[èéẹẻẽêềếệểễ]+/g, 'e');
+        query = query.replace(/[ìíịỉĩ]+/g, 'i');
+        query = query.replace(/[òóọỏõôồốộổỗơờớợởỡ]+/g, 'o');
+        query = query.replace(/[ùúụủũưừứựửữ]+/g, 'u');
+        query = query.replace(/[ỳýỵỷỹ]+/g, 'y');
+        query = query.replace(/[đ]+/g, 'd');
+        query = query.replace(/ /g,'+');
+        query = query.replace(/%20/g, '+');
         return query;
         
     }
@@ -257,10 +259,13 @@ export abstract class Genkan extends Source {
         return time
     }
 
-   override getCloudflareBypassRequest() {
+    override getCloudflareBypassRequest() {
         return createRequestObject({
             url: `${this.baseUrl}`,
             method: 'GET',
+            headers: {
+                ...(this.userAgent && { 'user-agent': this.userAgent }),
+            }
         })
     }
 

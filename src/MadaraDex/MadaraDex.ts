@@ -9,7 +9,7 @@ import {
     Madara
 } from '../Madara'
 
-const MADARADEX_DOMAIN = 'https://madaradex.org'
+const DOMAIN = 'https://madaradex.org'
 
 export const MadaraDexInfo: SourceInfo = {
     version: getExportVersion('0.0.1'),
@@ -19,7 +19,7 @@ export const MadaraDexInfo: SourceInfo = {
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.ADULT,
-    websiteBaseURL: MADARADEX_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -33,9 +33,14 @@ export const MadaraDexInfo: SourceInfo = {
 }
 
 export class MadaraDex extends Madara {
-    baseUrl: string = MADARADEX_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override hasAdvancedSearchPage = true
+
     override sourceTraversalPathName = 'title'
+    
     override searchMangaSelector = 'div.c-tabs-item > div.row'
 }

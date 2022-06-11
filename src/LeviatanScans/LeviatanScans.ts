@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const LEVIATANSCANS_DOMAIN = 'https://leviatanscans.com'
+const DOMAIN = 'https://leviatanscans.com'
 
 export const LeviatanScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'LeviatanScans',
-    description: 'Extension that pulls manga from leviatanscans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: LEVIATANSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,8 +29,12 @@ export const LeviatanScansInfo: SourceInfo = {
 }
 
 export class LeviatanScans extends Madara {
-    baseUrl: string = LEVIATANSCANS_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     override languageCode: LanguageCode = LanguageCode.ENGLISH
-    override sourceTraversalPathName = 'omg/manga'
+
+    override sourceTraversalPathName = 'hm/manga'
+
     override alternativeChapterAjaxEndpoint = true
 }

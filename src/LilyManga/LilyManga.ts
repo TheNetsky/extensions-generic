@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const LILYMANGA_DOMAIN = 'https://lilymanga.com'
+const DOMAIN = 'https://lilymanga.com'
 
 export const LilyMangaInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'LilyManga',
-    description: 'Extension that pulls manga from lilymanga.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: LILYMANGA_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,9 +29,14 @@ export const LilyMangaInfo: SourceInfo = {
 }
 
 export class LilyManga extends Madara {
-    baseUrl: string = LILYMANGA_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override hasAdvancedSearchPage = true
+
     override alternativeChapterAjaxEndpoint = true
+    
     override sourceTraversalPathName = 'ys'
 }

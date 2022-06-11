@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const COMICKIBA_DOMAIN = 'https://comickiba.com'
+const DOMAIN = 'https://comickiba.com'
 
 export const ComicKibaInfo: SourceInfo = {
     version: getExportVersion('0.0.1'),
     name: 'ComicKiba',
-    description: 'Extension that pulls manga from comickiba.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: COMICKIBA_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,9 +29,14 @@ export const ComicKibaInfo: SourceInfo = {
 }
 
 export class ComicKiba extends Madara {
-    baseUrl: string = COMICKIBA_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override hasAdvancedSearchPage = true
+
     override chapterDetailsSelector = 'li.blocks-gallery-item img:nth-child(1), div.reading-content p > img, .read-container .reading-content img'
+    
     override alternativeChapterAjaxEndpoint = true
 }

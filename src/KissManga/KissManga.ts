@@ -9,32 +9,34 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://wdscans.com'
+const DOMAIN = 'https://1stkissmanga.io'
 
-export const WDScansInfo: SourceInfo = {
+export const KissMangaInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'WickedDragon Scans',
+    name: '1stKissManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'NotMarek',
-    authorWebsite: 'http://github.com/notmarek',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: ContentRating.EVERYONE,
+    contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
             type: TagType.GREEN
+        },
+        {
+            text: 'Cloudflare',
+            type: TagType.RED
         }
     ]
 }
 
-export class WDScans extends Madara {
+export class KissManga extends Madara {
 
     baseUrl: string = DOMAIN
 
     languageCode: LanguageCode = LanguageCode.ENGLISH
 
-    override hasAdvancedSearchPage = true
-    
     override alternativeChapterAjaxEndpoint = true
 }

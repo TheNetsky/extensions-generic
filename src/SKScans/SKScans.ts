@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const SKSCANS_DOMAIN = 'https://skscans.com'
+const DOMAIN = 'https://skscans.com'
 
 export const SKScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'SKScans',
-    description: 'Extension that pulls manga from skscans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: SKSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,6 +29,8 @@ export const SKScansInfo: SourceInfo = {
 }
 
 export class SKScans extends Madara {
-    baseUrl: string = SKSCANS_DOMAIN
+
+    baseUrl: string = DOMAIN
+    
     languageCode: LanguageCode = LanguageCode.ENGLISH
 }

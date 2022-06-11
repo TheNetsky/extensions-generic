@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const PLATINUMSCANS_DOMAIN = 'https://platinumscans.com'
+const DOMAIN = 'https://platinumscans.com'
 
 export const PlatinumScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'PlatinumScans',
-    description: 'Extension that pulls manga from platinumscans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: PLATINUMSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,7 +29,10 @@ export const PlatinumScansInfo: SourceInfo = {
 }
 
 export class PlatinumScans extends Madara {
-    baseUrl: string = PLATINUMSCANS_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     override languageCode: LanguageCode = LanguageCode.ENGLISH
+    
     override alternativeChapterAjaxEndpoint = false
 }

@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const HENTAI20_DOMAIN = 'https://hentai20.com'
+const DOMAIN = 'https://hentai20.com'
 
 export const Hentai20Info: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'Hentai20',
-    description: 'Extension that pulls manga from hentai20.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.ADULT,
-    websiteBaseURL: HENTAI20_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -37,8 +37,12 @@ export const Hentai20Info: SourceInfo = {
 }
 
 export class Hentai20 extends Madara {
-    baseUrl: string = HENTAI20_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override hasAdvancedSearchPage = true
+    
     override userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1'
 }

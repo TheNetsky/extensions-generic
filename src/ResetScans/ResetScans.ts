@@ -10,17 +10,17 @@ import {
 } from '../Madara'
 
 
-const RESETSCANS_DOMAIN = 'https://reset-scans.com'
+const DOMAIN = 'https://reset-scans.com'
 
 export const ResetScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'ResetScans',
-    description: 'Extension that pulls manga from reset-scans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'darkdemon',
     authorWebsite: 'http://github.com/daarkdemon',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: RESETSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -30,8 +30,12 @@ export const ResetScansInfo: SourceInfo = {
 }
 
 export class ResetScans extends Madara {
-    baseUrl: string = RESETSCANS_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override alternativeChapterAjaxEndpoint = true
+    
     override hasAdvancedSearchPage = true
 }

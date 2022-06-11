@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const XUNSCANS_DOMAIN = 'https://xunscans.xyz'
+const DOMAIN = 'https://xunscans.xyz'
 
 export const XuNScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'XuNScans',
-    description: 'Extension that pulls manga from xunscans.xyz',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Nuno Costa',
     authorWebsite: 'http://github.com/nuno99costa',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: XUNSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,7 +29,10 @@ export const XuNScansInfo: SourceInfo = {
 }
 
 export class XuNScans extends Madara {
-    baseUrl: string = XUNSCANS_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override hasAdvancedSearchPage = true
 }

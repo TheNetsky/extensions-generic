@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const MACBOLD_DOMAIN = 'https://macbold.com'
+const DOMAIN = 'https://macbold.com'
 
 export const MacBoldInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'MacBold',
-    description: 'Extension that pulls manga from macbold.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
-    websiteBaseURL: MACBOLD_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,8 +29,12 @@ export const MacBoldInfo: SourceInfo = {
 }
 
 export class MacBold extends Madara {
-    baseUrl: string = MACBOLD_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override hasAdvancedSearchPage = true
+    
     override alternativeChapterAjaxEndpoint = true
 }

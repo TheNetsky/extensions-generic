@@ -10,17 +10,17 @@ import {
 } from '../Madara'
 
 
-const MANGA1ST_DOMAIN = 'https://manga1st.online'
+const DOMAIN = 'https://manga1st.online'
 
 export const Manga1stInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'Manga1st',
-    description: 'Extension that pulls manga from manga1st.online',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.ADULT,
-    websiteBaseURL: MANGA1ST_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -30,8 +30,12 @@ export const Manga1stInfo: SourceInfo = {
 }
 
 export class Manga1st extends Madara {
-    baseUrl: string = MANGA1ST_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override alternativeChapterAjaxEndpoint = true
+    
     override hasAdvancedSearchPage = true
 }

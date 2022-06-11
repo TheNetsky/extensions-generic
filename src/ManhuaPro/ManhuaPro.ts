@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const MANHUAPRO_DOMAIN = 'https://manhuapro.com'
+const DOMAIN = 'https://manhuapro.com'
 
 export const ManhuaProInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'ManhuaPro',
-    description: 'Extension that pulls manga from manhuapro.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: MANHUAPRO_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,7 +29,10 @@ export const ManhuaProInfo: SourceInfo = {
 }
 
 export class ManhuaPro extends Madara {
-    baseUrl: string = MANHUAPRO_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     override languageCode: LanguageCode = LanguageCode.ENGLISH
+    
     override alternativeChapterAjaxEndpoint = false
 }

@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const MANGACULTIVATOR_DOMAIN = 'https://mangacultivator.com'
+const DOMAIN = 'https://mangacultivator.com'
 
 export const MangaCultivatorInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'MangaCultivator',
-    description: 'Extension that pulls manga from mangacultivator.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: MANGACULTIVATOR_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,8 +29,12 @@ export const MangaCultivatorInfo: SourceInfo = {
 }
 
 export class MangaCultivator extends Madara {
-    baseUrl: string = MANGACULTIVATOR_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override hasAdvancedSearchPage = true
+    
     override alternativeChapterAjaxEndpoint = true
 }

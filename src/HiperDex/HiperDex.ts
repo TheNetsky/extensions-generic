@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const HIPERDEX_DOMAIN = 'https://hiperdex.com'
+const DOMAIN = 'https://hiperdex.com'
 
 export const HiperDexInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'HiperDex',
-    description: 'Extension that pulls manga from hiperdex.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: ContentRating.ADULT,
-    websiteBaseURL: HIPERDEX_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -37,9 +37,14 @@ export const HiperDexInfo: SourceInfo = {
 }
 
 export class HiperDex extends Madara {
-    baseUrl: string = HIPERDEX_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override hasAdvancedSearchPage = true
+
     override userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1'
+    
     override alternativeChapterAjaxEndpoint = true
 }

@@ -9,17 +9,17 @@ import {
     Madara
 } from '../Madara'
 
-const MANGABOB_DOMAIN = 'https://mangabob.com'
+const DOMAIN = 'https://mangabob.com'
 
 export const MangaBobInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'MangaBob',
-    description: 'Extension that pulls manga from mangabob.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
     authorWebsite: 'http://github.com/gamefuzzy',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: MANGABOB_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,7 +29,10 @@ export const MangaBobInfo: SourceInfo = {
 }
 
 export class MangaBob extends Madara {
-    baseUrl: string = MANGABOB_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override hasAdvancedSearchPage = true
 }

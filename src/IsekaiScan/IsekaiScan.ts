@@ -10,17 +10,17 @@ import {
 } from '../Madara'
 
 
-const ISEKAISCAN_DOMAIN = 'https://isekaiscan.com'
+const DOMAIN = 'https://isekaiscan.com'
 
 export const IsekaiScanInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'IsekaiScan',
-    description: 'Extension that pulls manga from isekaiscan.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: ISEKAISCAN_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -30,8 +30,12 @@ export const IsekaiScanInfo: SourceInfo = {
 }
 
 export class IsekaiScan extends Madara {
-    baseUrl: string = ISEKAISCAN_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override alternativeChapterAjaxEndpoint = true
+    
     override hasAdvancedSearchPage = true
 }

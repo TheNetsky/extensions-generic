@@ -54,4 +54,6 @@ export class Toonily extends Madara {
 
     override readonly parser: ToonilyParser = new ToonilyParser();
 
+    override chapterDetailsSelector = '.wp-manga-chapter-img'
+
 }

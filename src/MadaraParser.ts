@@ -236,8 +236,13 @@ export class Parser {
         else if ((typeof imageObj?.attr('srcset')) != 'undefined') {
             image = imageObj?.attr('srcset')?.split(' ')[0] ?? ''
         }
-        else {
+        else if ((typeof imageObj?.attr('src')) != 'undefined') {
             image = imageObj?.attr('src')
+        }
+        else if ((typeof imageObj?.attr('data-cfsrc')) != 'undefined') {
+            image = imageObj?.attr('data-cfsrc')
+        } else {
+            image = 'https://i.imgur.com/GYUxEX8.png' // Fallback image
         }
         return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')))
     }

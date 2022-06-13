@@ -18,7 +18,7 @@ describe('Toonily Tests', () => {
      * Try to choose a manga which is updated frequently, so that the historical checking test can 
      * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
      */
-    const mangaId = 'my-landlady-noona' // my-landlady-noona
+    const mangaId = 'stepmothers-friends-1' // my-landlady-noona
 
     it('Retrieve Manga Details', async () => {
         const details = await wrapper.getMangaDetails(source, mangaId)
@@ -50,7 +50,7 @@ describe('Toonily Tests', () => {
     it('Get Chapter Details', async () => {
 
         const chapters = await wrapper.getChapters(source, mangaId)
-        const data = await wrapper.getChapterDetails(source, mangaId, chapters[0]?.id ?? 'unknown')
+        const data = await wrapper.getChapterDetails(source, mangaId, chapters[99]?.id ?? 'unknown')
 
         expect(data, 'No server response').to.exist
         expect(data, 'Empty server response').to.not.be.empty

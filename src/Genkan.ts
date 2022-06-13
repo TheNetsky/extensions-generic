@@ -112,6 +112,7 @@ export abstract class Genkan extends Source {
                     title: 'Latest Updates',
                     view_more: true,
                 }),
+                isLatest: true
             },
             {
                 request: createRequestObject({
@@ -123,6 +124,7 @@ export abstract class Genkan extends Source {
                     title: 'Popular Series',
                     view_more: true,
                 }),
+                isLatest: false
             },
         ]
         const promises: Promise<void>[] = []
@@ -131,7 +133,7 @@ export abstract class Genkan extends Source {
             promises.push(
                 this.requestManager.schedule(section.request, 1).then(response => {
                     const $ = this.cheerio.load(response.data)
-                    section.section.items = parseMangaList($, this)
+                    section.section.items = parseMangaList($, this,section.isLatest)
                     sectionCallback(section.section)
                 }),
             )
@@ -169,12 +171,15 @@ export abstract class Genkan extends Source {
         let page: number = metadata?.page ?? 1
         if (page == -1) return createPagedResults({ results: [], metadata: { page: -1 } })
         let param = ''
+        let isLatest: Boolean = false 
         switch (homepageSectionId) {
             case '1':
                 param = `/latest?page=${page}`
+                isLatest = true
                 break
             case '2':
                 param = `/${this.DefaultUrlDirectory}?page=${page}`
+                isLatest = false
                 break
             default:
                 throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
@@ -188,7 +193,7 @@ export abstract class Genkan extends Source {
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data)
         let collectedIds: string[] = []
-        const manga = parseMangaList($, this,collectedIds)
+        const manga = parseMangaList($, this,isLatest,collectedIds)
         page++
         if (!NextPage($)) page = -1
 
@@ -211,7 +216,7 @@ export abstract class Genkan extends Source {
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data)
-        const manga = parseMangaList($, this)
+        const manga = parseMangaList($, this,false)
         page++
         if (!NextPage($)) page = -1
 

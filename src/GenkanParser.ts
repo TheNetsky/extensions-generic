@@ -66,9 +66,9 @@ export const parseChapters = ($: CheerioStatic, mangaId: string, source: any): C
         if (urlElement.text().includes(`Chapter ${chapNum}`)) {
             title = urlElement.text().trim()
         } else {
-            title = `Ch. ${chapNum}: ${urlElement.text()}`
+            title = `Ch. ${chapNum}: ${urlElement.text().trim()}`
         }
-        if(dateinfo.toLowerCase().includes('')){
+        if(dateinfo.toLowerCase().includes('ago')){
             date = source.convertTime(dateinfo)
         } else {
             date = new Date(dateinfo)
@@ -133,16 +133,17 @@ export const parseUpdatedManga = ($: CheerioStatic, time: Date, ids: string[], s
     }
 }
 
-export const parseMangaList = ($: CheerioStatic, source: any, collectedIds?: string[]): MangaTile[] => {
+export const parseMangaList = ($: CheerioStatic, source: any, isLatest: Boolean,collectedIds?: string[]): MangaTile[] => {
     const results: MangaTile[] = []
     if(typeof collectedIds === 'undefined') {
         collectedIds = []
     }
     for (const manga of $('div.list-item').toArray()) {
         var info = $('a.list-title',manga).first()
-        const title = $(info).text() ?? ''
+        const title = $(info).text().trim() ?? ''
         const id = idCleaner($(info).attr('href') ?? '',source) ?? ''
         const image = styleToUrl($('a.media-content', manga).first(),source) ?? 'https://i.imgur.com/GYUxEX8.png'
+        const subTitle = $('.media .media-overlay span',manga).text().trim() ?? ''
         if (!id || !title) {
             throw(`Failed to parse homepage sections for ${source.baseUrl}/`)
         }
@@ -151,6 +152,7 @@ export const parseMangaList = ($: CheerioStatic, source: any, collectedIds?: str
             id: id,
             image: image,
             title: createIconText({ text: decodeHTMLEntity(title) }),
+            subtitleText: createIconText({ text: isLatest ? decodeHTMLEntity(subTitle) : ''})
         }))
         collectedIds.push(id)
     }

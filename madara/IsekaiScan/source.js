@@ -999,7 +999,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.1.3';
+const BASE_VERSION = '2.1.4';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1651,8 +1651,14 @@ class Parser {
         else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('srcset'))) != 'undefined') {
             image = (_b = (_a = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('srcset')) === null || _a === void 0 ? void 0 : _a.split(' ')[0]) !== null && _b !== void 0 ? _b : '';
         }
-        else {
+        else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('src'))) != 'undefined') {
             image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('src');
+        }
+        else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-cfsrc'))) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-cfsrc');
+        }
+        else {
+            image = 'https://i.imgur.com/GYUxEX8.png'; // Fallback image
         }
         return encodeURI(decodeURI(this.decodeHTMLEntity((_c = image === null || image === void 0 ? void 0 : image.trim()) !== null && _c !== void 0 ? _c : '')));
     }

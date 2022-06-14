@@ -40,15 +40,18 @@ export const parseMangaDetails = ($: CheerioStatic, mangaId: string, source: any
 export const countryOfOriginToSeriesType = (country: string): string =>{
     let info = ''
     switch (country.toLowerCase()){
-    case 'south korea':
-       info = 'Manhwa'
-       break
-    case 'japan':
-       info = 'Manga'
-       break
-    case 'china':
-        info = 'Manhwa'
-       break
+        case 'south korea':
+            info = 'Manhwa'
+            break
+        case 'japan':
+            info = 'Manga'
+            break
+        case 'china':
+            info = 'Manhwa'
+            break
+        default:
+            info = ''
+            break
     }
     return info
 }
@@ -89,7 +92,7 @@ export const parseChapters = ($: CheerioStatic, mangaId: string, source: any): C
 export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string,source: any): ChapterDetails => {
     const pages: string[] = []
 
-    let allImages = $('div#pages-container + script')[0]?.children[0]?.data?.substringAfterFirst('[').substringBeforeLast('];').replace(/["\\]/g, '').split(',') ?? []
+    const allImages = $('div#pages-container + script')[0]?.children[0]?.data?.substringAfterFirst('[').substringBeforeLast('];').replace(/["\\]/g, '').split(',') ?? []
     for (const p in allImages) {
         let page = encodeURI(allImages[p])
         page = page.startsWith('http') ? page : source.baseUrl + page
@@ -110,11 +113,11 @@ export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId
 
 export const parseUpdatedManga = ($: CheerioStatic, time: Date, ids: string[], source: any) => {
     let passedReferenceTime = false
-    let updatedManga: string[] = []
+    const updatedManga: string[] = []
 
-    for (let obj of $('div.list-item').toArray()) {
-        let id = idCleaner($('a.list-title', $(obj)).attr('href') ?? '',source) ?? ''
-        let mangaTime: Date = source.convertTime($('.text-muted.text-sm', obj).text() ?? '')
+    for (const obj of $('div.list-item').toArray()) {
+        const id = idCleaner($('a.list-title', $(obj)).attr('href') ?? '',source) ?? ''
+        const mangaTime: Date = source.convertTime($('.text-muted.text-sm', obj).text() ?? '')
         passedReferenceTime = mangaTime <= time
         if (!passedReferenceTime) {
             if (ids.includes(id)) {
@@ -133,13 +136,13 @@ export const parseUpdatedManga = ($: CheerioStatic, time: Date, ids: string[], s
     }
 }
 
-export const parseMangaList = ($: CheerioStatic, source: any, isLatest: Boolean,collectedIds?: string[]): MangaTile[] => {
+export const parseMangaList = ($: CheerioStatic, source: any, isLatest: boolean,collectedIds?: string[]): MangaTile[] => {
     const results: MangaTile[] = []
     if(typeof collectedIds === 'undefined') {
         collectedIds = []
     }
     for (const manga of $('div.list-item').toArray()) {
-        var info = $('a.list-title',manga).first()
+        const info = $('a.list-title',manga).first()
         const title = $(info).text().trim() ?? ''
         const id = idCleaner($(info).attr('href') ?? '',source) ?? ''
         const image = styleToUrl($('a.media-content', manga).first(),source) ?? 'https://i.imgur.com/GYUxEX8.png'
@@ -148,39 +151,39 @@ export const parseMangaList = ($: CheerioStatic, source: any, isLatest: Boolean,
             throw(`Failed to parse homepage sections for ${source.baseUrl}/`)
         }
         if (!collectedIds.includes(id)) {
-        results.push(createMangaTile({
-            id: id,
-            image: image,
-            title: createIconText({ text: decodeHTMLEntity(title) }),
-            subtitleText: createIconText({ text: isLatest ? decodeHTMLEntity(subTitle) : ''})
-        }))
-        collectedIds.push(id)
-    }
+            results.push(createMangaTile({
+                id: id,
+                image: image,
+                title: createIconText({ text: decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: isLatest ? decodeHTMLEntity(subTitle) : ''})
+            }))
+            collectedIds.push(id)
+        }
     }
     return results
 }
 export const NextPage = ($: CheerioStatic): boolean => {
-    var nextPage = $('[rel=next]');
+    const nextPage = $('[rel=next]')
     if (nextPage.contents().length !== 0) {
-        return true;
+        return true
     } else {
-        return false;
+        return false
     }
 }
 
 export const decodeHTMLEntity = (str: string): string => {
-    return str.replace(/&#(\d+);/g, function (_match, dec) {
-        return String.fromCharCode(dec);
+    return str.replace(/&#(\d+);/g, (_match, dec) => {
+        return String.fromCharCode(dec)
     })
 }
 export const styleToUrl = (Element:Cheerio,source: any): any =>{
-  return Element.attr('style')?.substringAfterFirst('(').substringBeforeLast(')').let((it: any)=>{
-   if(it.startsWith('http')){
-     return it
-   } else {
-    return source.baseUrl + it
-   }
-  })
+    return Element.attr('style')?.substringAfterFirst('(').substringBeforeLast(')').let((it: any)=>{
+        if(it.startsWith('http')){
+            return it
+        } else {
+            return source.baseUrl + it
+        }
+    })
 }
 export const idCleaner = (str: string, source: any): string => {
     const base = source.baseUrl.split('://').pop()
@@ -191,7 +194,7 @@ export const idCleaner = (str: string, source: any): string => {
     str = str.replace(`${source.SerieslDirectory}/`, '')
     return str
 }
-export {};
+export {}
 
 declare global {
     interface String {
@@ -200,20 +203,20 @@ declare global {
          * @param block - The function to be executed with `this` as argument
          * @returns `block`'s result
          */
-        let<R>(this: String | null | undefined, block: (it: string) => R): R;
+        let<R>(this: string | null | undefined, block: (it: string) => R): R
         substringBeforeLast(character:any): any
         substringAfterFirst(substring:any): any
     }
 }
 String.prototype.let = function(this, block) {
-    return block(this!.valueOf());
+    return block(this!.valueOf())
 }
 String.prototype.substringBeforeLast = function (character) {
-    var lastIndexOfCharacter = this.lastIndexOf(character);
-    return this.substring(0, lastIndexOfCharacter);
-};
+    const lastIndexOfCharacter = this.lastIndexOf(character)
+    return this.substring(0, lastIndexOfCharacter)
+}
 String.prototype.substringAfterFirst = function (substring) {
-    var startingIndexOfSubstring = this.indexOf(substring);
-    var endIndexOfSubstring = startingIndexOfSubstring + substring.length - 1;
-    return this.substring(endIndexOfSubstring + 1, this.length);
-};
+    const startingIndexOfSubstring = this.indexOf(substring)
+    const endIndexOfSubstring = startingIndexOfSubstring + substring.length - 1
+    return this.substring(endIndexOfSubstring + 1, this.length)
+}

@@ -32,6 +32,6 @@ export class LynxScans extends Genkan {
     baseUrl: string = LYNXSCANS_DOMAIN
     languageCode: LanguageCode = LanguageCode.ENGLISH
     override DefaultUrlDirectory = 'web/comics'
-    override SerieslDirectory = "comics"
+    override SerieslDirectory = 'comics'
 
 }

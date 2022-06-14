@@ -61,7 +61,7 @@ export const parseChapters = ($: CheerioStatic, mangaId: string, source: any): C
     for (const chapter of $('div.col-lg-9 div.flex').toArray()) {
         const urlElement = $('a.item-author',chapter)
         const chapNu = urlElement.attr('href')?.split('/') ?? ''
-        const chapNum = chapNu[chapNu.length - 1]
+        const chapNum = Number(chapNu[chapNu.length - 1])
         const id = idCleaner(urlElement.attr('href') ?? '',source) ?? ''
         const dateinfo = $('a.item-company', chapter).first().text()?.trim() ?? ''
         let date
@@ -82,7 +82,7 @@ export const parseChapters = ($: CheerioStatic, mangaId: string, source: any): C
             mangaId,
             name: title,
             langCode: LanguageCode.ENGLISH,
-            chapNum: Number(chapNum),
+            chapNum: isNaN(chapNum) ? 0 : chapNum,
             time: date,
         }))
     }

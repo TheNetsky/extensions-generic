@@ -227,9 +227,8 @@ export abstract class Genkan extends Source {
     }
     
     protected convertTime(date: string): Date {
-        date = date.toUpperCase()
         let time: Date
-        let number = Number((/\d*/.exec(date) ?? [])[0])
+        let number = Number((/\d*/.exec(date.trim()) ?? [])[0])
         number = (number == 0 && date.includes('a')) ? 1 : number
         if (date.includes('mins') || date.includes('minutes') || date.includes('minute')) {
             time = new Date(Date.now() - number * 60000)

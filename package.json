@@ -1,6 +1,7 @@
 {
   "name": "extensions-official",
   "version": "1.0.0",
+  "repositoryName": "Extensions Genkan (Netsky Fork)",
   "description": "Community maintained Paperback extension repository",
   "main": "index.js",
   "scripts": {

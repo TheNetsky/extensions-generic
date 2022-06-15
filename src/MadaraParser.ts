@@ -105,7 +105,7 @@ export class Parser {
                 throw new Error(`Could not parse page for ${mangaId}/${chapterId}`)
             }
 
-            pages.push(page)
+            pages.push(encodeURI(page))
         }
 
         return createChapterDetails({
@@ -244,7 +244,7 @@ export class Parser {
         } else {
             image = 'https://i.imgur.com/GYUxEX8.png' // Fallback image
         }
-        return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')))
+        return decodeURI(this.decodeHTMLEntity(image?.trim() ?? ''))
     }
 
     protected decodeHTMLEntity(str: string): string {

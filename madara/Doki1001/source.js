@@ -948,6 +948,44 @@ __exportStar(require("./RawData"), exports);
 
 },{"./Chapter":14,"./ChapterDetails":15,"./Constants":16,"./DynamicUI":32,"./HomeSection":33,"./Languages":34,"./Manga":35,"./MangaTile":36,"./MangaUpdate":37,"./PagedResults":38,"./RawData":39,"./RequestHeaders":40,"./RequestInterceptor":41,"./RequestManager":42,"./RequestObject":43,"./ResponseObject":44,"./SearchField":45,"./SearchRequest":46,"./SourceInfo":47,"./SourceManga":48,"./SourceStateManager":49,"./SourceTag":50,"./TagSection":51,"./TrackedManga":52,"./TrackedMangaChapterReadAction":53,"./TrackerActionQueue":54}],56:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Doki1001 = exports.Doki1001Info = void 0;
+const paperback_extensions_common_1 = require("paperback-extensions-common");
+const Madara_1 = require("../Madara");
+const DOMAIN = 'https://doki1001.com';
+exports.Doki1001Info = {
+    version: Madara_1.getExportVersion('0.0.0'),
+    name: 'Doki1001',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: paperback_extensions_common_1.ContentRating.MATURE,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [
+        {
+            text: 'Notifications',
+            type: paperback_extensions_common_1.TagType.GREEN
+        },
+        {
+            text: 'Japanese',
+            type: paperback_extensions_common_1.TagType.GREY
+        }
+    ]
+};
+class Doki1001 extends Madara_1.Madara {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+        this.languageCode = paperback_extensions_common_1.LanguageCode.JAPANESE;
+        this.hasAdvancedSearchPage = true;
+        this.alternativeChapterAjaxEndpoint = true;
+    }
+}
+exports.Doki1001 = Doki1001;
+
+},{"../Madara":57,"paperback-extensions-common":13}],57:[function(require,module,exports){
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1358,7 +1396,7 @@ class Madara extends paperback_extensions_common_1.Source {
 }
 exports.Madara = Madara;
 
-},{"./MadaraHelper":57,"./MadaraParser":58,"paperback-extensions-common":13}],57:[function(require,module,exports){
+},{"./MadaraHelper":58,"./MadaraParser":59,"paperback-extensions-common":13}],58:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URLBuilder = void 0;
@@ -1402,7 +1440,7 @@ class URLBuilder {
 }
 exports.URLBuilder = URLBuilder;
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -1634,39 +1672,5 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{"entities":9,"paperback-extensions-common":13}],59:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Manga1st = exports.Manga1stInfo = void 0;
-const paperback_extensions_common_1 = require("paperback-extensions-common");
-const Madara_1 = require("../Madara");
-const DOMAIN = 'https://manga1st.online';
-exports.Manga1stInfo = {
-    version: Madara_1.getExportVersion('0.0.0'),
-    name: 'Manga1st',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: paperback_extensions_common_1.ContentRating.ADULT,
-    websiteBaseURL: DOMAIN,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: paperback_extensions_common_1.TagType.GREEN
-        }
-    ]
-};
-class Manga1st extends Madara_1.Madara {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-        this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.alternativeChapterAjaxEndpoint = true;
-        this.hasAdvancedSearchPage = true;
-    }
-}
-exports.Manga1st = Manga1st;
-
-},{"../Madara":56,"paperback-extensions-common":13}]},{},[59])(59)
+},{"entities":9,"paperback-extensions-common":13}]},{},[56])(56)
 });

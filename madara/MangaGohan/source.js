@@ -1637,36 +1637,40 @@ exports.Parser = Parser;
 },{"entities":9,"paperback-extensions-common":13}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Manga1st = exports.Manga1stInfo = void 0;
+exports.MangaGohan = exports.MangaGohanInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://manga1st.online';
-exports.Manga1stInfo = {
+const DOMAIN = 'https://mangagohan.me';
+exports.MangaGohanInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
-    name: 'Manga1st',
+    name: 'MangaGohan',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: paperback_extensions_common_1.ContentRating.ADULT,
+    contentRating: paperback_extensions_common_1.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
             type: paperback_extensions_common_1.TagType.GREEN
+        },
+        {
+            text: 'Japanese',
+            type: paperback_extensions_common_1.TagType.GREY
         }
     ]
 };
-class Manga1st extends Madara_1.Madara {
+class MangaGohan extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.alternativeChapterAjaxEndpoint = true;
+        this.languageCode = paperback_extensions_common_1.LanguageCode.JAPANESE;
         this.hasAdvancedSearchPage = true;
+        this.alternativeChapterAjaxEndpoint = true;
     }
 }
-exports.Manga1st = Manga1st;
+exports.MangaGohan = MangaGohan;
 
 },{"../Madara":56,"paperback-extensions-common":13}]},{},[59])(59)
 });

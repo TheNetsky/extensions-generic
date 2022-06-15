@@ -1496,7 +1496,7 @@ class Parser {
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = ($('a', obj).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
             const chapName = (_a = $('a', obj).first().text().trim()) !== null && _a !== void 0 ? _a : '';
-            const chapNum = Number((_c = (_b = id.match(/\D*(\d*\-?\d*)\D*$/)) === null || _b === void 0 ? void 0 : _b.pop()) === null || _c === void 0 ? void 0 : _c.replace(/-/g, '.'));
+            const chapNum = Number((_c = (_b = decodeURIComponent(id).match(/\D*(\d*\-?\d*)\D*$/)) === null || _b === void 0 ? void 0 : _b.pop()) === null || _c === void 0 ? void 0 : _c.replace(/-/g, '.'));
             let mangaTime;
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {

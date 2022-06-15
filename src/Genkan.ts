@@ -1,4 +1,6 @@
-
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     Source,
     Manga,
@@ -13,21 +15,18 @@ import {
     Response,
 } from 'paperback-extensions-common'
 import {
-    NextPage,
-    parseMangaList,
-    parseUpdatedManga,
-    parseChapterDetails,
-    parseChapters,
-    parseMangaDetails,
+    GenkanParser,
+    UpdatedManga
 } from './GenkanParser'
-const BASE_VERSION = '1.0.2'
+
+const BASE_VERSION = '1.0.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
 export abstract class Genkan extends Source {
     readonly requestManager = createRequestManager({
-        requestsPerSecond: 3,
+        requestsPerSecond: 4,
         requestTimeout: 30000,
         interceptor: {
             interceptRequest: async (request: Request): Promise<Request> => {
@@ -48,16 +47,22 @@ export abstract class Genkan extends Source {
             }
         }
     })
+
+    parser = new GenkanParser();
+
     abstract baseUrl: string
+
     abstract languageCode: LanguageCode
-     
+
     DefaultUrlDirectory = 'comics'
-    SerieslDirectory = 'comics'
+
+    serieslDirectory = 'comics'
+
     countryOfOriginSelector = '.card.mt-2 .list-item:contains(Country of Origin) .no-wrap'
-    isHentaiSelector = '.card.mt-2 .list-item:contains(Mature (18+)) .no-wrap'
+
     userAgent = ''
 
-    parseTagUrl(url: string): string|undefined {
+    parseTagUrl(url: string): string | undefined {
         return url.split('-').pop()
     }
 
@@ -67,35 +72,35 @@ export abstract class Genkan extends Source {
 
     async getMangaDetails(mangaId: string): Promise<Manga> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/${this.SerieslDirectory}/${mangaId}`,
+            url: `${this.baseUrl}/${this.serieslDirectory}/${mangaId}`,
             method: 'GET',
         })
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data)
-        return parseMangaDetails($, mangaId, this)
+        return this.parser .parseMangaDetails($, mangaId, this)
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/${this.SerieslDirectory}/${mangaId}`,
+            url: `${this.baseUrl}/${this.serieslDirectory}/${mangaId}`,
             method: 'GET',
         })
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data)
-        return parseChapters($, mangaId, this)
+        return this.parser.parseChapters($, mangaId, this)
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/${this.SerieslDirectory}/${chapterId}`,
+            url: `${this.baseUrl}/${this.serieslDirectory}/${chapterId}`,
             method: 'GET',
         })
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data)
-        return parseChapterDetails($, mangaId, chapterId,this)
+        return this.parser.parseChapterDetails($, mangaId, chapterId, this)
     }
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
@@ -123,53 +128,55 @@ export abstract class Genkan extends Source {
                     view_more: true,
                 }),
                 isLatest: false
-            },
+            }
         ]
+
         const promises: Promise<void>[] = []
         for (const section of sections) {
             sectionCallback(section.section)
             promises.push(
                 this.requestManager.schedule(section.request, 1).then(response => {
                     const $ = this.cheerio.load(response.data)
-                    section.section.items = parseMangaList($, this,section.isLatest)
+                    section.section.items = this.parser.parseMangaList($, this, section.isLatest)
                     sectionCallback(section.section)
                 }),
             )
 
         }
+
         await Promise.all(promises)
     }
 
     override async filterUpdatedManga(mangaUpdatesFoundCallback: (updates: MangaUpdates) => void, time: Date, ids: string[]): Promise<void> {
         let page = 1
-        let loadNextPage = true
-        while (loadNextPage) {
+        let updatedManga: UpdatedManga = {
+            ids: [],
+            loadMore: true
+        }
+
+        while (updatedManga.loadMore) {
             const request = createRequestObject({
-                url: `${this.baseUrl}/latest?page=${page}`,
+                url: `${this.baseUrl}/latest?page=${page++}`,
                 method: 'GET',
             })
 
             const data = await this.requestManager.schedule(request, 1)
             const $ = this.cheerio.load(data.data)
 
-            const updatedManga = parseUpdatedManga($, time, ids, this)
-            loadNextPage = updatedManga.loadNextPage && !NextPage($)
-            if (loadNextPage) {
-                page++
-            }
-            if (updatedManga.updates.length > 0) {
+            updatedManga = this.parser.parseUpdatedManga($, time, ids, this)
+            if (updatedManga.ids.length > 0) {
                 mangaUpdatesFoundCallback(createMangaUpdates({
-                    ids: updatedManga.updates
+                    ids: updatedManga.ids
                 }))
             }
         }
     }
-    
+
     override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
         let page: number = metadata?.page ?? 1
         if (page == -1) return createPagedResults({ results: [], metadata: { page: -1 } })
         let param = ''
-        let isLatest = false 
+        let isLatest = false
         switch (homepageSectionId) {
             case '1':
                 param = `/latest?page=${page}`
@@ -182,6 +189,7 @@ export abstract class Genkan extends Source {
             default:
                 throw new Error(`Invalid homeSectionId | ${homepageSectionId}`)
         }
+        
         const request = createRequestObject({
             url: `${this.baseUrl}`,
             method: 'GET',
@@ -190,10 +198,11 @@ export abstract class Genkan extends Source {
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data)
-        const collectedIds: string[] = []
-        const manga = parseMangaList($, this,isLatest,collectedIds)
+
+        const manga = this.parser.parseMangaList($, this, isLatest)
         page++
-        if (!NextPage($)) page = -1
+
+        if (!this.parser.NextPage($)) page = -1
 
         return createPagedResults({
             results: manga,
@@ -206,50 +215,29 @@ export abstract class Genkan extends Source {
     async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
         let page: number = metadata?.page ?? 1
         if (page == -1) return createPagedResults({ results: [], metadata: { page: -1 } })
-        if(!query.title) return createPagedResults({ results: [], metadata: { page: -1 } })
+        if (!query.title) return createPagedResults({ results: [], metadata: { page: -1 } })
+
         const request = createRequestObject({
-            url: `${this.baseUrl}/${this.DefaultUrlDirectory}?query=${query.title.replace(/%20/g, '+').replace(/ /g,'+') ?? ''}`,
+            url: `${this.baseUrl}/${this.DefaultUrlDirectory}?query=${this.normalizeSearchQuery(query.title) ?? ''}`,
             method: 'GET'
         })
 
         const response = await this.requestManager.schedule(request, 1)
         const $ = this.cheerio.load(response.data)
-        const manga = parseMangaList($, this,false)
+        const manga = this.parser.parseMangaList($, this, false)
+
         page++
-        if (!NextPage($)) page = -1
+        if (!this.parser.NextPage($)) page = -1
 
         return createPagedResults({
             results: manga,
-            metadata:{
+            metadata: {
                 page
             }
         })
     }
-    
-    protected convertTime(date: string): Date {
-        let time: Date
-        let number = Number((/\d*/.exec(date.trim()) ?? [])[0])
-        number = (number == 0 && date.includes('a')) ? 1 : number
-        if (date.includes('mins') || date.includes('minutes') || date.includes('minute')) {
-            time = new Date(Date.now() - number * 60000)
-        } else if (date.includes('hours') || date.includes('hour')) {
-            time = new Date(Date.now() - number * 3600000)
-        } else if (date.includes('days') || date.includes('day')) {
-            time = new Date(Date.now() - number * 86400000)
-        } else if (date.includes('weeks') || date.includes('week')) {
-            time = new Date(Date.now() - number * 604800000)
-        } else if (date.includes('months') || date.includes('month')) {
-            time = new Date(Date.now() - number * 2548800000)
-        } else if (date.includes('years') || date.includes('year')) {
-            time = new Date(Date.now() - number * 31556952000)
-        } else {
-            time = new Date(date)
-        }
 
-        return time
-    }
-
-    override getCloudflareBypassRequest(): Request {
+    override getCloudflareBypassRequest() {
         return createRequestObject({
             url: `${this.baseUrl}`,
             method: 'GET',
@@ -259,4 +247,17 @@ export abstract class Genkan extends Source {
         })
     }
 
+    protected normalizeSearchQuery(query: any) {
+        query = query.toLowerCase()
+        query = query.replace(/[àáạảãâầấậẩẫăằắặẳẵ]+/g, 'a')
+        query = query.replace(/[èéẹẻẽêềếệểễ]+/g, 'e')
+        query = query.replace(/[ìíịỉĩ]+/g, 'i')
+        query = query.replace(/[òóọỏõôồốộổỗơờớợởỡ]+/g, 'o')
+        query = query.replace(/[ùúụủũưừứựửữ]+/g, 'u')
+        query = query.replace(/[ỳýỵỷỹ]+/g, 'y')
+        query = query.replace(/[đ]+/g, 'd')
+        query = query.replace(/ /g, '+')
+        query = query.replace(/%20/g, '+')
+        return query
+    }
 }

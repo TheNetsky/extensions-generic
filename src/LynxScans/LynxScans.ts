@@ -9,17 +9,17 @@ import {
     getExportVersion
 } from '../Genkan'
 
-const LYNXSCANS_DOMAIN = 'https://lynxscans.com'
+const DOMAIN = 'https://lynxscans.com'
 
 export const LynxScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'LynxScans',
-    description: 'Extension that pulls manga from lynxscans.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'xOnlyFadi',
     authorWebsite: 'https://github.com/xOnlyFadi',
     icon: 'icon.png',
     contentRating: ContentRating.EVERYONE,
-    websiteBaseURL: LYNXSCANS_DOMAIN,
+    websiteBaseURL: DOMAIN,
     sourceTags: [
         {
             text: 'Notifications',
@@ -29,9 +29,13 @@ export const LynxScansInfo: SourceInfo = {
 }
 
 export class LynxScans extends Genkan {
-    baseUrl: string = LYNXSCANS_DOMAIN
+
+    baseUrl: string = DOMAIN
+
     languageCode: LanguageCode = LanguageCode.ENGLISH
+
     override DefaultUrlDirectory = 'web/comics'
-    override SerieslDirectory = 'comics'
+
+    override serieslDirectory = 'comics'
 
 }

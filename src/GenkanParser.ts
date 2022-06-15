@@ -1,196 +1,232 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
     Chapter,
     ChapterDetails,
-    Tag,
     LanguageCode,
     Manga,
     MangaStatus,
-    MangaTile,
-    TagSection
+    MangaTile
 } from 'paperback-extensions-common'
 
-export const parseMangaDetails = ($: CheerioStatic, mangaId: string, source: any): Manga => {
+import entities = require('entities')
 
-    const title = $('div#content h5').first().text() ?? ''
-    const image = styleToUrl($('div.media a').first(),source) ?? 'https://i.imgur.com/GYUxEX8.png'
-    const description = decodeHTMLEntity($('div.col-lg-9').first().text().trim()).substringAfterFirst('Description ').substringBeforeLast(' Volume')
-    let hentai = false
-
-    const arrayTags: Tag[] = []
-    const country = $(source.countryOfOriginSelector).first().text().trim()
-    const ishentai = $(source.isHentaiSelector).first().text().trim()
-    country !== '' ? arrayTags.push({id: 'country', label: countryOfOriginToSeriesType(country)}) : null
-    if (ishentai.toLocaleLowerCase().includes('yes')) hentai = true
-    const tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: arrayTags.map(x => createTag(x)) })]
-
-    return createManga({
-        id: mangaId,
-        titles: [title],
-        image: image,
-        rating: 0,
-        status: MangaStatus.ONGOING,
-        tags: tagSections,
-        desc: description,
-        hentai: hentai
-    })
+export interface UpdatedManga {
+    ids: string[];
+    loadMore: boolean;
 }
-export const countryOfOriginToSeriesType = (country: string): string =>{
-    let info = ''
-    switch (country.toLowerCase()){
-        case 'south korea':
-            info = 'Manhwa'
-            break
-        case 'japan':
-            info = 'Manga'
-            break
-        case 'china':
-            info = 'Manhwa'
-            break
-        default:
-            info = ''
-            break
+
+export class GenkanParser {
+
+
+    parseMangaDetails = ($: CheerioStatic, mangaId: string, source: any): Manga => {
+        const title = $('div#content h5').first().text() ?? ''
+
+        const imageStyle = $('div.media.media-comic-card > a').css('background-image') ?? ''
+        const imageStyleRegex = imageStyle?.match(/\((.+)\)/)
+
+        let image
+        if (imageStyleRegex && imageStyleRegex[1]) image = imageStyleRegex[1]
+        if (image?.startsWith('/')) image = source.baseUrl + image
+
+        const description = this.decodeHTMLEntity($('h6:contains(Description)').parent().parent().children().remove().end().text().trim())
+
+        return createManga({
+            id: mangaId,
+            titles: [title],
+            image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+            status: MangaStatus.ONGOING,
+            desc: description,
+        })
     }
-    return info
-}
-export const parseChapters = ($: CheerioStatic, mangaId: string, source: any): Chapter[] => {
-    const chapters: Chapter[] = []
 
-    for (const chapter of $('div.col-lg-9 div.flex').toArray()) {
-        const urlElement = $('a.item-author',chapter)
-        const chapNu = urlElement.attr('href')?.split('/') ?? ''
-        const chapNum = Number(chapNu[chapNu.length - 1])
-        const id = idCleaner(urlElement.attr('href') ?? '',source) ?? ''
-        const dateinfo = $('a.item-company', chapter).first().text()?.trim() ?? ''
-        let date
-        let title
-        if (urlElement.text().includes(`Chapter ${chapNum}`)) {
-            title = urlElement.text().trim()
-        } else {
-            title = `Ch. ${chapNum}: ${urlElement.text().trim()}`
-        }
-        if(dateinfo.toLowerCase().includes('ago')){
-            date = source.convertTime(dateinfo)
-        } else {
-            date = new Date(dateinfo)
-        }
-        if (!id) continue
-        chapters.push(createChapter({
-            id: id,
-            mangaId,
-            name: title,
-            langCode: LanguageCode.ENGLISH,
-            chapNum: isNaN(chapNum) ? 0 : chapNum,
-            time: date,
-        }))
-    }
-    return chapters
-}
+    parseChapters = ($: CheerioStatic, mangaId: string, source: any): Chapter[] => {
+        const chapters: Chapter[] = []
 
-export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string,source: any): ChapterDetails => {
-    const pages: string[] = []
+        for (const volume of $('div.row.py-2').toArray()) {
+            const getVolume = $('div.heading.py-2', volume).text().trim()
 
-    const allImages = $('div#pages-container + script')[0]?.children[0]?.data?.substringAfterFirst('[').substringBeforeLast('];').replace(/["\\]/g, '').split(',') ?? []
-    for (const p in allImages) {
-        let page = encodeURI(allImages[p])
-        page = page.startsWith('http') ? page : source.baseUrl + page
-        if (!page) continue
-        pages.push(page)
-    }
-    const chapterDetails = createChapterDetails({
-        id: chapterId,
-        mangaId: mangaId,
-        pages: pages,
-        longStrip: false
-    })
+            const volNumberRegex = getVolume.match(/(\d+\.?\d?)+/)
+            let volumeNumber = 0
+            if (volNumberRegex && volNumberRegex[1]) volumeNumber = Number(volNumberRegex[1])
 
-    return chapterDetails
-}
+            const volChapters = $('div.list-item', volume).toArray()
 
-export const parseUpdatedManga = ($: CheerioStatic, time: Date, ids: string[], source: any) => {
-    let passedReferenceTime = false
-    const updatedManga: string[] = []
+            for (const chapter of volChapters) {
+                const id = this.idCleaner($('a.item-author', chapter).attr('href') ?? '', source) ?? ''
+                const chapNum = Number(id.split('/').pop())
 
-    for (const obj of $('div.list-item').toArray()) {
-        const id = idCleaner($('a.list-title', $(obj)).attr('href') ?? '',source) ?? ''
-        const mangaTime: Date = source.convertTime($('.text-muted.text-sm', obj).text() ?? '')
-        passedReferenceTime = mangaTime <= time
-        if (!passedReferenceTime) {
-            if (ids.includes(id)) {
-                updatedManga.push(id)
+                const title = $('a.item-author', chapter).text().trim() ?? ''
+                const dateRaw = $('a.item-company', chapter).first().text()?.trim() ?? ''
+                const date = this.convertTime(dateRaw)
+
+                if (!id) continue
+
+                chapters.push(createChapter({
+                    id: id,
+                    mangaId,
+                    name: title,
+                    langCode: LanguageCode.ENGLISH,
+                    chapNum: isNaN(chapNum) ? 0 : chapNum,
+                    volume: volumeNumber,
+                    time: date,
+                }))
             }
-        } else break
 
-        if (typeof id === 'undefined') {
-            throw new Error(`Failed to parse homepage sections for ${source.baseUrl}/${source.homePage}/`)
+
+        }
+        return chapters
+
+    }
+
+    parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId: string, source: any): ChapterDetails => {
+        const pages: string[] = []
+
+        const allImages = $('div#pages-container + script')[0]?.children[0]?.data?.substringAfterFirst('[').substringBeforeLast('];').replace(/["\\]/g, '').split(',') ?? []
+
+        if (!allImages || allImages.length == 0) {
+            throw new Error(`Unable to parse image script for mangaId:${mangaId} chaperId:${chapterId}`)
+        }
+
+        for (const p in allImages) {
+            let page = encodeURI(allImages[p])
+            page = page.startsWith('http') ? page : source.baseUrl + page
+
+            if (!page) {
+                throw new Error(`Could not parse page for ${chapterId}`)
+            }
+            pages.push(page)
+        }
+
+        const chapterDetails = createChapterDetails({
+            id: chapterId,
+            mangaId: mangaId,
+            pages: pages,
+            longStrip: false
+        })
+
+        return chapterDetails
+    }
+
+
+    parseUpdatedManga = ($: CheerioStatic, time: Date, ids: string[], source: any): UpdatedManga => {
+        let loadMore = true
+        const updatedManga: string[] = []
+
+        for (const obj of $('div.list-item').toArray()) {
+            const id = this.idCleaner($('a.list-title', $(obj)).attr('href') ?? '', source) ?? ''
+            const mangaTime: Date = this.convertTime($('.text-muted.text-sm', obj).text() ?? '')
+
+            if (!id || !mangaTime) continue
+
+            if (mangaTime > time) {
+                if (ids.includes(id)) {
+                    updatedManga.push(id)
+                }
+            } else {
+                loadMore = false
+            }
+        }
+
+        return {
+            ids: updatedManga,
+            loadMore,
         }
     }
-    if (!passedReferenceTime) {
-        return {updates: updatedManga, loadNextPage: true}
-    } else {
-        return {updates: updatedManga, loadNextPage: false}
-    }
-}
 
-export const parseMangaList = ($: CheerioStatic, source: any, isLatest: boolean,collectedIds?: string[]): MangaTile[] => {
-    const results: MangaTile[] = []
-    if(typeof collectedIds === 'undefined') {
-        collectedIds = []
-    }
-    for (const manga of $('div.list-item').toArray()) {
-        const info = $('a.list-title',manga).first()
-        const title = $(info).text().trim() ?? ''
-        const id = idCleaner($(info).attr('href') ?? '',source) ?? ''
-        const image = styleToUrl($('a.media-content', manga).first(),source) ?? 'https://i.imgur.com/GYUxEX8.png'
-        const subTitle = $('.media .media-overlay span',manga).text().trim() ?? ''
-        if (!id || !title) continue
-        if (!collectedIds.includes(id)) {
+    parseMangaList = ($: CheerioStatic, source: any, isLatest: boolean): MangaTile[] => {
+        const results: MangaTile[] = []
+        const collectedIds: string[] = []
+
+        for (const manga of $('div.list-item').toArray()) {
+            const title = $('a.list-title', manga).first().text().trim() ?? ''
+            const id = this.idCleaner($('a.list-title', manga).first().attr('href') ?? '', source) ?? ''
+
+            const imageStyle = $('div.media.media-comic-card > a' , manga).css('background-image') ?? ''
+            const imageStyleRegex = imageStyle?.match(/\((.+)\)/)
+
+            let image
+            if (imageStyleRegex && imageStyleRegex[1]) image = imageStyleRegex[1]
+            if (image?.startsWith('/')) image = source.baseUrl + image
+
+            const subtitle = isLatest ? $('.media .media-overlay span', manga).text().trim() ?? '' : ''
+
+            if (!id || !title || collectedIds.includes(id)) continue
+
             results.push(createMangaTile({
                 id: id,
-                image: image,
-                title: createIconText({ text: decodeHTMLEntity(title) }),
-                subtitleText: createIconText({ text: isLatest ? decodeHTMLEntity(subTitle) : ''})
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
             }))
             collectedIds.push(id)
-        }
-    }
-    return results
-}
-export const NextPage = ($: CheerioStatic): boolean => {
-    const nextPage = $('[rel=next]')
-    if (nextPage.contents().length !== 0) {
-        return true
-    } else {
-        return false
-    }
-}
 
-export const decodeHTMLEntity = (str: string): string => {
-    return str.replace(/&#(\d+);/g, (_match, dec) => {
-        return String.fromCharCode(dec)
-    })
-}
-export const styleToUrl = (Element:Cheerio,source: any): any =>{
-    return Element.attr('style')?.substringAfterFirst('(').substringBeforeLast(')').let((it: any)=>{
-        if(it.startsWith('http')){
-            return it
-        } else {
-            return source.baseUrl + it
         }
-    })
+        return results
+    }
+
+    NextPage = ($: CheerioStatic): boolean => {
+        const nextPage = $('[rel=next]')
+        if (nextPage.contents().length !== 0) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    decodeHTMLEntity = (str: string): string => {
+        return entities.decodeHTML(str)
+    }
+
+    idCleaner = (str: string, source: any): string => {
+        const base = source.baseUrl.split('://').pop()
+        str = str.replace(/(https:\/\/|http:\/\/)/, '')
+        str = str.replace(/\/$/, '')
+        str = str.replace(`${base}/`, '')
+        str = str.replace(`${source.mangaUrlDirectory}/`, '')
+        str = str.replace(`${source.serieslDirectory}/`, '')
+        return str
+    }
+
+    countryOfOriginToSeriesType = (country: string): string => {
+        let info = ''
+        switch (country.toLowerCase()) {
+            case 'south korea':
+                info = 'Manhwa'
+                break
+            case 'japan':
+                info = 'Manga'
+                break
+            case 'china':
+                info = 'Manhwa'
+                break
+        }
+        return info
+    }
+
+    convertTime = (timeAgo: string): Date => {
+        let time: Date
+        let trimmed = Number((/\d*/.exec(timeAgo.trim()) ?? [])[0])
+        trimmed = (trimmed == 0 && timeAgo.includes('a')) ? 1 : trimmed
+        if (timeAgo.includes('mins') || timeAgo.includes('minutes') || timeAgo.includes('minute')) {
+            time = new Date(Date.now() - trimmed * 60000)
+        } else if (timeAgo.includes('hours') || timeAgo.includes('hour')) {
+            time = new Date(Date.now() - trimmed * 3600000)
+        } else if (timeAgo.includes('days') || timeAgo.includes('day')) {
+            time = new Date(Date.now() - trimmed * 86400000)
+        } else if (timeAgo.includes('weeks') || timeAgo.includes('week')) {
+            time = new Date(Date.now() - trimmed * 604800000)
+        } else if (timeAgo.includes('months') || timeAgo.includes('month')) {
+            time = new Date(Date.now() - trimmed * 2548800000)
+        } else if (timeAgo.includes('years') || timeAgo.includes('year')) {
+            time = new Date(Date.now() - trimmed * 31556952000)
+        } else {
+            time = new Date(timeAgo)
+        }
+
+        return time
+    }
 }
-export const idCleaner = (str: string, source: any): string => {
-    const base = source.baseUrl.split('://').pop()
-    str = str.replace(/(https:\/\/|http:\/\/)/, '')
-    str = str.replace(/\/$/, '')
-    str = str.replace(`${base}/`, '')
-    str = str.replace(`${source.mangaUrlDirectory}/`, '')
-    str = str.replace(`${source.SerieslDirectory}/`, '')
-    return str
-}
-export {}
 
 declare global {
     interface String {
@@ -199,18 +235,17 @@ declare global {
          * @param block - The function to be executed with `this` as argument
          * @returns `block`'s result
          */
-        let<R>(this: string | null | undefined, block: (it: string) => R): R
-        substringBeforeLast(character:any): any
-        substringAfterFirst(substring:any): any
+        let<R>(this: string | null | undefined, block: (it: string) => R): R;
+        substringBeforeLast(character: any): any
+        substringAfterFirst(substring: any): any
     }
 }
-String.prototype.let = function(this, block) {
-    return block(this!.valueOf())
-}
+
 String.prototype.substringBeforeLast = function (character) {
     const lastIndexOfCharacter = this.lastIndexOf(character)
     return this.substring(0, lastIndexOfCharacter)
 }
+
 String.prototype.substringAfterFirst = function (substring) {
     const startingIndexOfSubstring = this.indexOf(substring)
     const endIndexOfSubstring = startingIndexOfSubstring + substring.length - 1

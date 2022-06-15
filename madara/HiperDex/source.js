@@ -1008,7 +1008,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.1.4';
+const BASE_VERSION = '2.1.5';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1534,7 +1534,7 @@ class Parser {
             if (!page) {
                 throw new Error(`Could not parse page for ${mangaId}/${chapterId}`);
             }
-            pages.push(page);
+            pages.push(encodeURI(page));
         }
         return createChapterDetails({
             id: chapterId,
@@ -1669,7 +1669,7 @@ class Parser {
         else {
             image = 'https://i.imgur.com/GYUxEX8.png'; // Fallback image
         }
-        return encodeURI(decodeURI(this.decodeHTMLEntity((_c = image === null || image === void 0 ? void 0 : image.trim()) !== null && _c !== void 0 ? _c : '')));
+        return decodeURI(this.decodeHTMLEntity((_c = image === null || image === void 0 ? void 0 : image.trim()) !== null && _c !== void 0 ? _c : ''));
     }
     decodeHTMLEntity(str) {
         return entities.decodeHTML(str);

@@ -1636,18 +1636,19 @@ exports.Parser = Parser;
 },{"entities":9,"paperback-extensions-common":13}],59:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MangaHatachi = exports.MangaHatachiInfo = void 0;
+exports.MangaLek = exports.MangaLekInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://mangahatachi.com';
-exports.MangaHatachiInfo = {
+const MangaLekParser_1 = require("./MangaLekParser");
+const DOMAIN = 'https://mangalek.org';
+exports.MangaLekInfo = {
     version: Madara_1.getExportVersion('0.0.0'),
-    name: 'MangaHatachi',
+    name: 'MangaLek',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
-    contentRating: paperback_extensions_common_1.ContentRating.ADULT,
+    contentRating: paperback_extensions_common_1.ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
@@ -1655,25 +1656,73 @@ exports.MangaHatachiInfo = {
             type: paperback_extensions_common_1.TagType.GREEN
         },
         {
-            text: '18+',
-            type: paperback_extensions_common_1.TagType.YELLOW
-        },
-        {
-            text: 'Japanese',
+            text: 'Arabic',
             type: paperback_extensions_common_1.TagType.GREY
         }
     ]
 };
-class MangaHatachi extends Madara_1.Madara {
+class MangaLek extends Madara_1.Madara {
     constructor() {
         super(...arguments);
         this.baseUrl = DOMAIN;
-        this.languageCode = paperback_extensions_common_1.LanguageCode.JAPANESE;
+        this.languageCode = 'Arabic';
         this.hasAdvancedSearchPage = true;
         this.alternativeChapterAjaxEndpoint = true;
+        this.sourceTraversalPathName = 'comics';
+        this.parser = new MangaLekParser_1.MangaLekParser();
     }
 }
-exports.MangaHatachi = MangaHatachi;
+exports.MangaLek = MangaLek;
 
-},{"../Madara":56,"paperback-extensions-common":13}]},{},[59])(59)
+},{"../Madara":56,"./MangaLekParser":60,"paperback-extensions-common":13}],60:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MangaLekParser = void 0;
+const MadaraParser_1 = require("../MadaraParser");
+class MangaLekParser extends MadaraParser_1.Parser {
+    constructor() {
+        super(...arguments);
+        this.parseDate = (date) => {
+            var _a;
+            date = date.toUpperCase();
+            let time;
+            const number = Number(((_a = /\d*/.exec(date)) !== null && _a !== void 0 ? _a : [])[0]);
+            if (date.includes('قبل ساعة') || date.includes('الان')) {
+                time = new Date(Date.now());
+            }
+            else if (date.includes('سنة') || date.includes('سنوات')) {
+                time = new Date(Date.now() - (number * 31556952000));
+            }
+            else if (date.includes('شهر') || date.includes('شهور')) {
+                time = new Date(Date.now() - (number * 2592000000));
+            }
+            else if (date.includes('اسبوع') || date.includes('اسوبيعن') || date.includes('اسابيع')) {
+                time = new Date(Date.now() - (number * 604800000));
+            }
+            else if (date.includes('يومين')) {
+                time = new Date(Date.now() - (number + 2 * 86400000));
+            }
+            else if (date.includes('يوم') || date.includes('ايام')) {
+                time = new Date(Date.now() - (number * 86400000));
+            }
+            else if (date.includes('ساعة') || date.includes('ساعات')) {
+                time = new Date(Date.now() - (number * 3600000));
+            }
+            else if (date.includes('دقيقية') || date.includes('دقائق')) {
+                time = new Date(Date.now() - (number * 60000));
+            }
+            else if (date.includes('ثانية') || date.includes('ثانيا') || date.includes('ثواني')) {
+                time = new Date(Date.now() - (number * 1000));
+            }
+            else {
+                date = date.replace(/يناير/gi, 'January').replace(/فبراير/gi, 'February').replace(/مارس/gi, 'March').replace(/ابريل+|أبريل/gi, 'April').replace(/مايو/gi, 'May').replace(/يونيو/gi, 'June').replace(/يوليو/gi, 'July').replace(/أغسطس+|اغسطس/gi, 'August').replace(/سبتمبر/gi, 'September').replace(/أكتوبر+|اكتوبر/gi, 'October').replace(/نوفمبر/gi, 'November').replace(/ديسمبر/gi, 'December');
+                time = new Date(date);
+            }
+            return time;
+        };
+    }
+}
+exports.MangaLekParser = MangaLekParser;
+
+},{"../MadaraParser":58}]},{},[59])(59)
 });

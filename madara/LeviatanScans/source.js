@@ -999,7 +999,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.1.5';
+const BASE_VERSION = '2.1.6';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1064,46 +1064,6 @@ class Madara extends paperback_extensions_common_1.Source {
         */
         this.userAgent = '';
         this.parser = new MadaraParser_1.Parser();
-        /**
-         * Parses a time string from a Madara source into a Date object.
-         */
-        this.parseDate = (date) => {
-            var _a;
-            date = date.toUpperCase();
-            let time;
-            const number = Number(((_a = /\d*/.exec(date)) !== null && _a !== void 0 ? _a : [])[0]);
-            if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
-                time = new Date(Date.now());
-            }
-            else if (date.includes('YEAR') || date.includes('YEARS')) {
-                time = new Date(Date.now() - (number * 31556952000));
-            }
-            else if (date.includes('MONTH') || date.includes('MONTHS')) {
-                time = new Date(Date.now() - (number * 2592000000));
-            }
-            else if (date.includes('WEEK') || date.includes('WEEKS')) {
-                time = new Date(Date.now() - (number * 604800000));
-            }
-            else if (date.includes('YESTERDAY')) {
-                time = new Date(Date.now() - 86400000);
-            }
-            else if (date.includes('DAY') || date.includes('DAYS')) {
-                time = new Date(Date.now() - (number * 86400000));
-            }
-            else if (date.includes('HOUR') || date.includes('HOURS')) {
-                time = new Date(Date.now() - (number * 3600000));
-            }
-            else if (date.includes('MINUTE') || date.includes('MINUTES')) {
-                time = new Date(Date.now() - (number * 60000));
-            }
-            else if (date.includes('SECOND') || date.includes('SECONDS')) {
-                time = new Date(Date.now() - (number * 1000));
-            }
-            else {
-                time = new Date(date);
-            }
-            return time;
-        };
     }
     getMangaShareUrl(mangaId) {
         return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`;
@@ -1445,6 +1405,45 @@ exports.Parser = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const entities = require("entities");
 class Parser {
+    constructor() {
+        this.parseDate = (date) => {
+            var _a;
+            date = date.toUpperCase();
+            let time;
+            const number = Number(((_a = /\d*/.exec(date)) !== null && _a !== void 0 ? _a : [])[0]);
+            if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
+                time = new Date(Date.now());
+            }
+            else if (date.includes('YEAR') || date.includes('YEARS')) {
+                time = new Date(Date.now() - (number * 31556952000));
+            }
+            else if (date.includes('MONTH') || date.includes('MONTHS')) {
+                time = new Date(Date.now() - (number * 2592000000));
+            }
+            else if (date.includes('WEEK') || date.includes('WEEKS')) {
+                time = new Date(Date.now() - (number * 604800000));
+            }
+            else if (date.includes('YESTERDAY')) {
+                time = new Date(Date.now() - 86400000);
+            }
+            else if (date.includes('DAY') || date.includes('DAYS')) {
+                time = new Date(Date.now() - (number * 86400000));
+            }
+            else if (date.includes('HOUR') || date.includes('HOURS')) {
+                time = new Date(Date.now() - (number * 3600000));
+            }
+            else if (date.includes('MINUTE') || date.includes('MINUTES')) {
+                time = new Date(Date.now() - (number * 60000));
+            }
+            else if (date.includes('SECOND') || date.includes('SECONDS')) {
+                time = new Date(Date.now() - (number * 1000));
+            }
+            else {
+                time = new Date(date);
+            }
+            return time;
+        };
+    }
     parseMangaDetails($, mangaId) {
         var _a, _b;
         const numericId = $('script#wp-manga-js-extra').get()[0].children[0].data.match('"manga_id":"(\\d+)"')[1];
@@ -1492,11 +1491,11 @@ class Parser {
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = source.parseDate(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
+                mangaTime = this.parseDate(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
             }
             else {
                 //Else get the date from the info box
-                mangaTime = source.parseDate($('span.chapter-release-date > i', obj).text().trim());
+                mangaTime = this.parseDate($('span.chapter-release-date > i', obj).text().trim());
             }
             //Check if the date is a valid date, else return the current date
             if (!mangaTime.getTime())
@@ -1598,6 +1597,9 @@ class Parser {
         }
         return items;
     }
+    decodeHTMLEntity(str) {
+        return entities.decodeHTML(str);
+    }
     filterUpdatedManga($, time, ids, source) {
         var _a, _b;
         let passedReferenceTimePrior = false;
@@ -1609,11 +1611,11 @@ class Parser {
             const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = source.parseDate(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
+                mangaTime = this.parseDate(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
             }
             else {
                 //Else get the date from the span
-                mangaTime = source.parseDate($('span.post-on.font-meta', obj).first().text().trim());
+                mangaTime = this.parseDate($('span.post-on.font-meta', obj).first().text().trim());
             }
             //Check if the date is valid, if it isn't we should skip it
             if (!mangaTime.getTime())
@@ -1661,9 +1663,6 @@ class Parser {
             image = 'https://i.imgur.com/GYUxEX8.png'; // Fallback image
         }
         return decodeURI(this.decodeHTMLEntity((_c = image === null || image === void 0 ? void 0 : image.trim()) !== null && _c !== void 0 ? _c : ''));
-    }
-    decodeHTMLEntity(str) {
-        return entities.decodeHTML(str);
     }
 }
 exports.Parser = Parser;

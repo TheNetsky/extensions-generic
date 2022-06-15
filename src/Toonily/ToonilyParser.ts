@@ -1,6 +1,8 @@
 import {
-    Parser,
+    Parser
 } from '../MadaraParser'
+
+const parser = new Parser()
 
 import { Toonily } from './Toonily'
 
@@ -18,14 +20,14 @@ export class ToonilyParser extends Parser {
             const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title')
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = source.parseDate(timeSelector ?? '')
+                mangaTime = parser.parseDate(timeSelector ?? '')
             } else {
                 //New Toonily layout, since it no longer has date, we check if it has the text "UP" meaning it's new!
                 if ($('span.post-on.font-meta', obj).first().text().trim().toLocaleUpperCase() == 'UP') {
                     mangaTime = new Date()
                 } else {
                     //Else get the date from the span
-                    mangaTime = source.parseDate($('span.post-on.font-meta', obj).first().text().trim())
+                    mangaTime = parser.parseDate($('span.post-on.font-meta', obj).first().text().trim())
                 }
             }
             //Check if the date is valid, if it isn't we should skip it

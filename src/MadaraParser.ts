@@ -67,10 +67,10 @@ export class Parser {
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title')
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = source.parseDate(timeSelector ?? '')
+                mangaTime = this.parseDate(timeSelector ?? '')
             } else {
                 //Else get the date from the info box
-                mangaTime = source.parseDate($('span.chapter-release-date > i', obj).text().trim())
+                mangaTime = this.parseDate($('span.chapter-release-date > i', obj).text().trim())
             }
 
             //Check if the date is a valid date, else return the current date
@@ -184,6 +184,10 @@ export class Parser {
         return items
     }
 
+    protected decodeHTMLEntity(str: string): string {
+        return entities.decodeHTML(str)
+    }
+
     filterUpdatedManga($: CheerioSelector, time: Date, ids: string[], source: any): { updates: string[], loadNextPage: boolean } {
         let passedReferenceTimePrior = false
         let passedReferenceTimeCurrent = false
@@ -196,10 +200,10 @@ export class Parser {
             const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title')
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = source.parseDate(timeSelector ?? '')
+                mangaTime = this.parseDate(timeSelector ?? '')
             } else {
                 //Else get the date from the span
-                mangaTime = source.parseDate($('span.post-on.font-meta', obj).first().text().trim())
+                mangaTime = this.parseDate($('span.post-on.font-meta', obj).first().text().trim())
             }
             //Check if the date is valid, if it isn't we should skip it
             if (!mangaTime.getTime()) continue
@@ -247,7 +251,32 @@ export class Parser {
         return decodeURI(this.decodeHTMLEntity(image?.trim() ?? ''))
     }
 
-    protected decodeHTMLEntity(str: string): string {
-        return entities.decodeHTML(str)
+    parseDate = (date: string): Date => {
+        date = date.toUpperCase()
+        let time: Date
+        const number = Number((/\d*/.exec(date) ?? [])[0])
+        if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
+            time = new Date(Date.now())
+        } else if (date.includes('YEAR') || date.includes('YEARS')) {
+            time = new Date(Date.now() - (number * 31556952000))
+        } else if (date.includes('MONTH') || date.includes('MONTHS')) {
+            time = new Date(Date.now() - (number * 2592000000))
+        } else if (date.includes('WEEK') || date.includes('WEEKS')) {
+            time = new Date(Date.now() - (number * 604800000))
+        } else if (date.includes('YESTERDAY')) {
+            time = new Date(Date.now() - 86400000)
+        } else if (date.includes('DAY') || date.includes('DAYS')) {
+            time = new Date(Date.now() - (number * 86400000))
+        } else if (date.includes('HOUR') || date.includes('HOURS')) {
+            time = new Date(Date.now() - (number * 3600000))
+        } else if (date.includes('MINUTE') || date.includes('MINUTES')) {
+            time = new Date(Date.now() - (number * 60000))
+        } else if (date.includes('SECOND') || date.includes('SECONDS')) {
+            time = new Date(Date.now() - (number * 1000))
+        } else {
+            time = new Date(date)
+        }
+        return time
     }
+
 }

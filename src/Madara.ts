@@ -20,7 +20,7 @@ import {
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.1.5'
+const BASE_VERSION = '2.1.6'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -407,37 +407,6 @@ export abstract class Madara extends Source {
             },
             cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
         })
-    }
-
-    /**
-     * Parses a time string from a Madara source into a Date object.
-     */
-    parseDate = (date: string): Date => {
-        date = date.toUpperCase()
-        let time: Date
-        const number = Number((/\d*/.exec(date) ?? [])[0])
-        if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
-            time = new Date(Date.now())
-        } else if (date.includes('YEAR') || date.includes('YEARS')) {
-            time = new Date(Date.now() - (number * 31556952000))
-        } else if (date.includes('MONTH') || date.includes('MONTHS')) {
-            time = new Date(Date.now() - (number * 2592000000))
-        } else if (date.includes('WEEK') || date.includes('WEEKS')) {
-            time = new Date(Date.now() - (number * 604800000))
-        } else if (date.includes('YESTERDAY')) {
-            time = new Date(Date.now() - 86400000)
-        } else if (date.includes('DAY') || date.includes('DAYS')) {
-            time = new Date(Date.now() - (number * 86400000))
-        } else if (date.includes('HOUR') || date.includes('HOURS')) {
-            time = new Date(Date.now() - (number * 3600000))
-        } else if (date.includes('MINUTE') || date.includes('MINUTES')) {
-            time = new Date(Date.now() - (number * 60000))
-        } else if (date.includes('SECOND') || date.includes('SECONDS')) {
-            time = new Date(Date.now() - (number * 1000))
-        } else {
-            time = new Date(date)
-        }
-        return time
     }
 
     CloudFlareError(status: any) {

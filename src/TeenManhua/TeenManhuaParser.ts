@@ -1,6 +1,8 @@
 import {
-    Parser,
+    Parser
 } from '../MadaraParser'
+
+const parser = new Parser()
 
 import { TeenManhua } from './TeenManhua'
 
@@ -18,12 +20,12 @@ export class TeenManhuaParser extends Parser {
             const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title')
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = source.parseDate(timeSelector ?? '')
+                mangaTime = parser.parseDate(timeSelector ?? '')
             } else {
                 //Else get the date from the span
                 const dateParsed = $('span.post-on.font-meta', obj).first().text().trim()
                 const dateSplit = dateParsed.split('/')
-                mangaTime = source.parseDate(`${dateSplit[1]}/${dateSplit[0]}/${dateSplit[2]}`)
+                mangaTime = parser.parseDate(`${dateSplit[1]}/${dateSplit[0]}/${dateSplit[2]}`)
             }
             //Check if the date is valid, if it isn't we should skip it
             if (!mangaTime.getTime()) continue

@@ -96,9 +96,7 @@ export const parseChapterDetails = ($: CheerioStatic, mangaId: string, chapterId
     for (const p in allImages) {
         let page = encodeURI(allImages[p])
         page = page.startsWith('http') ? page : source.baseUrl + page
-        if (!page) {
-            throw(`Could not parse page for ${chapterId}`)
-        }
+        if (!page) continue
         pages.push(page)
     }
     const chapterDetails = createChapterDetails({
@@ -126,7 +124,7 @@ export const parseUpdatedManga = ($: CheerioStatic, time: Date, ids: string[], s
         } else break
 
         if (typeof id === 'undefined') {
-            throw(`Failed to parse homepage sections for ${source.baseUrl}/${source.homePage}/`)
+            throw new Error(`Failed to parse homepage sections for ${source.baseUrl}/${source.homePage}/`)
         }
     }
     if (!passedReferenceTime) {
@@ -147,9 +145,7 @@ export const parseMangaList = ($: CheerioStatic, source: any, isLatest: boolean,
         const id = idCleaner($(info).attr('href') ?? '',source) ?? ''
         const image = styleToUrl($('a.media-content', manga).first(),source) ?? 'https://i.imgur.com/GYUxEX8.png'
         const subTitle = $('.media .media-overlay span',manga).text().trim() ?? ''
-        if (!id || !title) {
-            throw(`Failed to parse homepage sections for ${source.baseUrl}/`)
-        }
+        if (!id || !title) continue
         if (!collectedIds.includes(id)) {
             results.push(createMangaTile({
                 id: id,

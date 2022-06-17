@@ -1690,6 +1690,7 @@ const novelIDArray = [
     'hunter-academys-battle-god',
     'swordmasters-youngest-son',
     'max-talent-player',
+    'academys-undercover-professor',
     'im-not-a-regressor',
     'i-obtained-a-mythic-item',
     'the-demon-prince-goes-to-the-academy',

@@ -948,39 +948,6 @@ __exportStar(require("./RawData"), exports);
 
 },{"./Chapter":14,"./ChapterDetails":15,"./Constants":16,"./DynamicUI":32,"./HomeSection":33,"./Languages":34,"./Manga":35,"./MangaTile":36,"./MangaUpdate":37,"./PagedResults":38,"./RawData":39,"./RequestHeaders":40,"./RequestInterceptor":41,"./RequestManager":42,"./RequestObject":43,"./ResponseObject":44,"./SearchField":45,"./SearchRequest":46,"./SourceInfo":47,"./SourceManga":48,"./SourceStateManager":49,"./SourceTag":50,"./TagSection":51,"./TrackedManga":52,"./TrackedMangaChapterReadAction":53,"./TrackerActionQueue":54}],56:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Guya = exports.GuyaInfo = void 0;
-/* eslint-disable linebreak-style */
-const paperback_extensions_common_1 = require("paperback-extensions-common");
-const GuyaBase_1 = require("../GuyaBase");
-const DOMAIN = 'https://guya.cubari.moe';
-exports.GuyaInfo = {
-    version: GuyaBase_1.getExportVersion('0.0.0'),
-    name: 'Guya',
-    description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Netsky',
-    authorWebsite: 'http://github.com/TheNetsky',
-    icon: 'icon.png',
-    contentRating: paperback_extensions_common_1.ContentRating.EVERYONE,
-    websiteBaseURL: DOMAIN,
-    sourceTags: [
-        {
-            text: 'Notifications',
-            type: paperback_extensions_common_1.TagType.GREEN
-        }
-    ]
-};
-class Guya extends GuyaBase_1.GuyaBase {
-    constructor() {
-        super(...arguments);
-        this.baseUrl = DOMAIN;
-        this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-    }
-}
-exports.Guya = Guya;
-
-},{"../GuyaBase":57,"paperback-extensions-common":13}],57:[function(require,module,exports){
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1200,5 +1167,38 @@ class GuyaBase extends paperback_extensions_common_1.Source {
 }
 exports.GuyaBase = GuyaBase;
 
-},{"entities":9,"paperback-extensions-common":13}]},{},[56])(56)
+},{"entities":9,"paperback-extensions-common":13}],57:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MagicalTranslators = exports.MagicalTranslatorsInfo = void 0;
+/* eslint-disable linebreak-style */
+const paperback_extensions_common_1 = require("paperback-extensions-common");
+const GuyaBase_1 = require("../GuyaBase");
+const DOMAIN = 'https://mahoushoujobu.com';
+exports.MagicalTranslatorsInfo = {
+    version: GuyaBase_1.getExportVersion('0.0.0'),
+    name: 'Magical Translators',
+    description: `Extension that pulls manga from ${DOMAIN}`,
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
+    icon: 'icon.png',
+    contentRating: paperback_extensions_common_1.ContentRating.MATURE,
+    websiteBaseURL: DOMAIN,
+    sourceTags: [
+        {
+            text: 'Notifications',
+            type: paperback_extensions_common_1.TagType.GREEN
+        }
+    ]
+};
+class MagicalTranslators extends GuyaBase_1.GuyaBase {
+    constructor() {
+        super(...arguments);
+        this.baseUrl = DOMAIN;
+        this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
+    }
+}
+exports.MagicalTranslators = MagicalTranslators;
+
+},{"../GuyaBase":56,"paperback-extensions-common":13}]},{},[57])(57)
 });

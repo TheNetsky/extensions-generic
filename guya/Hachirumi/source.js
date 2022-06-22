@@ -1178,7 +1178,7 @@ const DOMAIN = 'https://hachirumi.com';
 exports.HachirumiInfo = {
     version: GuyaBase_1.getExportVersion('0.0.0'),
     name: 'Hachirumi',
-    description: 'Extension that pulls manga from hachirumi.com',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',

@@ -957,7 +957,7 @@ const DOMAIN = 'https://danke.moe';
 exports.DankeFursLesenInfo = {
     version: GuyaBase_1.getExportVersion('0.0.0'),
     name: 'DankeFursLesen',
-    description: 'Extension that pulls manga from danke.moe',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',

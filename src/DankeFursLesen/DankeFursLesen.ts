@@ -16,7 +16,7 @@ const DOMAIN = 'https://danke.moe'
 export const DankeFursLesenInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
     name: 'DankeFursLesen',
-    description: 'Extension that pulls manga from danke.moe',
+    description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
     authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',

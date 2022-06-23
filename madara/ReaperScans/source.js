@@ -965,7 +965,7 @@ exports.Madara = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
-const BASE_VERSION = '2.1.6';
+const BASE_VERSION = '2.1.7';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1690,7 +1690,6 @@ const novelIDArray = [
     'hunter-academys-battle-god',
     'swordmasters-youngest-son',
     'max-talent-player',
-    'academys-undercover-professor',
     'im-not-a-regressor',
     'i-obtained-a-mythic-item',
     'the-demon-prince-goes-to-the-academy',

@@ -48,7 +48,7 @@ export class Toonily extends Madara {
 
     override sourceTraversalPathName = 'webtoon'
 
-    override userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Mobile/15E148 Safari/604.1'
+    override userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36 Edg/100.0.1185.44'
     
     override alternativeChapterAjaxEndpoint = true
 

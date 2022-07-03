@@ -138,10 +138,10 @@ export class Parser {
         for (const obj of $('div.thumb', source.directoryGallerySelector).toArray()) {
 
             const image: string = this.getImageSrc($('img', $('div.inner_thumb', obj)).first() ?? '')
-            const title: string = $('h2', obj).first().text().trim() ?? ''
+            const title: string = $('h2, div.caption', obj).first().text().trim() ?? ''
             const subtitle: string = $(source.directorySubtitleSelector, obj).text().trim() ?? ''
 
-            const id = $('h2 > a', obj).attr('href')?.replace(/\/$/, '')?.split('/').pop() ?? ''
+            const id = $('h2 > a, div.caption > a', obj).attr('href')?.replace(/\/$/, '')?.split('/').pop() ?? ''
 
             if (!id || !title) continue
 

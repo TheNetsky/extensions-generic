@@ -14,7 +14,7 @@ import {
 const DOMAIN = 'https://imhentai.xxx'
 
 export const IMHentaiInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'IMHentai',
     description: `Extension that pulls items from ${DOMAIN}`,
     author: 'Netsky',

@@ -1163,9 +1163,9 @@ class Parser {
             const collectedIds = [];
             for (const obj of $('div.thumb', source.directoryGallerySelector).toArray()) {
                 const image = this.getImageSrc((_a = $('img', $('div.inner_thumb', obj)).first()) !== null && _a !== void 0 ? _a : '');
-                const title = (_b = $('h2', obj).first().text().trim()) !== null && _b !== void 0 ? _b : '';
+                const title = (_b = $('h2, div.caption', obj).first().text().trim()) !== null && _b !== void 0 ? _b : '';
                 const subtitle = (_c = $(source.directorySubtitleSelector, obj).text().trim()) !== null && _c !== void 0 ? _c : '';
-                const id = (_f = (_e = (_d = $('h2 > a', obj).attr('href')) === null || _d === void 0 ? void 0 : _d.replace(/\/$/, '')) === null || _e === void 0 ? void 0 : _e.split('/').pop()) !== null && _f !== void 0 ? _f : '';
+                const id = (_f = (_e = (_d = $('h2 > a, div.caption > a', obj).attr('href')) === null || _d === void 0 ? void 0 : _d.replace(/\/$/, '')) === null || _e === void 0 ? void 0 : _e.split('/').pop()) !== null && _f !== void 0 ? _f : '';
                 if (!id || !title)
                     continue;
                 if (!collectedIds.includes(id)) {
@@ -1326,7 +1326,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Bentai_1 = require("../Bentai");
 const DOMAIN = 'https://imhentai.xxx';
 exports.IMHentaiInfo = {
-    version: (0, Bentai_1.getExportVersion)('0.0.0'),
+    version: (0, Bentai_1.getExportVersion)('0.0.1'),
     name: 'IMHentai',
     description: `Extension that pulls items from ${DOMAIN}`,
     author: 'Netsky',

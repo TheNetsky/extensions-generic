@@ -19386,7 +19386,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
 const MadaraSettings_1 = require("./MadaraSettings");
-const BASE_VERSION = '2.2.0';
+const BASE_VERSION = '2.2.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -20144,9 +20144,11 @@ class Parser {
             else {
                 image = 'https://i.imgur.com/GYUxEX8.png'; // Fallback image
             }
-            const HQthumb = yield MadaraSettings_1.getHQThumbnailSetting(source.stateManager);
-            if (HQthumb) {
-                image = image === null || image === void 0 ? void 0 : image.replace('-110x150', '').replace('-175x238', '').replace('-193x278', '').replace('-350x476', '');
+            if (source === null || source === void 0 ? void 0 : source.stateManager) {
+                const HQthumb = yield MadaraSettings_1.getHQThumbnailSetting(source.stateManager);
+                if (HQthumb) {
+                    image = image === null || image === void 0 ? void 0 : image.replace('-110x150', '').replace('-175x238', '').replace('-193x278', '').replace('-350x476', '');
+                }
             }
             return decodeURI(this.decodeHTMLEntity((_c = image === null || image === void 0 ? void 0 : image.trim()) !== null && _c !== void 0 ? _c : ''));
         });
@@ -20201,7 +20203,7 @@ const sourceSettings = (stateManager, requestManager, source) => {
                             return [
                                 createLabel({
                                     id: 'current_ua',
-                                    value: !source.userAgent ? 'Now allowed to change' :
+                                    value: !source.userAgent ? 'Not allowed to change' :
                                         (typeof source.userAgent == 'string') ? source.userAgent :
                                             (_a = (yield stateManager.retrieve('userAgent'))) !== null && _a !== void 0 ? _a : 'Default',
                                     label: 'Current User Agent: '
@@ -20231,7 +20233,7 @@ const sourceSettings = (stateManager, requestManager, source) => {
                     // HQ Thumbnail Section
                     createSection({
                         id: 'content',
-                        footer: 'Enabling HQ thumbnails will use more bandwidth and will load them slightly slower.',
+                        footer: 'Enabling HQ thumbnails will use more bandwidth and will load thumbnails slightly slower.',
                         rows: () => {
                             return Promise.all([
                                 exports.getHQThumbnailSetting(stateManager)

@@ -34,7 +34,7 @@ export const sourceSettings = (stateManager: SourceStateManager, requestManager:
                         rows: async () => [
                             createLabel({
                                 id: 'current_ua',
-                                value: !source.userAgent ? 'Now allowed to change' :
+                                value: !source.userAgent ? 'Not allowed to change' :
                                     (typeof source.userAgent == 'string') ? source.userAgent :
                                         await stateManager.retrieve('userAgent') as string ?? 'Default',
                                 label: 'Current User Agent: '
@@ -65,7 +65,7 @@ export const sourceSettings = (stateManager: SourceStateManager, requestManager:
                     // HQ Thumbnail Section
                     createSection({
                         id: 'content',
-                        footer: 'Enabling HQ thumbnails will use more bandwidth and will load them slightly slower.',
+                        footer: 'Enabling HQ thumbnails will use more bandwidth and will load thumbnails slightly slower.',
                         rows: () => {
                             return Promise.all([
                                 getHQThumbnailSetting(stateManager)

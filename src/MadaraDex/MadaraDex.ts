@@ -41,6 +41,8 @@ export class MadaraDex extends Madara {
     override hasAdvancedSearchPage = true
 
     override sourceTraversalPathName = 'title'
-    
+
     override searchMangaSelector = 'div.c-tabs-item > div.row'
+
+    override userAgent = false
 }

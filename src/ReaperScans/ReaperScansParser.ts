@@ -39,12 +39,12 @@ const novelIDArray = [
 
 export class ReaperScansParser extends Parser {
 
-    override parseSearchResults($: CheerioSelector, source: ReaperScans): MangaTile[] {
+    override async parseSearchResults($: CheerioSelector, source: ReaperScans): Promise<MangaTile[]> {
         const results: MangaTile[] = []
         for (const obj of $(source.searchMangaSelector).toArray()) {
             const id = ($('a', obj).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const title = $('a', obj).attr('title') ?? ''
-            const image = encodeURI(this.getImageSrc($('img', obj)))
+            const image = encodeURI(await this.getImageSrc($('img', obj), source))
             const subtitle = $('span.font-meta.chapter', obj).text().trim()
 
             if (!id || !title) {
@@ -66,11 +66,11 @@ export class ReaperScansParser extends Parser {
         return results
     }
 
-    override parseHomeSection($: CheerioStatic, source: ReaperScans): MangaTile[] {
+    override async parseHomeSection($: CheerioStatic, source: ReaperScans): Promise<MangaTile[]> {
         const items: MangaTile[] = []
 
         for (const obj of $('div.page-item-detail').toArray()) {
-            const image = encodeURI(this.getImageSrc($('img', obj)) ?? '')
+            const image = encodeURI(await this.getImageSrc($('img', obj), source) ?? '')
             const title = $('a', $('h3.h5', obj)).text()
             const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const subtitle = $('span.font-meta.chapter', obj).first().text().trim()

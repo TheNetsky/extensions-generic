@@ -14,18 +14,26 @@ import {
     Source,
     TagSection,
     Request,
-    Response
+    Response,
+    Section
 } from 'paperback-extensions-common'
 
 import { Parser } from './MadaraParser'
 import { URLBuilder } from './MadaraHelper'
 
-const BASE_VERSION = '2.1.7'
+import {
+    sourceSettings
+} from './MadaraSettings'
+
+const BASE_VERSION = '2.2.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
 
+let globalUA: string | null
+
 export abstract class Madara extends Source {
+
     requestManager = createRequestManager({
         requestsPerSecond: 3,
         requestTimeout: 15000,
@@ -35,7 +43,7 @@ export abstract class Madara extends Source {
                 request.headers = {
                     ...(request.headers ?? {}),
                     ...{
-                        ...(this.userAgent && { 'user-agent': this.userAgent }),
+                        ...(globalUA && { 'user-agent': await this.getUserAgent() }), // Set globalUA intially
                         'referer': `${this.baseUrl}/`
                     }
                 }
@@ -48,6 +56,37 @@ export abstract class Madara extends Source {
             }
         }
     });
+
+
+    stateManager = createSourceStateManager({})
+
+    async getUserAgent(): Promise<string> {
+        const stateUA = await this.stateManager.retrieve('userAgent') as string
+
+        if (!this.userAgent) {
+            globalUA = null
+        } else if (typeof this.userAgent == 'string') {
+            globalUA = this.userAgent
+        } else if (stateUA) {
+            globalUA = stateUA
+        } else {
+            globalUA = null
+        }
+        return globalUA
+    }
+
+    override async getSourceMenu(): Promise<Section> {
+        const section = createSection({
+            id: 'main',
+            header: 'Source Settings',
+            footer: 'Change User Agent & Enable HQ Thumbnails',
+            rows: async () => [
+                sourceSettings(this.stateManager, this.requestManager, this)
+            ]
+        })
+        await this.getUserAgent()
+        return section
+    }
 
     /**
      * The Madara URL of the website. Eg. https://webtoon.xyz
@@ -107,7 +146,7 @@ export abstract class Madara extends Source {
     /**
     * Set custom User-Agent
     */
-    userAgent = ''
+    userAgent: string | boolean = true
 
     parser = new Parser()
 
@@ -119,7 +158,7 @@ export abstract class Madara extends Source {
         if (!isNaN(Number(mangaId))) {
             throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.')
         }
-        
+
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
             method: 'GET'
@@ -129,9 +168,8 @@ export abstract class Madara extends Source {
         this.CloudFlareError(data.status)
         const $ = this.cheerio.load(data.data)
 
-        return this.parser.parseMangaDetails($, mangaId)
+        return this.parser.parseMangaDetails($, mangaId, this)
     }
-
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
         if (!isNaN(Number(mangaId))) {
@@ -205,7 +243,7 @@ export abstract class Madara extends Source {
         const manga = this.parser.parseSearchResults($, this)
 
         return createPagedResults({
-            results: manga,
+            results: await manga,
             metadata: { page: (page + 1) }
         })
     }
@@ -284,10 +322,10 @@ export abstract class Madara extends Source {
 
             // Get the section data
             promises.push(
-                this.requestManager.schedule(section.request, 1).then(response => {
+                this.requestManager.schedule(section.request, 1).then(async response => {
                     this.CloudFlareError(response.status)
                     const $ = this.cheerio.load(response.data)
-                    section.section.items = this.parser.parseHomeSection($, this)
+                    section.section.items = await this.parser.parseHomeSection($, this)
                     sectionCallback(section.section)
                 }),
             )
@@ -325,7 +363,7 @@ export abstract class Madara extends Source {
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
         const $ = this.cheerio.load(data.data)
-        const items: MangaTile[] = this.parser.parseHomeSection($, this)
+        const items: MangaTile[] = await this.parser.parseHomeSection($, this)
         // Set up to go to the next page. If we are on the last page, remove the logic.
         let mData: any = { page: (page + 1) }
         if (items.length < 50) {
@@ -343,7 +381,7 @@ export abstract class Madara extends Source {
             url: `${this.baseUrl}`,
             method: 'GET',
             headers: {
-                ...(this.userAgent && { 'user-agent': this.userAgent }),
+                ...(globalUA && { 'user-agent': globalUA }),
             }
         })
     }

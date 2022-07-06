@@ -8,20 +8,21 @@ import {
     MangaStatus,
     MangaTile,
     Tag,
-    TagSection
+    TagSection,
 } from 'paperback-extensions-common'
 
 import entities = require('entities')
+import { getHQThumbnailSetting } from './MadaraSettings'
 
 export class Parser {
 
-    parseMangaDetails($: CheerioSelector, mangaId: string): Manga {
+    async parseMangaDetails($: CheerioSelector, mangaId: string, source: any): Promise<Manga> {
         const numericId = $('script#wp-manga-js-extra').get()[0].children[0].data.match('"manga_id":"(\\d+)"')[1]
         const title = this.decodeHTMLEntity($('div.post-title h1').children().remove().end().text().trim())
         const author = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown')
         const artist = this.decodeHTMLEntity($('div.artist-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown')
         const summary = this.decodeHTMLEntity($('div.description-summary').first().text()).replace('Show more', '').trim()
-        const image = encodeURI(this.getImageSrc($('div.summary_image img').first()))
+        const image = encodeURI(await this.getImageSrc($('div.summary_image img').first(), source))
         const isOngoing = $('div.summary-content', $('div.post-content_item').last()).text().toLowerCase().trim() == 'ongoing'
         const genres: Tag[] = []
 
@@ -96,7 +97,7 @@ export class Parser {
         return chapters
     }
 
-    parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string, selector: string): ChapterDetails {
+    async parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string, selector: string): Promise<ChapterDetails> {
         const pages: string[] = []
 
         for (const obj of $(selector).toArray()) {
@@ -105,7 +106,7 @@ export class Parser {
                 throw new Error(`Could not parse page for ${mangaId}/${chapterId}`)
             }
 
-            pages.push(encodeURI(page))
+            pages.push(encodeURI(await page))
         }
 
         return createChapterDetails({
@@ -134,12 +135,12 @@ export class Parser {
         return [createTagSection({ id: '0', label: 'genres', tags: genres })]
     }
 
-    parseSearchResults($: CheerioSelector, source: any): MangaTile[] {
+    async parseSearchResults($: CheerioSelector, source: any): Promise<MangaTile[]> {
         const results: MangaTile[] = []
         for (const obj of $(source.searchMangaSelector).toArray()) {
             const id = ($('a', obj).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const title = $('a', obj).attr('title') ?? ''
-            const image = encodeURI(this.getImageSrc($('img', obj)))
+            const image = encodeURI(await this.getImageSrc($('img', obj), source))
             const subtitle = $('span.font-meta.chapter', obj).text().trim()
 
             if (!id || !title) {
@@ -160,11 +161,11 @@ export class Parser {
         return results
     }
 
-    parseHomeSection($: CheerioStatic, source: any): MangaTile[] {
+    async parseHomeSection($: CheerioStatic, source: any): Promise<MangaTile[]> {
         const items: MangaTile[] = []
 
         for (const obj of $('div.page-item-detail').toArray()) {
-            const image = encodeURI(this.getImageSrc($('img', obj)) ?? '')
+            const image = encodeURI(await this.getImageSrc($('img', obj), source) ?? '')
             const title = $('a', $('h3.h5', obj)).text()
             const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const subtitle = $('span.font-meta.chapter', obj).first().text().trim()
@@ -229,7 +230,8 @@ export class Parser {
 
 
     // UTILITY METHODS
-    getImageSrc(imageObj: Cheerio | undefined): string {
+    async getImageSrc(imageObj: Cheerio | undefined, source?: any): Promise<string> {
+
         let image
         if ((typeof imageObj?.attr('data-src')) != 'undefined') {
             image = imageObj?.attr('data-src')
@@ -248,6 +250,16 @@ export class Parser {
         } else {
             image = 'https://i.imgur.com/GYUxEX8.png' // Fallback image
         }
+
+        const HQthumb = await getHQThumbnailSetting(source.stateManager) as boolean
+
+        if (HQthumb) {
+            image = image?.replace('-110x150', '')
+                .replace('-175x238', '')
+                .replace('-193x278', '')
+                .replace('-350x476', '')
+        }
+
         return decodeURI(this.decodeHTMLEntity(image?.trim() ?? ''))
     }
 

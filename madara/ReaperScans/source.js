@@ -20292,7 +20292,8 @@ const novelIDArray = [
     'i-returned-as-a-god',
     'leveling-with-the-gods',
     'the-song-of-sword-and-magic',
-    'the-tutorial-is-too-hard-novel'
+    'the-tutorial-is-too-hard-novel',
+    'academys-undercover-professor'
 ];
 class ReaperScansParser extends MadaraParser_1.Parser {
     parseSearchResults($, source) {

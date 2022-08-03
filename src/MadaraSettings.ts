@@ -30,7 +30,7 @@ export const sourceSettings = (stateManager: SourceStateManager, requestManager:
                     // User Agent Section
                     createSection({
                         id: 'ua_section',
-                        footer: 'If you\'re experiencing issues with CloudFlare, try randomizing your User Agent.\nPlease restart your app after doing so.',
+                        footer: 'If you\'re experiencing issues with CloudFlare, try randomizing your User Agent.\nPlease restart your app after doing so.\nNOTE! You might need to try this a couple of times for it to work!',
                         rows: async () => [
                             createLabel({
                                 id: 'current_ua',

@@ -25,7 +25,7 @@ import {
     sourceSettings
 } from './MadaraSettings'
 
-const BASE_VERSION = '2.2.1'
+const BASE_VERSION = '2.2.2'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -47,6 +47,10 @@ export abstract class Madara extends Source {
                         'referer': `${this.baseUrl}/`
                     }
                 }
+                request.cookies = [
+                    createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl }),
+                    createCookie({ name: 'toonily-mature', value: '1', domain: this.baseUrl })
+                ]
 
                 return request
             },
@@ -60,7 +64,7 @@ export abstract class Madara extends Source {
 
     stateManager = createSourceStateManager({})
 
-    async getUserAgent(): Promise<string> {
+    async getUserAgent(): Promise<any> {
         const stateUA = await this.stateManager.retrieve('userAgent') as string
 
         if (!this.userAgent) {
@@ -199,7 +203,6 @@ export abstract class Madara extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
             method: 'GET',
-            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })],
             param: this.chapterDetailsParam
         })
 
@@ -415,8 +418,7 @@ export abstract class Madara extends Source {
                 .addQueryParameter('post_type', 'wp-manga')
                 .addQueryParameter('genre', query?.includedTags?.map((x: any) => x.id))
                 .buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
-            method: 'GET',
-            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
+            method: 'GET'
         })
     }
 
@@ -442,8 +444,7 @@ export abstract class Madara extends Source {
                 'vars[order]': 'desc',
                 'vars[meta_key]': meta_key,
                 'vars[meta_value]': meta_value
-            },
-            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
+            }
         })
     }
 

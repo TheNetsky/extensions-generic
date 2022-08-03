@@ -199,7 +199,7 @@ export abstract class Madara extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
             method: 'GET',
-            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })],
+            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl }),createCookie({ name: 'toonily-mature', value: '1', domain: this.baseUrl })],
             param: this.chapterDetailsParam
         })
 
@@ -416,7 +416,7 @@ export abstract class Madara extends Source {
                 .addQueryParameter('genre', query?.includedTags?.map((x: any) => x.id))
                 .buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
             method: 'GET',
-            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
+            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl }),createCookie({ name: 'toonily-mature', value: '1', domain: this.baseUrl })]
         })
     }
 
@@ -443,7 +443,7 @@ export abstract class Madara extends Source {
                 'vars[meta_key]': meta_key,
                 'vars[meta_value]': meta_value
             },
-            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
+            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl }),createCookie({ name: 'toonily-mature', value: '1', domain: this.baseUrl })]
         })
     }
 

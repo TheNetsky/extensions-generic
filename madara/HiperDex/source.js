@@ -19428,7 +19428,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
 const MadaraSettings_1 = require("./MadaraSettings");
-const BASE_VERSION = '2.2.1';
+const BASE_VERSION = '2.2.2';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -19444,6 +19444,10 @@ class Madara extends paperback_extensions_common_1.Source {
                 interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
                     var _a;
                     request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), Object.assign(Object.assign({}, (globalUA && { 'user-agent': yield this.getUserAgent() })), { 'referer': `${this.baseUrl}/` }));
+                    request.cookies = [
+                        createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl }),
+                        createCookie({ name: 'toonily-mature', value: '1', domain: this.baseUrl })
+                    ];
                     return request;
                 }),
                 interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
@@ -19575,7 +19579,6 @@ class Madara extends paperback_extensions_common_1.Source {
             const request = createRequestObject({
                 url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
                 method: 'GET',
-                cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })],
                 param: this.chapterDetailsParam
             });
             const data = yield this.requestManager.schedule(request, 1);
@@ -19779,8 +19782,7 @@ class Madara extends paperback_extensions_common_1.Source {
                 .addQueryParameter('post_type', 'wp-manga')
                 .addQueryParameter('genre', (_b = query === null || query === void 0 ? void 0 : query.includedTags) === null || _b === void 0 ? void 0 : _b.map((x) => x.id))
                 .buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
-            method: 'GET',
-            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
+            method: 'GET'
         });
     }
     /**
@@ -19805,8 +19807,7 @@ class Madara extends paperback_extensions_common_1.Source {
                 'vars[order]': 'desc',
                 'vars[meta_key]': meta_key,
                 'vars[meta_value]': meta_value
-            },
-            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
+            }
         });
     }
     CloudFlareError(status) {
@@ -20199,7 +20200,7 @@ const sourceSettings = (stateManager, requestManager, source) => {
                     // User Agent Section
                     createSection({
                         id: 'ua_section',
-                        footer: 'If you\'re experiencing issues with CloudFlare, try randomizing your User Agent.\nPlease restart your app after doing so.',
+                        footer: 'If you\'re experiencing issues with CloudFlare, try randomizing your User Agent.\nPlease restart your app after doing so.\nNOTE! You might need to try this a couple of times for it to work!',
                         rows: () => __awaiter(void 0, void 0, void 0, function* () {
                             var _a;
                             return [

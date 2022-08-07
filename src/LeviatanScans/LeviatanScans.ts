@@ -12,7 +12,7 @@ import {
 const DOMAIN = 'https://leviatanscans.com'
 
 export const LeviatanScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'LeviatanScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
@@ -34,7 +34,7 @@ export class LeviatanScans extends Madara {
 
     override languageCode: LanguageCode = LanguageCode.ENGLISH
 
-    override sourceTraversalPathName = 'hm/manga'
+    override sourceTraversalPathName = 'hy/manga'
 
     override alternativeChapterAjaxEndpoint = true
 }

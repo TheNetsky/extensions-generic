@@ -9,10 +9,10 @@ import {
     getExportVersion
 } from '../MangaBox'
 
-const MANGABAT_DOMAIN = 'https://m.mangabat.com'
+const MANGABAT_DOMAIN = 'https://h.mangabat.com'
 
 export const MangaBatInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'MangaBat',
     description: 'Extension that pulls manga from m.mangabat.com',
     author: 'nar1n',

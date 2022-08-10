@@ -19386,7 +19386,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
 const MadaraSettings_1 = require("./MadaraSettings");
-const BASE_VERSION = '2.2.2';
+const BASE_VERSION = '2.2.3';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -19882,7 +19882,7 @@ class Parser {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             const numericId = $('script#wp-manga-js-extra').get()[0].children[0].data.match('"manga_id":"(\\d+)"')[1];
-            const title = this.decodeHTMLEntity($('div.post-title h1').children().remove().end().text().trim());
+            const title = this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim());
             const author = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown');
             const artist = this.decodeHTMLEntity($('div.artist-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown');
             const summary = this.decodeHTMLEntity($('div.description-summary').first().text()).replace('Show more', '').trim();

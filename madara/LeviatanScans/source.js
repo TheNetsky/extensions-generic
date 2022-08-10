@@ -19368,6 +19368,15 @@ module.exports=[
 ]
 },{}],60:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LeviatanScans = exports.LeviatanScansInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
@@ -19394,8 +19403,76 @@ class LeviatanScans extends Madara_1.Madara {
         super(...arguments);
         this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.sourceTraversalPathName = 'hy/manga';
+        this.sourceTraversalPathName = '';
         this.alternativeChapterAjaxEndpoint = true;
+    }
+    getHomePageSections(sectionCallback) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const getTraversalPathName = yield this.getTraversalPathName();
+            this.sourceTraversalPathName = getTraversalPathName;
+            const sections = [
+                {
+                    request: this.constructAjaxHomepageRequest(0, 10, '_latest_update'),
+                    section: createHomeSection({
+                        id: '0',
+                        title: 'Recently Updated',
+                        view_more: true,
+                    }),
+                },
+                {
+                    request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_week_views_value'),
+                    section: createHomeSection({
+                        id: '1',
+                        title: 'Currently Trending',
+                        view_more: true,
+                    })
+                },
+                {
+                    request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_views'),
+                    section: createHomeSection({
+                        id: '2',
+                        title: 'Most Popular',
+                        view_more: true,
+                    })
+                },
+                {
+                    request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_status', 'end'),
+                    section: createHomeSection({
+                        id: '3',
+                        title: 'Completed',
+                        view_more: true,
+                    })
+                },
+            ];
+            const promises = [];
+            for (const section of sections) {
+                // Let the app load empty sections
+                sectionCallback(section.section);
+                // Get the section data
+                promises.push(this.requestManager.schedule(section.request, 1).then((response) => __awaiter(this, void 0, void 0, function* () {
+                    this.CloudFlareError(response.status);
+                    const $ = this.cheerio.load(response.data);
+                    section.section.items = yield this.parser.parseHomeSection($, this);
+                    sectionCallback(section.section);
+                })));
+            }
+            // Make sure the function completes
+            yield Promise.all(promises);
+        });
+    }
+    getTraversalPathName() {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            const request = createRequestObject({
+                url: `${this.baseUrl}`,
+                method: 'GET',
+            });
+            const data = yield this.requestManager.schedule(request, 1);
+            this.CloudFlareError(data.status);
+            const $ = this.cheerio.load(data.data);
+            const path = (_b = (_a = $('.bottom-footer .font-nav a:contains("All Series")').attr('href')) === null || _a === void 0 ? void 0 : _a.replace(`${this.baseUrl}/`, '').replace(/\/+$/, '')) !== null && _b !== void 0 ? _b : '';
+            return path;
+        });
     }
 }
 exports.LeviatanScans = LeviatanScans;
@@ -19420,7 +19497,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
 const MadaraSettings_1 = require("./MadaraSettings");
-const BASE_VERSION = '2.2.2';
+const BASE_VERSION = '2.2.3';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -19916,7 +19993,7 @@ class Parser {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             const numericId = $('script#wp-manga-js-extra').get()[0].children[0].data.match('"manga_id":"(\\d+)"')[1];
-            const title = this.decodeHTMLEntity($('div.post-title h1').children().remove().end().text().trim());
+            const title = this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim());
             const author = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown');
             const artist = this.decodeHTMLEntity($('div.artist-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown');
             const summary = this.decodeHTMLEntity($('div.description-summary').first().text()).replace('Show more', '').trim();

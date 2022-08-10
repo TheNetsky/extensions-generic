@@ -677,9 +677,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MangaBat = exports.MangaBatInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MangaBox_1 = require("../MangaBox");
-const MANGABAT_DOMAIN = 'https://m.mangabat.com';
+const MANGABAT_DOMAIN = 'https://h.mangabat.com';
 exports.MangaBatInfo = {
-    version: MangaBox_1.getExportVersion('0.0.0'),
+    version: MangaBox_1.getExportVersion('0.0.1'),
     name: 'MangaBat',
     description: 'Extension that pulls manga from m.mangabat.com',
     author: 'nar1n',

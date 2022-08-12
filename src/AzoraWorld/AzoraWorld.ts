@@ -1,17 +1,14 @@
 /* eslint-disable linebreak-style */
 import {
-    Chapter,
     ContentRating,
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
-import {
-    getExportVersion,
-    Madara
-} from '../Madara'
 import { 
-    AzoraWorldParser
-} from './AzoraWorldParser'
+    getExportVersion,
+    Madara 
+} from '../Madara'
+import { AzoraWorldParser } from './AzoraWorldParser'
 
 const DOMAIN = 'https://azoraworld.com'
 
@@ -31,7 +28,7 @@ export const AzoraWorldInfo: SourceInfo = {
         {
             text: 'Arabic',
             type: TagType.GREY
-        }
+        },
     ]
 }
 
@@ -39,19 +36,7 @@ export class AzoraWorld extends Madara {
     baseUrl: string = DOMAIN
     languageCode: string = 'Arabic'
     override sourceTraversalPathName = 'series'
-    override readonly parser: AzoraWorldParser = new AzoraWorldParser();
-    override async getChapters(mangaId: string): Promise<Chapter[]> {
-       
-        const request = createRequestObject({
-            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-            method: 'GET'
-        })
-
-        const data = await this.requestManager.schedule(request, 1)
-        this.CloudFlareError(data.status)
-        const $ = this.cheerio.load(data.data)
-
-        return this.parser.parseChapterList($, mangaId, this)
-    }
-
+    override hasAdvancedSearchPage = true
+    override alternativeChapterAjaxEndpoint = true
+    override readonly parser: AzoraWorldParser = new AzoraWorldParser()
 }

@@ -20225,7 +20225,7 @@ const Madara_1 = require("../Madara");
 const ToonilyParser_1 = require("./ToonilyParser");
 const DOMAIN = 'https://toonily.com';
 exports.ToonilyInfo = {
-    version: Madara_1.getExportVersion('0.0.1'),
+    version: Madara_1.getExportVersion('0.0.2'),
     name: 'Toonily',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -20256,6 +20256,7 @@ class Toonily extends Madara_1.Madara {
         this.hasAdvancedSearchPage = true;
         this.sourceTraversalPathName = 'webtoon';
         this.alternativeChapterAjaxEndpoint = true;
+        this.searchMangaSelector = 'div.page-item-detail.manga';
         this.parser = new ToonilyParser_1.ToonilyParser();
     }
 }

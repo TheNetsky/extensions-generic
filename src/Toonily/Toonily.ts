@@ -14,7 +14,7 @@ import { ToonilyParser } from './ToonilyParser'
 const DOMAIN = 'https://toonily.com'
 
 export const ToonilyInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'Toonily',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -49,6 +49,8 @@ export class Toonily extends Madara {
     override sourceTraversalPathName = 'webtoon'
     
     override alternativeChapterAjaxEndpoint = true
+
+    override searchMangaSelector = 'div.page-item-detail.manga'
 
     override readonly parser: ToonilyParser = new ToonilyParser();
 

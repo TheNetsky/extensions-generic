@@ -12,9 +12,10 @@ import {
 import {
     getExportVersion,
     Madara
-} from '..//Madara'
+} from '../Madara'
 
-import {MangaOriginesParser} from "./MangaOriginesParser";
+import { URLBuilder } from '../MadaraHelper'
+import {MangaOriginesParser} from './MangaOriginesParser'
 
 const DOMAIN = 'https://mangas-origines.fr'
 
@@ -46,36 +47,44 @@ export class MangaOrigines extends Madara {
     override alternativeChapterAjaxEndpoint = true
 
     override constructSearchRequest(page: number, query: SearchRequest): any {
-        const data = {
-            "action": "madara_load_more",
-            "page": (page - 1).toString(),
-            "template": "madara-core/content/content-search",
-            "vars[s]": (query?.title ?? '').replace(' ', '+'),
-            "vars[orderby]": "",
-            "vars[paged]": "1",
-            "vars[template]": "search",
-            "vars[meta_query][0][s]": "Test",
-            "vars[meta_query][0][orderby]": "",
-            "vars[meta_query][0][paged]": "1",
-            "vars[meta_query][0][template]": "search",
-            "vars[meta_query][0][meta_query][relation]": "AND",
-            // "vars[meta_query][0][tax_query][0][taxonomy]": "wp-manga-genre",
-            // "vars[meta_query][0][tax_query][0][field]": "term_id",
-            // "vars[meta_query][0][tax_query][0][terms][]": "2",
-            // "vars[meta_query][0][tax_query][relation]": "OR",
-            "vars[meta_query][0][post_type]": "wp-manga",
-            "vars[meta_query][0][post_status]": "publish",
-            "vars[meta_query][relation]": "AND",
-            // "vars[tax_query][0][taxonomy]": "wp-manga-genre",
-            // "vars[tax_query][0][field]": "term_id",
-            // "vars[tax_query][0][terms][]": "2",
-            // "vars[tax_query][relation]": "OR",
-            "vars[post_type]": "wp-manga",
-            "vars[post_status]": "publish",
-            "vars[manga_archives_item_layout]": "default"
-        };
+        const tags = query?.includedTags?.map((x: any) => x.id) ?? []
+        let filterData = {}
 
-        // Implement genre filtering
+        if (tags) {
+            // Fail to find a way to give genre slug as a search input
+            filterData = {
+                // 'vars[meta_query][0][tax_query][0][taxonomy]': 'wp-manga-genre',
+                // 'vars[meta_query][0][tax_query][0][field]': 'term_id',
+                // 'vars[meta_query][0][tax_query][0][terms][]': tags,
+                // 'vars[meta_query][0][tax_query][relation]': 'OR',
+                // 'vars[tax_query][0][taxonomy]': 'wp-manga-genre',
+                // 'vars[tax_query][0][field]': 'term_id',
+                // 'vars[tax_query][0][terms][]': tags,
+                // 'vars[tax_query][relation]': 'OR',
+            }
+        }
+
+        const data = {
+            'action': 'madara_load_more',
+            'page': (page - 1).toString(),
+            'template': 'madara-core/content/content-search',
+            'vars[s]': (query?.title ?? '').replace(' ', '+'),
+            'vars[orderby]': '',
+            'vars[paged]': '1',
+            'vars[template]': 'search',
+            'vars[meta_query][0][s]': 'Test',
+            'vars[meta_query][0][orderby]': '',
+            'vars[meta_query][0][paged]': '1',
+            'vars[meta_query][0][template]': 'search',
+            'vars[meta_query][0][meta_query][relation]': 'AND',
+            'vars[meta_query][0][post_type]': 'wp-manga',
+            'vars[meta_query][0][post_status]': 'publish',
+            'vars[meta_query][relation]': 'AND',
+            'vars[post_type]': 'wp-manga',
+            'vars[post_status]': 'publish',
+            'vars[manga_archives_item_layout]': 'default',
+            ...filterData
+        }
 
         return createRequestObject({
             url: `${this.baseUrl}/wp-admin/admin-ajax.php`,

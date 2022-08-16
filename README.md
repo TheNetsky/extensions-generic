@@ -1,6 +1,6 @@
 # Madara extensions
 
-[Madara](https://madaradex.org/) is a theme on top of WordPress that a lot of Manga websites use to simplify the development and deployment. It brings several Manga oriented features such as searches and classification. Therefore, many website can be scrapped using almost the same methods because they are based on the same structure.
+[Madara](https://madaradex.org/) is a WordPress theme that Manga websites use to simplify the development and deployment. It brings several Manga oriented features such as searches and classification. Therefore, many website can be scrapped using almost the same methods because they are based on the same structure.
 
 The available sources are:
 - AllPornComic

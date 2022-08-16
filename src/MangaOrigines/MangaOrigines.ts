@@ -14,7 +14,6 @@ import {
     Madara
 } from '../Madara'
 
-import { URLBuilder } from '../MadaraHelper'
 import {MangaOriginesParser} from './MangaOriginesParser'
 
 const DOMAIN = 'https://mangas-origines.fr'
@@ -32,7 +31,7 @@ export const MangaOriginesInfo: SourceInfo = {
         {
             text: 'Notifications',
             type: TagType.GREEN
-        }
+        },
     ]
 }
 
@@ -51,7 +50,7 @@ export class MangaOrigines extends Madara {
         let filterData = {}
 
         if (tags) {
-            // Fail to find a way to give genre slug as a search input
+            // TODO: Fail to find a way to give genre slug as a search input
             filterData = {
                 // 'vars[meta_query][0][tax_query][0][taxonomy]': 'wp-manga-genre',
                 // 'vars[meta_query][0][tax_query][0][field]': 'term_id',

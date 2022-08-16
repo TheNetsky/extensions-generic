@@ -1,38 +1,42 @@
 {
-  "name": "extensions-official",
+  "name": "extensions-generic",
   "repositoryName": "Extensions Madara (Netsky Fork)",
   "version": "1.0.0",
   "description": "Community maintained Paperback extension repository",
-  "main": "index.js",
   "scripts": {
     "bundle": "paperback bundle",
-    "serve": "paperback serve"
+    "serve": "paperback serve",
+    "test": "mocha --color --timeout 10000 --require ts-node/register",
+    "test-all": "mocha --color --timeout 10000 --require ts-node/register src/**/*.test.ts"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Paperback-iOS/extensions-official.git"
+    "url": "git@github.com:TheNetsky/extensions-generic.git"
   },
   "author": "Paperback Community",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/Paperback-iOS/extensions-official/issues"
+    "url": "https://github.com/TheNetsky/extensions-generic/issues"
   },
-  "homepage": "https://github.com/Paperback-iOS/extensions-official#readme",
+  "homepage": "https://github.com/TheNetsky/extensions-generic",
   "devDependencies": {
     "@types/chai": "^4.2.21",
     "@types/chai-as-promised": "^7.1.4",
-    "@types/cheerio": "^0.22.21",
+    "@types/cheerio": "0.22.21",
     "@types/mocha": "^9.0.0",
+    "@types/random-useragent": "^0.3.1",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "eslint": "^7.27.0",
     "eslint-plugin-modules-newline": "^0.0.6",
+    "ts-mocha": "^7.0.0",
     "mocha": "^9.1.1",
     "typescript": "^4.3.2"
   },
   "dependencies": {
+    "cheerio": "^0.22.0",
     "entities": "^4.3.0",
     "paperback-cli": "^1.4.0",
     "paperback-extensions-common": "^4.3.5",

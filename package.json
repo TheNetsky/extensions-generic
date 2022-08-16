@@ -5,7 +5,7 @@
   "description": "Community maintained Paperback extension repository",
   "scripts": {
     "bundle": "paperback bundle",
-    "serve": "paperback serve",
+    "serve": "paperback serve -p 8081",
     "test": "mocha --color --timeout 10000 --require ts-node/register",
     "test-all": "mocha --color --timeout 10000 --require ts-node/register src/**/*.test.ts"
   },

@@ -71,7 +71,7 @@ export class MangaOrigines extends Madara {
             'vars[orderby]': '',
             'vars[paged]': '1',
             'vars[template]': 'search',
-            'vars[meta_query][0][s]': 'Test',
+            'vars[meta_query][0][s]': (query?.title ?? '').replace(' ', '+'),
             'vars[meta_query][0][orderby]': '',
             'vars[meta_query][0][paged]': '1',
             'vars[meta_query][0][template]': 'search',

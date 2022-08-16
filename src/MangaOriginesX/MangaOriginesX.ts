@@ -34,4 +34,5 @@ export const MangaOriginesXInfo: SourceInfo = {
 
 export class MangaOriginesX extends MangaOrigines {
     override baseUrl: string = DOMAIN;
+    override sourceTraversalPathName = 'oeuvre';
 }

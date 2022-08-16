@@ -6,7 +6,7 @@ const Madara_1 = require("../Madara");
 const SourceTemplateParser_1 = require("./SourceTemplateParser");
 const DOMAIN = 'https://thewebsite.com';
 exports.SourceTemplateInfo = {
-    version: (0, Madara_1.getExportVersion)('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.0'),
     name: 'SourceTemplate',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',

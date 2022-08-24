@@ -16,8 +16,8 @@ import { getHQThumbnailSetting } from './MadaraSettings'
 
 export class Parser {
 
-    async parseMangaDetails($: CheerioSelector, mangaId: string, source: any): Promise<Manga> {
-        const numericId = $('script#wp-manga-js-extra').get()[0].children[0].data.match('"manga_id":"(\\d+)"')[1]
+    async parseMangaDetails($: CheerioStatic, mangaId: string, source: any): Promise<Manga> {
+        const numericId = this.parsePostId($)
         const title = this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim())
         const author = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown')
         const artist = this.decodeHTMLEntity($('div.artist-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown')
@@ -290,6 +290,33 @@ export class Parser {
             time = new Date(date)
         }
         return time
+    }
+
+    parsePostId($: CheerioStatic): string {
+        let postId: number
+
+        // Step 1: Try to get postId from shortlink
+        postId = Number($('link[rel="shortlink"]')?.attr('href')?.split('/?p=')[1])
+
+        // Step 2: If no number has been found, try to parse from data-post
+        if (isNaN(postId)) {
+            postId = Number($('a.wp-manga-action-button').attr('data-post'))
+        }
+
+        // Step 3: If no number has been found, try to parse from manga script
+        if (isNaN(postId)) {
+            const page = $.root().html()
+            const match = page?.match(/manga_id.*\D(\d+)/)
+            if (match && match[1]) {
+                postId = Number(match[1]?.trim())
+            }
+        }
+
+        if (!postId || isNaN(postId)) {
+            throw new Error('Unable to fetch numeric postId for this item!')
+        }
+
+        return postId.toString()
     }
 
 }

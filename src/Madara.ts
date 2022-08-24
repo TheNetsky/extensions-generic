@@ -25,7 +25,7 @@ import {
     sourceSettings
 } from './MadaraSettings'
 
-const BASE_VERSION = '2.2.3'
+const BASE_VERSION = '2.2.4'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -398,11 +398,8 @@ export abstract class Madara extends Source {
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
         const $ = this.cheerio.load(data.data)
-        const numericId = $('script#wp-manga-js-extra').get()[0].children[0].data.match('"manga_id":"(\\d+)"')[1]
-        if (!numericId) {
-            throw new Error(`Failed to parse the numeric ID for ${mangaId}`)
-        }
 
+        const numericId = this.parser.parsePostId($)
         return numericId
     }
 

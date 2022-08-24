@@ -19462,6 +19462,7 @@ class Madara extends paperback_extensions_common_1.Source {
         this.searchMangaSelector = 'div.c-tabs-item__content';
         /**
          * Set to true if your source has advanced search functionality built in.
+         * If this is not true, no genre tags will be shown on the homepage!
          */
         this.hasAdvancedSearchPage = false;
         /**
@@ -19569,7 +19570,7 @@ class Madara extends paperback_extensions_common_1.Source {
     getChapterDetails(mangaId, chapterId) {
         return __awaiter(this, void 0, void 0, function* () {
             const request = createRequestObject({
-                url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
+                url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
                 method: 'GET',
                 param: this.chapterDetailsParam
             });
@@ -19738,13 +19739,6 @@ class Madara extends paperback_extensions_common_1.Source {
             });
         });
     }
-    getCloudflareBypassRequest() {
-        return createRequestObject({
-            url: `${this.baseUrl}`,
-            method: 'GET',
-            headers: Object.assign({}, (globalUA && { 'user-agent': globalUA }))
-        });
-    }
     getNumericId(mangaId) {
         return __awaiter(this, void 0, void 0, function* () {
             const request = createRequestObject({
@@ -19797,6 +19791,13 @@ class Madara extends paperback_extensions_common_1.Source {
                 'vars[meta_key]': meta_key,
                 'vars[meta_value]': meta_value
             }
+        });
+    }
+    getCloudflareBypassRequest() {
+        return createRequestObject({
+            url: `${this.baseUrl}`,
+            method: 'GET',
+            headers: Object.assign({}, (globalUA && { 'user-agent': globalUA }))
         });
     }
     CloudFlareError(status) {
@@ -20053,7 +20054,7 @@ class Parser {
             const items = [];
             for (const obj of $('div.page-item-detail').toArray()) {
                 const image = encodeURI((_a = yield this.getImageSrc($('img', obj), source)) !== null && _a !== void 0 ? _a : '');
-                const title = $('a', $('h3.h5', obj)).text();
+                const title = $('a', $('h3.h5', obj)).last().text();
                 const id = (_b = $('a', $('h3.h5', obj)).attr('href')) === null || _b === void 0 ? void 0 : _b.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
                 const subtitle = $('span.font-meta.chapter', obj).first().text().trim();
                 if (!id || !title) {
@@ -20069,9 +20070,6 @@ class Parser {
             }
             return items;
         });
-    }
-    decodeHTMLEntity(str) {
-        return entities.decodeHTML(str);
     }
     filterUpdatedManga($, time, ids, source) {
         var _a, _b;
@@ -20114,6 +20112,9 @@ class Parser {
         }
     }
     // UTILITY METHODS
+    decodeHTMLEntity(str) {
+        return entities.decodeHTML(str);
+    }
     getImageSrc(imageObj, source) {
         var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
@@ -20163,7 +20164,7 @@ class Parser {
             }
         }
         if (!postId || isNaN(postId)) {
-            throw new Error('Unable to fetch numeric postId for this item!');
+            throw new Error('Unable to fetch numeric postId for this item!\nCheck if path is set correctly!');
         }
         return postId.toString();
     }

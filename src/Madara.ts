@@ -118,6 +118,7 @@ export abstract class Madara extends Source {
 
     /**
      * Set to true if your source has advanced search functionality built in.
+     * If this is not true, no genre tags will be shown on the homepage!
      */
     hasAdvancedSearchPage = false
 
@@ -201,7 +202,7 @@ export abstract class Madara extends Source {
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
         const request = createRequestObject({
-            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
+            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
             method: 'GET',
             param: this.chapterDetailsParam
         })
@@ -379,16 +380,6 @@ export abstract class Madara extends Source {
         })
     }
 
-    override getCloudflareBypassRequest() {
-        return createRequestObject({
-            url: `${this.baseUrl}`,
-            method: 'GET',
-            headers: {
-                ...(globalUA && { 'user-agent': globalUA }),
-            }
-        })
-    }
-
     async getNumericId(mangaId: string): Promise<string> {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
@@ -441,6 +432,16 @@ export abstract class Madara extends Source {
                 'vars[order]': 'desc',
                 'vars[meta_key]': meta_key,
                 'vars[meta_value]': meta_value
+            }
+        })
+    }
+
+    override getCloudflareBypassRequest() {
+        return createRequestObject({
+            url: `${this.baseUrl}`,
+            method: 'GET',
+            headers: {
+                ...(globalUA && { 'user-agent': globalUA }),
             }
         })
     }

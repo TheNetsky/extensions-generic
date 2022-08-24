@@ -1,6 +1,6 @@
-/* eslint-disable linebreak-style */
 import {
     ContentRating,
+    LanguageCode,
     SourceInfo,
     TagType
 } from 'paperback-extensions-common'
@@ -8,15 +8,15 @@ import {
     getExportVersion,
     Madara
 } from '../Madara'
-import { AzoraWorldParser } from './AzoraWorldParser'
 
-const DOMAIN = 'https://azoraworld.com'
+const DOMAIN = 'https://setsuscans.com'
 
-export const AzoraWorldInfo: SourceInfo = {
+export const SetsuScansInfo: SourceInfo = {
     version: getExportVersion('0.0.0'),
-    name: 'AzoraWorld',
+    name: 'SetsuScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'Ali Mohamed',
+    author: 'Netsky',
+    authorWebsite: 'http://github.com/TheNetsky',
     icon: 'icon.png',
     contentRating: ContentRating.MATURE,
     websiteBaseURL: DOMAIN,
@@ -24,25 +24,17 @@ export const AzoraWorldInfo: SourceInfo = {
         {
             text: 'Notifications',
             type: TagType.GREEN
-        },
-        {
-            text: 'Arabic',
-            type: TagType.GREY
-        },
+        }
     ]
 }
 
-export class AzoraWorld extends Madara {
+export class SetsuScans extends Madara {
 
     baseUrl: string = DOMAIN
 
-    languageCode: string = 'Arabic'
-
-    override sourceTraversalPathName = 'series'
+    override languageCode: LanguageCode = LanguageCode.ENGLISH
 
     override hasAdvancedSearchPage = true
-
+    
     override alternativeChapterAjaxEndpoint = true
-
-    override readonly parser: AzoraWorldParser = new AzoraWorldParser()
 }

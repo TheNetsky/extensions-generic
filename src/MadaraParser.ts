@@ -166,7 +166,7 @@ export class Parser {
 
         for (const obj of $('div.page-item-detail').toArray()) {
             const image = encodeURI(await this.getImageSrc($('img', obj), source) ?? '')
-            const title = $('a', $('h3.h5', obj)).text()
+            const title = $('a', $('h3.h5', obj)).last().text()
             const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
             const subtitle = $('span.font-meta.chapter', obj).first().text().trim()
 
@@ -183,10 +183,6 @@ export class Parser {
             }))
         }
         return items
-    }
-
-    protected decodeHTMLEntity(str: string): string {
-        return entities.decodeHTML(str)
     }
 
     filterUpdatedManga($: CheerioSelector, time: Date, ids: string[], source: any): { updates: string[], loadNextPage: boolean } {
@@ -228,8 +224,11 @@ export class Parser {
         }
     }
 
-
     // UTILITY METHODS
+    protected decodeHTMLEntity(str: string): string {
+        return entities.decodeHTML(str)
+    }
+
     async getImageSrc(imageObj: Cheerio | undefined, source?: any): Promise<string> {
 
         let image
@@ -292,7 +291,7 @@ export class Parser {
         return time
     }
 
-    parsePostId($: CheerioStatic): string {
+    parsePostId($: CheerioStatic): string { // Credit to the MadaraDex team :-D
         let postId: number
 
         // Step 1: Try to get postId from shortlink
@@ -313,7 +312,7 @@ export class Parser {
         }
 
         if (!postId || isNaN(postId)) {
-            throw new Error('Unable to fetch numeric postId for this item!')
+            throw new Error('Unable to fetch numeric postId for this item!\nCheck if path is set correctly!')
         }
 
         return postId.toString()

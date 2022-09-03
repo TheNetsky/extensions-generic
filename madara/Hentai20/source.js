@@ -19374,7 +19374,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://hentai20.com';
 exports.Hentai20Info = {
-    version: Madara_1.getExportVersion('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.1'),
     name: 'Hentai20',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -19402,7 +19402,7 @@ class Hentai20 extends Madara_1.Madara {
         super(...arguments);
         this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
-        this.hasAdvancedSearchPage = true;
+        this.hasAdvancedSearchPage = false;
     }
 }
 exports.Hentai20 = Hentai20;

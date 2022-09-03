@@ -12,7 +12,7 @@ import {
 const DOMAIN = 'https://hentai20.com'
 
 export const Hentai20Info: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'Hentai20',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -42,5 +42,5 @@ export class Hentai20 extends Madara {
 
     languageCode: LanguageCode = LanguageCode.ENGLISH
 
-    override hasAdvancedSearchPage = true
+    override hasAdvancedSearchPage = false
 }

@@ -12,7 +12,7 @@ import {
 const DOMAIN = 'https://manhuaus.com'
 
 export const ManhuausInfo: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'Manhuaus',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',
@@ -36,7 +36,7 @@ export class Manhuaus extends Madara {
 
     override hasAdvancedSearchPage = true
 
-    override chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > figure.wp-block-gallery > figure.wp-block-image > img'
+    override chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > figure.wp-block-gallery > figure.wp-block-image > img, div.text-left > p > img'
     
     override alternativeChapterAjaxEndpoint = true
 }

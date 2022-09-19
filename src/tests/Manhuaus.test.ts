@@ -6,19 +6,8 @@ import { Manhuaus } from '../Manhuaus/Manhuaus'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 
-describe('Manhuaus Tests', () => {
 
-    const wrapper: APIWrapper = new APIWrapper()
-    const source: Source = new Manhuaus(cheerio)
-    const expect = chai.expect
-    chai.use(chaiAsPromised)
-
-    /**
-     * The Manga ID which this unit test uses to base it's details off of.
-     * Try to choose a manga which is updated frequently, so that the historical checking test can 
-     * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
-     */
-    const mangaId = 'reborn-80000-years' // Reborn 80,000 Years
+function executeMangaTest(mangaId: string, mangaName: string) {
     it('Retrieve Manga Details', async () => {
         const details = await wrapper.getMangaDetails(source, mangaId)
         expect(details, 'No results found with test-defined ID [' + mangaId + ']').to.exist
@@ -61,7 +50,7 @@ describe('Manhuaus Tests', () => {
 
     it('Testing search', async () => {
         const testSearch: SearchRequest = {
-            title: 'Reborn 80,000 Years',
+            title: mangaName,
             parameters: {}
         }
 
@@ -83,4 +72,20 @@ describe('Manhuaus Tests', () => {
         expect(homePages[1], 'No currently trending available').to.exist
         expect(homePages[2], 'No most popular available').to.exist
     })
+}
+
+describe('Manhuaus Tests', () => {
+
+    const wrapper: APIWrapper = new APIWrapper()
+    const source: Source = new Manhuaus(cheerio)
+    const expect = chai.expect
+    chai.use(chaiAsPromised)
+
+    /**
+     * The Manga ID which this unit test uses to base it's details off of.
+     * Try to choose a manga which is updated frequently, so that the historical checking test can 
+     * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
+     */
+    executeMangaTest('reborn-80000-years', 'Reborn 80,000 Years') // Reborn 80,000 Years
+    executeMangaTest('i-randomly-have-a-new-career-every-week-manhuaus', 'I randomly have a new career every week') // I randomly have a new career every week
 })

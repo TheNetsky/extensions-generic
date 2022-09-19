@@ -9,16 +9,16 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://manhuaus.com'
+const DOMAIN = 'https://manhwa18.cc'
 
-export const ManhuausInfo: SourceInfo = {
-    version: getExportVersion('0.0.3'),
-    name: 'Manhuaus',
+export const Manhwa18Info: SourceInfo = {
+    version: getExportVersion('0.0.1'),
+    name: 'Manhwa18',
     description: `Extension that pulls manga from ${DOMAIN}`,
-    author: 'GameFuzzy',
-    authorWebsite: 'http://github.com/gamefuzzy',
+    author: 'IvanMatthew',
+    authorWebsite: 'http://github.com/Ivanmatthew',
     icon: 'icon.png',
-    contentRating: ContentRating.EVERYONE,
+    contentRating: ContentRating.ADULT,
     websiteBaseURL: DOMAIN,
     sourceTags: [
         {
@@ -28,7 +28,7 @@ export const ManhuausInfo: SourceInfo = {
     ]
 }
 
-export class Manhuaus extends Madara {
+export class Manhwa18 extends Madara {
 
     baseUrl: string = DOMAIN
 
@@ -36,7 +36,7 @@ export class Manhuaus extends Madara {
 
     override hasAdvancedSearchPage = true
 
-    override chapterDetailsSelector = 'li.blocks-gallery-item > figure > img, div.page-break > img, div#chapter-video-frame > p > img, div.text-left > figure.wp-block-gallery > figure.wp-block-image > img, div.text-left > p > img'
+    override chapterDetailsSelector = 'div.read-content > img'
     
     override alternativeChapterAjaxEndpoint = true
 }

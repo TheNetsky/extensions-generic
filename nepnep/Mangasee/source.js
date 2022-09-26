@@ -708,15 +708,6 @@ exports.Mangasee = Mangasee;
 
 },{"../NepNep":57,"paperback-extensions-common":13}],57:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NepNep = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
@@ -735,133 +726,113 @@ class NepNep extends paperback_extensions_common_1.Source {
     getMangaShareUrl(mangaId) {
         return `${this.baseUrl}/manga/${mangaId}`;
     }
-    getMangaDetails(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${this.baseUrl}/manga/`,
-                method,
-                param: mangaId
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseMangaDetails($, mangaId);
+    async getMangaDetails(mangaId) {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/manga/`,
+            method,
+            param: mangaId
         });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseMangaDetails($, mangaId);
     }
-    getChapters(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${this.baseUrl}/manga/`,
-                method,
-                headers,
-                param: mangaId
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            return this.parser.parseChapters($, mangaId);
+    async getChapters(mangaId) {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/manga/`,
+            method,
+            headers,
+            param: mangaId
         });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        return this.parser.parseChapters($, mangaId);
     }
-    getChapterDetails(mangaId, chapterId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${this.baseUrl}/read-online/`,
-                headers,
-                method,
-                param: chapterId
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            return this.parser.parseChapterDetails(response.data, mangaId, chapterId);
+    async getChapterDetails(mangaId, chapterId) {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/read-online/`,
+            headers,
+            method,
+            param: chapterId
         });
+        const response = await this.requestManager.schedule(request, 1);
+        return this.parser.parseChapterDetails(response.data, mangaId, chapterId);
     }
-    filterUpdatedManga(mangaUpdatesFoundCallback, time, ids) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${this.baseUrl}/`,
-                headers,
-                method,
-            });
-            const response = yield this.requestManager.schedule(request, 1);
-            const returnObject = this.parser.parseUpdatedManga(response.data, time, ids);
-            mangaUpdatesFoundCallback(createMangaUpdates(returnObject));
+    async filterUpdatedManga(mangaUpdatesFoundCallback, time, ids) {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/`,
+            headers,
+            method,
         });
+        const response = await this.requestManager.schedule(request, 1);
+        const returnObject = this.parser.parseUpdatedManga(response.data, time, ids);
+        mangaUpdatesFoundCallback(createMangaUpdates(returnObject));
     }
-    getSearchResults(query, metadata) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!metadata) {
-                const request = createRequestObject({
-                    url: `${this.baseUrl}/search/`,
-                    headers,
-                    method,
-                });
-                const searchMetadata = this.parser.searchMetadata(query);
-                const response = yield this.requestManager.schedule(request, 1);
-                metadata = {
-                    manga: this.parser.parseSearch(response.data, searchMetadata),
-                    offset: 0
-                };
-            }
-            return createPagedResults({
-                results: metadata.manga.slice(metadata.offset, metadata.offset + 100),
-                metadata: {
-                    manga: metadata.manga,
-                    offset: metadata.offset + 100
-                }
-            });
-        });
-    }
-    getSearchTags() {
-        return __awaiter(this, void 0, void 0, function* () {
+    async getSearchResults(query, metadata) {
+        if (!metadata) {
             const request = createRequestObject({
                 url: `${this.baseUrl}/search/`,
                 headers,
                 method,
             });
-            const response = yield this.requestManager.schedule(request, 1);
-            return this.parser.parseSearchTags(response.data);
+            const searchMetadata = this.parser.searchMetadata(query);
+            const response = await this.requestManager.schedule(request, 1);
+            metadata = {
+                manga: this.parser.parseSearch(response.data, searchMetadata),
+                offset: 0
+            };
+        }
+        return createPagedResults({
+            results: metadata.manga.slice(metadata.offset, metadata.offset + 100),
+            metadata: {
+                manga: metadata.manga,
+                offset: metadata.offset + 100
+            }
         });
     }
-    supportsTagExclusion() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return true;
+    async getSearchTags() {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/search/`,
+            headers,
+            method,
         });
+        const response = await this.requestManager.schedule(request, 1);
+        return this.parser.parseSearchTags(response.data);
     }
-    getSearchFields() {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Uncomment when this actually works in-app
-            //return this.parser.parseSearchFields()
-            return [];
+    async supportsTagExclusion() {
+        return true;
+    }
+    async getSearchFields() {
+        // Uncomment when this actually works in-app
+        //return this.parser.parseSearchFields()
+        return [];
+    }
+    async getHomePageSections(sectionCallback) {
+        const request = createRequestObject({
+            url: `${this.baseUrl}`,
+            method,
         });
+        const response = await this.requestManager.schedule(request, 1);
+        const $ = this.cheerio.load(response.data);
+        this.parser.parseHomeSections($, response.data, sectionCallback);
     }
-    getHomePageSections(sectionCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
+    async getViewMoreItems(homepageSectionId, metadata) {
+        if (!metadata) {
             const request = createRequestObject({
-                url: `${this.baseUrl}`,
+                url: this.baseUrl,
                 method,
             });
-            const response = yield this.requestManager.schedule(request, 1);
-            const $ = this.cheerio.load(response.data);
-            this.parser.parseHomeSections($, response.data, sectionCallback);
-        });
-    }
-    getViewMoreItems(homepageSectionId, metadata) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!metadata) {
-                const request = createRequestObject({
-                    url: this.baseUrl,
-                    method,
-                });
-                const response = yield this.requestManager.schedule(request, 1);
-                metadata = {
-                    manga: this.parser.parseViewMore(response.data, homepageSectionId),
-                    offset: 0
-                };
+            const response = await this.requestManager.schedule(request, 1);
+            metadata = {
+                manga: this.parser.parseViewMore(response.data, homepageSectionId),
+                offset: 0
+            };
+        }
+        return createPagedResults({
+            results: metadata.manga.slice(metadata.offset, metadata.offset + 100),
+            metadata: {
+                manga: metadata.manga,
+                offset: metadata.offset + 100
             }
-            return createPagedResults({
-                results: metadata.manga.slice(metadata.offset, metadata.offset + 100),
-                metadata: {
-                    manga: metadata.manga,
-                    offset: metadata.offset + 100
-                }
-            });
         });
     }
     globalRequestHeaders() {
@@ -901,23 +872,24 @@ exports.regex = {
 };
 class Parser {
     parseMangaDetails($, mangaId) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
-        const json = (_b = (_a = $('[type=application\\/ld\\+json]').html()) === null || _a === void 0 ? void 0 : _a.replace(/\n*/g, '')) !== null && _b !== void 0 ? _b : '';
+        const json = $('[type=application\\/ld\\+json]').html()?.replace(/\n*/g, '') ?? '';
         // This is only because they added some really jank alternate titles and didn't properly string escape
         const jsonWithoutAlternateName = json.replace(/"alternateName".*?],/g, '');
-        const alternateNames = (_d = (_c = /"alternateName": \[(.*?)]/.exec(json)) === null || _c === void 0 ? void 0 : _c[1]) === null || _d === void 0 ? void 0 : _d.replace(/"/g, '').split(',');
+        const alternateNames = /"alternateName": \[(.*?)]/.exec(json)?.[1]
+            ?.replace(/"/g, '')
+            .split(',');
         const parsedJson = JSON.parse(jsonWithoutAlternateName);
         const entity = parsedJson.mainEntity;
         const info = $('.row');
-        const imgSource = (_g = (_f = (_e = $('.ImgHolder').html()) === null || _e === void 0 ? void 0 : _e.match(/src="(.*)\//)) === null || _f === void 0 ? void 0 : _f[1]) !== null && _g !== void 0 ? _g : NEPNEP_IMAGE_DOMAIN;
+        const imgSource = $('.ImgHolder').html()?.match(/src="(.*)\//)?.[1] ?? NEPNEP_IMAGE_DOMAIN;
         if (imgSource !== NEPNEP_IMAGE_DOMAIN)
             NEPNEP_IMAGE_DOMAIN = imgSource;
         const image = `${NEPNEP_IMAGE_DOMAIN}/${mangaId}.jpg`;
-        const title = this.decodeHTMLEntity((_h = $('h1', info).first().text()) !== null && _h !== void 0 ? _h : '');
+        const title = this.decodeHTMLEntity($('h1', info).first().text() ?? '');
         let titles = [title];
         const author = this.decodeHTMLEntity(entity.author[0]);
-        titles = titles.concat(alternateNames !== null && alternateNames !== void 0 ? alternateNames : '');
-        const follows = Number((_k = (_j = $.root().html()) === null || _j === void 0 ? void 0 : _j.match(/vm.NumSubs = (.*);/)) === null || _k === void 0 ? void 0 : _k[1]);
+        titles = titles.concat(alternateNames ?? '');
+        const follows = Number($.root().html()?.match(/vm.NumSubs = (.*);/)?.[1]);
         const tagSections = [createTagSection({ id: '0', label: 'Genres', tags: [] }),
             createTagSection({ id: '1', label: 'Format', tags: [] })];
         tagSections[0].tags = entity.genre.map((elem) => createTag({ id: elem.toLowerCase(), label: elem }));
@@ -959,8 +931,7 @@ class Parser {
         });
     }
     parseChapters($, mangaId) {
-        var _a, _b, _c;
-        const chapterJS = JSON.parse((_c = (_b = (_a = $.root().html()) === null || _a === void 0 ? void 0 : _a.match(exports.regex['chapters'])) === null || _b === void 0 ? void 0 : _b[1]) !== null && _c !== void 0 ? _c : '').reverse();
+        const chapterJS = JSON.parse($.root().html()?.match(exports.regex['chapters'])?.[1] ?? '').reverse();
         const chapters = [];
         // Following the url encoding that the website uses, same variables too
         for (const elem of chapterJS) {
@@ -988,11 +959,10 @@ class Parser {
         return chapters;
     }
     parseChapterDetails(data, mangaId, chapterId) {
-        var _a, _b, _c;
         const pages = [];
-        const variableName = (_a = data.match(/ng-src="https:\/\/{{([a-zA-Z0-9.]+)}}\/manga\/.+\.png/)) === null || _a === void 0 ? void 0 : _a[1];
-        const matchedPath = (_b = data.match(new RegExp(`${variableName} = "(.*)";`))) === null || _b === void 0 ? void 0 : _b[1];
-        const chapterInfo = JSON.parse((_c = data.match(/vm.CurChapter = (.*);/)) === null || _c === void 0 ? void 0 : _c[1]);
+        const variableName = data.match(/ng-src="https:\/\/{{([a-zA-Z0-9.]+)}}\/manga\/.+\.png/)?.[1];
+        const matchedPath = data.match(new RegExp(`${variableName} = "(.*)";`))?.[1];
+        const chapterInfo = JSON.parse(data.match(/vm.CurChapter = (.*);/)?.[1]);
         const pageNum = Number(chapterInfo.Page);
         const chapter = chapterInfo.Chapter.slice(1, -1);
         const odd = chapterInfo.Chapter[chapterInfo.Chapter.length - 1];
@@ -1009,11 +979,10 @@ class Parser {
         });
     }
     parseUpdatedManga(data, time, ids) {
-        var _a;
         const returnObject = {
             'ids': []
         };
-        const updateManga = JSON.parse((_a = data.match(exports.regex['latest'])) === null || _a === void 0 ? void 0 : _a[1]);
+        const updateManga = JSON.parse(data.match(exports.regex['latest'])?.[1]);
         for (const elem of updateManga) {
             if (ids.includes(elem.IndexName) && time < new Date(elem.Date))
                 returnObject.ids.push(elem.IndexName);
@@ -1021,19 +990,30 @@ class Parser {
         return returnObject;
     }
     searchMetadata(query) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
-        const author = (_b = (_a = query.parameters) === null || _a === void 0 ? void 0 : _a['author']) === null || _b === void 0 ? void 0 : _b[0];
-        const year = (_d = (_c = query.parameters) === null || _c === void 0 ? void 0 : _c['year']) === null || _d === void 0 ? void 0 : _d[0];
-        const type = (_e = query.includedTags) === null || _e === void 0 ? void 0 : _e.filter(type => type.id.includes('type_')).map(type => type.id.replace('type_', ''));
-        const scanStatus = (_f = query.includedTags) === null || _f === void 0 ? void 0 : _f.filter(type => type.id.includes('scan_status_')).map(type => type.id.replace('scan_status_', ''));
-        const publishStatus = (_g = query.includedTags) === null || _g === void 0 ? void 0 : _g.filter(type => type.id.includes('publish_status_')).map(type => type.id.replace('publish_status_', ''));
-        const translation = (_h = query.includedTags) === null || _h === void 0 ? void 0 : _h.filter(type => type.id.includes('translation_')).map(type => type.id.replace('translation_', ''));
-        const includedGenres = (_j = query.includedTags) === null || _j === void 0 ? void 0 : _j.filter(tag => tag.id.includes('genre_')).map(genre => genre.id.replace('genre_', ''));
-        const excludedGenres = (_k = query.excludedTags) === null || _k === void 0 ? void 0 : _k.filter(tag => tag.id.includes('genre_')).map(genre => genre.id.replace('genre_', ''));
+        const author = query.parameters?.['author']?.[0];
+        const year = query.parameters?.['year']?.[0];
+        const type = query.includedTags
+            ?.filter(type => type.id.includes('type_'))
+            .map(type => type.id.replace('type_', ''));
+        const scanStatus = query.includedTags
+            ?.filter(type => type.id.includes('scan_status_'))
+            .map(type => type.id.replace('scan_status_', ''));
+        const publishStatus = query.includedTags
+            ?.filter(type => type.id.includes('publish_status_'))
+            .map(type => type.id.replace('publish_status_', ''));
+        const translation = query.includedTags
+            ?.filter(type => type.id.includes('translation_'))
+            .map(type => type.id.replace('translation_', ''));
+        const includedGenres = query.includedTags
+            ?.filter(tag => tag.id.includes('genre_'))
+            .map(genre => genre.id.replace('genre_', ''));
+        const excludedGenres = query.excludedTags
+            ?.filter(tag => tag.id.includes('genre_'))
+            .map(genre => genre.id.replace('genre_', ''));
         return {
-            'keyword': (_l = query.title) === null || _l === void 0 ? void 0 : _l.toLowerCase(),
-            'author': (_m = author === null || author === void 0 ? void 0 : author.toLowerCase()) !== null && _m !== void 0 ? _m : '',
-            'year': (_o = year === null || year === void 0 ? void 0 : year.toLowerCase()) !== null && _o !== void 0 ? _o : '',
+            'keyword': query.title?.toLowerCase(),
+            'author': author?.toLowerCase() ?? '',
+            'year': year?.toLowerCase() ?? '',
             'scanStatus': scanStatus,
             'publishStatus': publishStatus,
             'translation': translation,
@@ -1043,14 +1023,13 @@ class Parser {
         };
     }
     getDirectory(data) {
-        var _a, _b;
-        return JSON.parse((_b = (_a = data === null || data === void 0 ? void 0 : data.replace(/(\r\n|\n|\r)/gm, '').match(exports.regex['directory'])) === null || _a === void 0 ? void 0 : _a[1].trim().replace(/;$/, '')) !== null && _b !== void 0 ? _b : '');
+        return JSON.parse(data?.replace(/(\r\n|\n|\r)/gm, '')
+            .match(exports.regex['directory'])?.[1].trim().replace(/;$/, '') ?? '');
     }
     parseSearch(data, metadata) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         const manga = [];
         const directory = this.getDirectory(data);
-        const imgSource = (_b = (_a = data.match(exports.regex['directory_image_host'])) === null || _a === void 0 ? void 0 : _a[1]) !== null && _b !== void 0 ? _b : NEPNEP_IMAGE_DOMAIN;
+        const imgSource = data.match(exports.regex['directory_image_host'])?.[1] ?? NEPNEP_IMAGE_DOMAIN;
         if (imgSource !== NEPNEP_IMAGE_DOMAIN)
             NEPNEP_IMAGE_DOMAIN = imgSource;
         for (const elem of directory) {
@@ -1064,17 +1043,17 @@ class Parser {
             let mGenre = !(typeof metadata.genre !== 'undefined' && metadata.genre.length > 0);
             let mGenreNo = typeof metadata.genreNo !== 'undefined' && metadata.genreNo.length > 0;
             if (!mKeyword) {
-                const allWords = [...((_c = elem.al) !== null && _c !== void 0 ? _c : []), (_d = elem.s) !== null && _d !== void 0 ? _d : ''].join('||').toLowerCase();
+                const allWords = [...(elem.al ?? []), elem.s ?? ''].join('||').toLowerCase();
                 mKeyword = allWords.includes(metadata.keyword);
             }
             if (!mAuthor) {
-                const flatA = (_f = (_e = elem.a) === null || _e === void 0 ? void 0 : _e.join('||').toLowerCase()) !== null && _f !== void 0 ? _f : '';
+                const flatA = elem.a?.join('||').toLowerCase() ?? '';
                 mAuthor = (flatA.includes(metadata.author));
             }
             if (!mYear) {
                 if (metadata.year.includes('-')) {
-                    const startYear = parseInt((_h = (_g = metadata.year) === null || _g === void 0 ? void 0 : _g.split('-')) === null || _h === void 0 ? void 0 : _h[0]) || 0;
-                    const endYear = parseInt((_k = (_j = metadata.year) === null || _j === void 0 ? void 0 : _j.split('-')) === null || _k === void 0 ? void 0 : _k[1]) || (new Date).getFullYear();
+                    const startYear = parseInt(metadata.year?.split('-')?.[0]) || 0;
+                    const endYear = parseInt(metadata.year?.split('-')?.[1]) || (new Date).getFullYear();
                     mYear = parseInt(elem.y) >= startYear && parseInt(elem.y) <= endYear;
                 }
                 else {
@@ -1082,17 +1061,17 @@ class Parser {
                 }
             }
             if (!mType)
-                mType = metadata.type.every((i) => { var _a, _b; return (_b = (_a = elem.t) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === null || _b === void 0 ? void 0 : _b.includes(i); });
+                mType = metadata.type.every((i) => elem.t?.toLowerCase()?.includes(i));
             if (!mScanStatus)
-                mScanStatus = metadata.scanStatus.every((i) => { var _a, _b; return (_b = (_a = elem.ss) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === null || _b === void 0 ? void 0 : _b.includes(i); });
+                mScanStatus = metadata.scanStatus.every((i) => elem.ss?.toLowerCase()?.includes(i));
             if (!mPublishStatus)
-                mPublishStatus = metadata.publishStatus.every((i) => { var _a, _b; return (_b = (_a = elem.ps) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === null || _b === void 0 ? void 0 : _b.includes(i); });
+                mPublishStatus = metadata.publishStatus.every((i) => elem.ps?.toLowerCase()?.includes(i));
             if (!mTranslation)
-                mTranslation = metadata.translation.every((i) => { var _a, _b; return (_b = (_a = elem.o) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === null || _b === void 0 ? void 0 : _b.includes(i); });
+                mTranslation = metadata.translation.every((i) => elem.o?.toLowerCase()?.includes(i));
             if (!mGenre)
-                mGenre = metadata.genre.every((i) => { var _a, _b; return (_b = (_a = elem.g) === null || _a === void 0 ? void 0 : _a.map((genre) => genre.toLowerCase())) === null || _b === void 0 ? void 0 : _b.includes(i); });
+                mGenre = metadata.genre.every((i) => elem.g?.map((genre) => genre.toLowerCase())?.includes(i));
             if (mGenreNo)
-                mGenreNo = metadata.genreNo.every((i) => { var _a, _b; return (_b = (_a = elem.g) === null || _a === void 0 ? void 0 : _a.map((genre) => genre.toLowerCase())) === null || _b === void 0 ? void 0 : _b.includes(i); });
+                mGenreNo = metadata.genreNo.every((i) => elem.g?.map((genre) => genre.toLowerCase())?.includes(i));
             let time = (new Date(elem.ls)).toDateString();
             time = time.slice(0, time.length - 5);
             time = time.slice(4, time.length);
@@ -1108,7 +1087,6 @@ class Parser {
         return manga;
     }
     parseSearchTags(data) {
-        var _a, _b, _c, _d, _e, _f, _g;
         const tagSections = [
             createTagSection({ id: 'genres', label: 'Genres', tags: [] }),
             createTagSection({ id: 'format', label: 'Format', tags: [] }),
@@ -1116,16 +1094,16 @@ class Parser {
             createTagSection({ id: 'publish_status', label: 'Publish Status', tags: [] }),
             createTagSection({ id: 'translation', label: 'Translation', tags: [] })
         ];
-        const genres = JSON.parse((_a = data.match(/"Genre"\s*: (.*)/)) === null || _a === void 0 ? void 0 : _a[1].replace(/'/g, '"'));
+        const genres = JSON.parse(data.match(/"Genre"\s*: (.*)/)?.[1].replace(/'/g, '"'));
         tagSections[0].tags = genres.map((tag) => createTag({ id: `genre_${tag.toLowerCase()}`, label: tag }));
-        const typesHTML = (_b = data.match(/"Type"\s*: (.*),/g)) === null || _b === void 0 ? void 0 : _b[1];
-        const types = JSON.parse((_c = typesHTML.match(/(\[.*])/)) === null || _c === void 0 ? void 0 : _c[1].replace(/'/g, '"'));
+        const typesHTML = data.match(/"Type"\s*: (.*),/g)?.[1];
+        const types = JSON.parse(typesHTML.match(/(\[.*])/)?.[1].replace(/'/g, '"'));
         tagSections[1].tags = types.map((tag) => createTag({ id: `type_${tag.toLowerCase()}`, label: tag }));
-        const scanStatusHTML = (_d = data.match(/"ScanStatus"\s*: (.*),/g)) === null || _d === void 0 ? void 0 : _d[1];
-        const scanStatus = JSON.parse((_e = scanStatusHTML.match(/(\[.*])/)) === null || _e === void 0 ? void 0 : _e[1].replace(/'/g, '"'));
+        const scanStatusHTML = data.match(/"ScanStatus"\s*: (.*),/g)?.[1];
+        const scanStatus = JSON.parse(scanStatusHTML.match(/(\[.*])/)?.[1].replace(/'/g, '"'));
         tagSections[2].tags = scanStatus.map((tag) => createTag({ id: `scan_status_${tag.toLowerCase()}`, label: tag }));
-        const publishStatusHTML = (_f = data.match(/"PublishStatus"\s*: (.*),/g)) === null || _f === void 0 ? void 0 : _f[1];
-        const publishStatus = JSON.parse((_g = publishStatusHTML.match(/(\[.*])/)) === null || _g === void 0 ? void 0 : _g[1].replace(/'/g, '"'));
+        const publishStatusHTML = data.match(/"PublishStatus"\s*: (.*),/g)?.[1];
+        const publishStatus = JSON.parse(publishStatusHTML.match(/(\[.*])/)?.[1].replace(/'/g, '"'));
         tagSections[3].tags = publishStatus.map((tag) => createTag({ id: `publish_status_${tag.toLowerCase()}`, label: tag }));
         tagSections[4].tags = [
             createTag({ id: 'translation_yes', label: 'Official' }),
@@ -1141,20 +1119,19 @@ class Parser {
         return searchFields;
     }
     parseHomeSections($, data, sectionCallback) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const topTenSection = createHomeSection({ id: 'top_ten', title: 'Top Ten', type: paperback_extensions_common_1.HomeSectionType.featured });
         const hotSection = createHomeSection({ id: 'hot_update', title: 'Hot Updates', view_more: true });
         const latestSection = createHomeSection({ id: 'latest', title: 'Latest Updates', view_more: true });
         const newTitlesSection = createHomeSection({ id: 'new_titles', title: 'New Titles', view_more: true });
         const recommendedSection = createHomeSection({ id: 'recommended', title: 'Recommendations', view_more: true });
-        const topTen = JSON.parse(((_a = data.match(exports.regex[topTenSection.id])) === null || _a === void 0 ? void 0 : _a[1])).slice(0, 15);
-        const hot = JSON.parse(((_b = data.match(exports.regex[hotSection.id])) === null || _b === void 0 ? void 0 : _b[1])).slice(0, 15);
-        const latest = JSON.parse(((_c = data.match(exports.regex[latestSection.id])) === null || _c === void 0 ? void 0 : _c[1])).slice(0, 15);
-        const newTitles = JSON.parse((_d = (data.match(exports.regex[newTitlesSection.id]))) === null || _d === void 0 ? void 0 : _d[1]).slice(0, 15);
-        const recommended = JSON.parse(((_e = data.match(exports.regex[recommendedSection.id])) === null || _e === void 0 ? void 0 : _e[1])).slice(0, 15);
+        const topTen = JSON.parse((data.match(exports.regex[topTenSection.id])?.[1])).slice(0, 15);
+        const hot = JSON.parse((data.match(exports.regex[hotSection.id])?.[1])).slice(0, 15);
+        const latest = JSON.parse((data.match(exports.regex[latestSection.id])?.[1])).slice(0, 15);
+        const newTitles = JSON.parse((data.match(exports.regex[newTitlesSection.id]))?.[1]).slice(0, 15);
+        const recommended = JSON.parse((data.match(exports.regex[recommendedSection.id])?.[1])).slice(0, 15);
         const sections = [topTenSection, hotSection, latestSection, newTitlesSection, recommendedSection];
         const sectionData = [topTen, hot, latest, newTitles, recommended];
-        const imgSource = (_h = (_g = (_f = $('.ImageHolder').html()) === null || _f === void 0 ? void 0 : _f.match(/ng-src="(.*)\//)) === null || _g === void 0 ? void 0 : _g[1]) !== null && _h !== void 0 ? _h : NEPNEP_IMAGE_DOMAIN;
+        const imgSource = $('.ImageHolder').html()?.match(/ng-src="(.*)\//)?.[1] ?? NEPNEP_IMAGE_DOMAIN;
         if (imgSource !== NEPNEP_IMAGE_DOMAIN)
             NEPNEP_IMAGE_DOMAIN = imgSource;
         for (const [i, section] of sections.entries()) {
@@ -1164,7 +1141,7 @@ class Parser {
                 const id = elem.IndexName;
                 const title = elem.SeriesName;
                 const image = `${NEPNEP_IMAGE_DOMAIN}/${id}.jpg`;
-                let time = (new Date((_j = elem.Date) !== null && _j !== void 0 ? _j : 0)).toDateString();
+                let time = (new Date(elem.Date ?? 0)).toDateString();
                 time = time.slice(0, time.length - 5);
                 time = time.slice(4, time.length);
                 manga.push(createMangaTile({
@@ -1179,12 +1156,11 @@ class Parser {
         }
     }
     parseViewMore(data, homepageSectionId) {
-        var _a;
         const manga = [];
         const mangaIds = new Set();
         if (!exports.regex[homepageSectionId])
             createPagedResults({ results: [] });
-        const items = JSON.parse((_a = (data.match(exports.regex[homepageSectionId]))) === null || _a === void 0 ? void 0 : _a[1]);
+        const items = JSON.parse((data.match(exports.regex[homepageSectionId]))?.[1]);
         for (const item of items) {
             const id = item.IndexName;
             if (!mangaIds.has(id)) {

@@ -951,6 +951,15 @@ __exportStar(require("./RawData"), exports);
 /* eslint-disable no-useless-escape */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bentai = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
@@ -968,17 +977,14 @@ class Bentai extends paperback_extensions_common_1.Source {
             requestsPerSecond: 5,
             requestTimeout: 15000,
             interceptor: {
-                interceptRequest: async (request) => {
-                    request.headers = {
-                        ...(request.headers ?? {}),
-                        'referer': `${this.baseUrl}/`,
-                        'user-agent': this.userAgent ?? request.headers?.['user-agent']
-                    };
+                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
+                    var _a, _b, _c;
+                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), { 'referer': `${this.baseUrl}/`, 'user-agent': (_b = this.userAgent) !== null && _b !== void 0 ? _b : (_c = request.headers) === null || _c === void 0 ? void 0 : _c['user-agent'] });
                     return request;
-                },
-                interceptResponse: async (response) => {
+                }),
+                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
                     return response;
-                }
+                })
             }
         });
         /*
@@ -998,101 +1004,117 @@ class Bentai extends paperback_extensions_common_1.Source {
     getMangaShareUrl(mangaId) {
         return `${this.baseUrl}/gallery/${mangaId}`;
     }
-    async getMangaDetails(mangaId) {
-        const request = createRequestObject({
-            url: `${this.baseUrl}/gallery/${mangaId}`,
-            method: 'GET',
+    getMangaDetails(mangaId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const request = createRequestObject({
+                url: `${this.baseUrl}/gallery/${mangaId}`,
+                method: 'GET',
+            });
+            const response = yield this.requestManager.schedule(request, 1);
+            this.CloudFlareError(response.status);
+            const $ = this.cheerio.load(response.data);
+            return this.parser.parseMangaDetails($, mangaId, this);
         });
-        const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        return this.parser.parseMangaDetails($, mangaId, this);
     }
-    async getChapters(mangaId) {
-        const request = createRequestObject({
-            url: `${this.baseUrl}/gallery/${mangaId}`,
-            method: 'GET',
+    getChapters(mangaId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const request = createRequestObject({
+                url: `${this.baseUrl}/gallery/${mangaId}`,
+                method: 'GET',
+            });
+            const response = yield this.requestManager.schedule(request, 3);
+            this.CloudFlareError(response.status);
+            const $ = this.cheerio.load(response.data);
+            return this.parser.parseChapters($, mangaId);
         });
-        const response = await this.requestManager.schedule(request, 3);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        return this.parser.parseChapters($, mangaId);
     }
-    async getChapterDetails(mangaId, chapterId) {
-        if (!this.imageCDN) {
-            throw new Error('No CDN provided for chapterDetails');
-        }
-        const request = createRequestObject({
-            url: `${this.baseUrl}/gallery/${mangaId}`,
-            method: 'GET',
+    getChapterDetails(mangaId, chapterId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.imageCDN) {
+                throw new Error('No CDN provided for chapterDetails');
+            }
+            const request = createRequestObject({
+                url: `${this.baseUrl}/gallery/${mangaId}`,
+                method: 'GET',
+            });
+            const response = yield this.requestManager.schedule(request, 3);
+            this.CloudFlareError(response.status);
+            const $ = this.cheerio.load(response.data);
+            return this.parser.parseChapterDetails($, mangaId, chapterId, this);
         });
-        const response = await this.requestManager.schedule(request, 3);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        return this.parser.parseChapterDetails($, mangaId, chapterId, this);
     }
-    async getSearchResults(query, metadata) {
-        const page = metadata?.page ?? 1;
-        let request;
-        //Regular search
-        if (query.title) {
-            request = createRequestObject({
-                url: `${this.baseUrl}/search/${this.directorySearchParam}${encodeURI(query.title ?? '')}&page=${page}`,
+    getSearchResults(query, metadata) {
+        var _a, _b, _c;
+        return __awaiter(this, void 0, void 0, function* () {
+            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
+            let request;
+            //Regular search
+            if (query.title) {
+                request = createRequestObject({
+                    url: `${this.baseUrl}/search/${this.directorySearchParam}${encodeURI((_b = query.title) !== null && _b !== void 0 ? _b : '')}&page=${page}`,
+                    method: 'GET'
+                });
+                //Tag Search
+            }
+            else {
+                request = createRequestObject({
+                    url: `${this.baseUrl}/tag/${(_c = query === null || query === void 0 ? void 0 : query.includedTags) === null || _c === void 0 ? void 0 : _c.map((x) => x.id)[0]}/${this.directoryPageParam}${page}`,
+                    method: 'GET'
+                });
+            }
+            const response = yield this.requestManager.schedule(request, 1);
+            const $ = this.cheerio.load(response.data);
+            const manga = this.parser.parseDirectory($, this);
+            metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
+            return createPagedResults({
+                results: manga,
+                metadata
+            });
+        });
+    }
+    getHomePageSections(sectionCallback) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const request = createRequestObject({
+                url: this.baseUrl,
+                method: 'GET',
+            });
+            const response = yield this.requestManager.schedule(request, 2);
+            this.CloudFlareError(response.status);
+            const $ = this.cheerio.load(response.data);
+            this.parser.parseHomeSections($, sectionCallback, this);
+        });
+    }
+    getViewMoreItems(homepageSectionId, metadata) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            homepageSectionId; //Ignore this
+            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : (this.directorySkipFirst ? 2 : 1);
+            const request = createRequestObject({
+                url: `${this.baseUrl}/${this.directoryPageParam}${page}`,
+                method: 'GET',
+            });
+            const response = yield this.requestManager.schedule(request, 1);
+            this.CloudFlareError(response.status);
+            const $ = this.cheerio.load(response.data);
+            const manga = this.parser.parseDirectory($, this);
+            metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
+            return createPagedResults({
+                results: manga,
+                metadata
+            });
+        });
+    }
+    getSearchTags() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const options = createRequestObject({
+                url: `${this.baseUrl}/tags/popular`,
                 method: 'GET'
             });
-            //Tag Search
-        }
-        else {
-            request = createRequestObject({
-                url: `${this.baseUrl}/tag/${query?.includedTags?.map((x) => x.id)[0]}/${this.directoryPageParam}${page}`,
-                method: 'GET'
-            });
-        }
-        const response = await this.requestManager.schedule(request, 1);
-        const $ = this.cheerio.load(response.data);
-        const manga = this.parser.parseDirectory($, this);
-        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
-        return createPagedResults({
-            results: manga,
-            metadata
+            const response = yield this.requestManager.schedule(options, 1);
+            this.CloudFlareError(response.status);
+            const $ = this.cheerio.load(response.data);
+            return this.parser.parseTags($, this);
         });
-    }
-    async getHomePageSections(sectionCallback) {
-        const request = createRequestObject({
-            url: this.baseUrl,
-            method: 'GET',
-        });
-        const response = await this.requestManager.schedule(request, 2);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        this.parser.parseHomeSections($, sectionCallback, this);
-    }
-    async getViewMoreItems(homepageSectionId, metadata) {
-        homepageSectionId; //Ignore this
-        const page = metadata?.page ?? (this.directorySkipFirst ? 2 : 1);
-        const request = createRequestObject({
-            url: `${this.baseUrl}/${this.directoryPageParam}${page}`,
-            method: 'GET',
-        });
-        const response = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        const manga = this.parser.parseDirectory($, this);
-        metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
-        return createPagedResults({
-            results: manga,
-            metadata
-        });
-    }
-    async getSearchTags() {
-        const options = createRequestObject({
-            url: `${this.baseUrl}/tags/popular`,
-            method: 'GET'
-        });
-        const response = await this.requestManager.schedule(options, 1);
-        this.CloudFlareError(response.status);
-        const $ = this.cheerio.load(response.data);
-        return this.parser.parseTags($, this);
     }
     getCloudflareBypassRequest() {
         return createRequestObject({
@@ -1114,6 +1136,15 @@ exports.Bentai = Bentai;
 
 },{"./BentaiParser":57,"paperback-extensions-common":13}],57:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
@@ -1127,13 +1158,14 @@ class Parser {
             sectionCallback(homepageSection);
         };
         this.parseDirectory = ($, source) => {
+            var _a, _b, _c, _d, _e, _f;
             const manga = [];
             const collectedIds = [];
             for (const obj of $('div.thumb', source.directoryGallerySelector).toArray()) {
-                const image = this.getImageSrc($('img', $('div.inner_thumb', obj)).first() ?? '');
-                const title = $('h2, div.caption', obj).first().text().trim() ?? '';
-                const subtitle = $(source.directorySubtitleSelector, obj).text().trim() ?? '';
-                const id = $('h2 > a, div.caption > a', obj).attr('href')?.replace(/\/$/, '')?.split('/').pop() ?? '';
+                const image = this.getImageSrc((_a = $('img', $('div.inner_thumb', obj)).first()) !== null && _a !== void 0 ? _a : '');
+                const title = (_b = $('h2, div.caption', obj).first().text().trim()) !== null && _b !== void 0 ? _b : '';
+                const subtitle = (_c = $(source.directorySubtitleSelector, obj).text().trim()) !== null && _c !== void 0 ? _c : '';
+                const id = (_f = (_e = (_d = $('h2 > a, div.caption > a', obj).attr('href')) === null || _d === void 0 ? void 0 : _d.replace(/\/$/, '')) === null || _e === void 0 ? void 0 : _e.split('/').pop()) !== null && _f !== void 0 ? _f : '';
                 if (!id || !title)
                     continue;
                 if (!collectedIds.includes(id)) {
@@ -1157,17 +1189,18 @@ class Parser {
         };
     }
     parseMangaDetails($, mangaId, source) {
+        var _a, _b, _c, _d, _e;
         const titles = [];
-        titles.push(this.decodeHTMLEntity($('img.lazy.entered.loaded, div.cover > img').attr('alt')?.trim() ?? ''));
+        titles.push(this.decodeHTMLEntity((_b = (_a = $('img.lazy.entered.loaded, div.cover > img').attr('alt')) === null || _a === void 0 ? void 0 : _a.trim()) !== null && _b !== void 0 ? _b : ''));
         const image = this.getImageSrc($('img.lazy, div.cover > img').first());
-        const artist = $('a', $('span:contains(Artist)').parent()).toArray().map(x => $(x).text().trim()).join(', ') ?? 'Unknown';
+        const artist = (_c = $('a', $('span:contains(Artist)').parent()).toArray().map(x => $(x).text().trim()).join(', ')) !== null && _c !== void 0 ? _c : 'Unknown';
         const arrayTags = [];
         for (const tag of $('a', $('span:contains(Tags)').parent()).toArray()) {
             const count = $(tag).children().remove().text().trim();
             let label = $(tag).text().replace(count, '').trim();
             if (isNaN(Number(count)))
                 label = count;
-            const id = encodeURI($(tag).attr('href')?.replace(/\/$/, '').split('/').pop() ?? '');
+            const id = encodeURI((_e = (_d = $(tag).attr('href')) === null || _d === void 0 ? void 0 : _d.replace(/\/$/, '').split('/').pop()) !== null && _e !== void 0 ? _e : '');
             if (!id || !label)
                 continue;
             arrayTags.push({ id: id, label: label });
@@ -1208,35 +1241,38 @@ class Parser {
         }));
         return chapters;
     }
-    async parseChapterDetails($, mangaId, chapterId, source) {
-        const pages = [];
-        const pageCount = Number($('#load_pages').attr('value'));
-        const imgDir = $('#load_dir').attr('value');
-        const imgId = $('#load_id').attr('value');
-        if (!pageCount || isNaN(pageCount)) {
-            throw new Error(`Unable to parse pageCount (found: ${pageCount}) for mangaId:${mangaId}`);
-        }
-        if (!imgDir) {
-            throw new Error(`Unable to parse imgDir (found: ${imgDir}) for mangaId:${mangaId}`);
-        }
-        if (!imgId) {
-            throw new Error(`Unable to parse imgId (found: ${imgId}) for mangaId:${mangaId}`);
-        }
-        for (let i = 1; i < pageCount; i++) {
-            pages.push(`${source.imageCDN}/${imgDir}/${imgId}/${i}.jpg`);
-        }
-        return createChapterDetails({
-            id: chapterId,
-            mangaId: mangaId,
-            pages: pages,
-            longStrip: true
+    parseChapterDetails($, mangaId, chapterId, source) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const pages = [];
+            const pageCount = Number($('#load_pages').attr('value'));
+            const imgDir = $('#load_dir').attr('value');
+            const imgId = $('#load_id').attr('value');
+            if (!pageCount || isNaN(pageCount)) {
+                throw new Error(`Unable to parse pageCount (found: ${pageCount}) for mangaId:${mangaId}`);
+            }
+            if (!imgDir) {
+                throw new Error(`Unable to parse imgDir (found: ${imgDir}) for mangaId:${mangaId}`);
+            }
+            if (!imgId) {
+                throw new Error(`Unable to parse imgId (found: ${imgId}) for mangaId:${mangaId}`);
+            }
+            for (let i = 1; i < pageCount; i++) {
+                pages.push(`${source.imageCDN}/${imgDir}/${imgId}/${i}.jpg`);
+            }
+            return createChapterDetails({
+                id: chapterId,
+                mangaId: mangaId,
+                pages: pages,
+                longStrip: true
+            });
         });
     }
     parseTags($, source) {
+        var _a, _b;
         const arrayTags = [];
         for (const tag of $('div.col.col', source.tagBoxSelector).toArray()) {
             const label = $('h3', tag).text().trim();
-            const id = encodeURI($('a', tag).attr('href')?.replace(/\/$/, '').split('/').pop() ?? '');
+            const id = encodeURI((_b = (_a = $('a', tag).attr('href')) === null || _a === void 0 ? void 0 : _a.replace(/\/$/, '').split('/').pop()) !== null && _b !== void 0 ? _b : '');
             if (!id || !label)
                 continue;
             arrayTags.push({ id: id, label: label });
@@ -1245,35 +1281,36 @@ class Parser {
         return tagSections;
     }
     getImageSrc(imageObj) {
+        var _a, _b, _c;
         let image;
-        if (typeof imageObj?.attr('data-original') != 'undefined') {
-            image = imageObj?.attr('data-original');
+        if (typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-original')) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-original');
         }
-        if (typeof imageObj?.attr('data-cfsrc') != 'undefined') {
-            image = imageObj?.attr('data-cfsrc');
+        if (typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-cfsrc')) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-cfsrc');
         }
-        else if (typeof imageObj?.attr('data-src') != 'undefined') {
-            image = imageObj?.attr('data-src');
+        else if (typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-src')) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-src');
         }
-        else if (typeof imageObj?.attr('data-bg') != 'undefined') {
-            image = imageObj?.attr('data-bg');
+        else if (typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-bg')) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-bg');
         }
-        else if (typeof imageObj?.attr('data-srcset') != 'undefined') {
-            image = imageObj?.attr('data-srcset');
+        else if (typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-srcset')) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-srcset');
         }
-        else if (typeof imageObj?.attr('data-lazy-src') != 'undefined') {
-            image = imageObj?.attr('data-lazy-src');
+        else if (typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-lazy-src')) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-lazy-src');
         }
-        else if (typeof imageObj?.attr('data-aload') != 'undefined') {
-            image = imageObj?.attr('data-aload');
+        else if (typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-aload')) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-aload');
         }
-        else if (typeof imageObj?.attr('srcset') != 'undefined') {
-            image = imageObj?.attr('srcset')?.split(' ')[0] ?? '';
+        else if (typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('srcset')) != 'undefined') {
+            image = (_b = (_a = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('srcset')) === null || _a === void 0 ? void 0 : _a.split(' ')[0]) !== null && _b !== void 0 ? _b : '';
         }
         else {
-            image = imageObj?.attr('src');
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('src');
         }
-        return encodeURI(decodeURI(this.decodeHTMLEntity(image?.trim() ?? '')));
+        return encodeURI(decodeURI(this.decodeHTMLEntity((_c = image === null || image === void 0 ? void 0 : image.trim()) !== null && _c !== void 0 ? _c : '')));
     }
     decodeHTMLEntity(str) {
         return entities.decodeHTML(str);

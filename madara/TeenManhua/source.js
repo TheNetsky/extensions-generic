@@ -19368,15 +19368,6 @@ module.exports=[
 ]
 },{}],60:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
 /* eslint-disable no-useless-escape */
@@ -19399,18 +19390,23 @@ class Madara extends paperback_extensions_common_1.Source {
             requestsPerSecond: 3,
             requestTimeout: 15000,
             interceptor: {
-                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), Object.assign(Object.assign({}, (globalUA && { 'user-agent': yield this.getUserAgent() })), { 'referer': `${this.baseUrl}/` }));
+                interceptRequest: async (request) => {
+                    request.headers = {
+                        ...(request.headers ?? {}),
+                        ...{
+                            ...(globalUA && { 'user-agent': await this.getUserAgent() }),
+                            'referer': `${this.baseUrl}/`
+                        }
+                    };
                     request.cookies = [
                         createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl }),
                         createCookie({ name: 'toonily-mature', value: '1', domain: this.baseUrl })
                     ];
                     return request;
-                }),
-                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
+                },
+                interceptResponse: async (response) => {
                     return response;
-                })
+                }
             }
         });
         this.stateManager = createSourceStateManager({});
@@ -19459,153 +19455,134 @@ class Madara extends paperback_extensions_common_1.Source {
         this.userAgent = true;
         this.parser = new MadaraParser_1.Parser();
     }
-    getUserAgent() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const stateUA = yield this.stateManager.retrieve('userAgent');
-            if (!this.userAgent) {
-                globalUA = null;
-            }
-            else if (typeof this.userAgent == 'string') {
-                globalUA = this.userAgent;
-            }
-            else if (stateUA) {
-                globalUA = stateUA;
-            }
-            else {
-                globalUA = null;
-            }
-            return globalUA;
-        });
+    async getUserAgent() {
+        const stateUA = await this.stateManager.retrieve('userAgent');
+        if (!this.userAgent) {
+            globalUA = null;
+        }
+        else if (typeof this.userAgent == 'string') {
+            globalUA = this.userAgent;
+        }
+        else if (stateUA) {
+            globalUA = stateUA;
+        }
+        else {
+            globalUA = null;
+        }
+        return globalUA;
     }
-    getSourceMenu() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const section = createSection({
-                id: 'main',
-                header: 'Source Settings',
-                footer: 'Change User Agent & Enable HQ Thumbnails',
-                rows: () => __awaiter(this, void 0, void 0, function* () {
-                    return [
-                        MadaraSettings_1.sourceSettings(this.stateManager, this.requestManager, this)
-                    ];
-                })
-            });
-            yield this.getUserAgent();
-            return section;
+    async getSourceMenu() {
+        const section = createSection({
+            id: 'main',
+            header: 'Source Settings',
+            footer: 'Change User Agent & Enable HQ Thumbnails',
+            rows: async () => [
+                MadaraSettings_1.sourceSettings(this.stateManager, this.requestManager, this)
+            ]
         });
+        await this.getUserAgent();
+        return section;
     }
     getMangaShareUrl(mangaId) {
         return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`;
     }
-    getMangaDetails(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!isNaN(Number(mangaId))) {
-                throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
+    async getMangaDetails(mangaId) {
+        if (!isNaN(Number(mangaId))) {
+            throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
+        }
+        const request = createRequestObject({
+            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
+            method: 'GET'
+        });
+        const data = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        return this.parser.parseMangaDetails($, mangaId, this);
+    }
+    async getChapters(mangaId) {
+        if (!isNaN(Number(mangaId))) {
+            throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
+        }
+        const request = createRequestObject({
+            url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
+            method: 'POST',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded'
+            },
+            data: {
+                'action': 'manga_get_chapters',
+                'manga': await this.getNumericId(mangaId)
             }
-            const request = createRequestObject({
-                url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
+        });
+        const data = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        return this.parser.parseChapterList($, mangaId, this);
+    }
+    async getChapterDetails(mangaId, chapterId) {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
+            method: 'GET',
+            param: this.chapterDetailsParam
+        });
+        const data = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector);
+    }
+    async getTags() {
+        let request;
+        if (this.hasAdvancedSearchPage) {
+            request = createRequestObject({
+                url: `${this.baseUrl}/?s=&post_type=wp-manga`,
                 method: 'GET'
             });
-            const data = yield this.requestManager.schedule(request, 1);
-            this.CloudFlareError(data.status);
-            const $ = this.cheerio.load(data.data);
-            return this.parser.parseMangaDetails($, mangaId, this);
-        });
-    }
-    getChapters(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!isNaN(Number(mangaId))) {
-                throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
-            }
-            const request = createRequestObject({
-                url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
-                method: 'POST',
-                headers: {
-                    'content-type': 'application/x-www-form-urlencoded'
-                },
-                data: {
-                    'action': 'manga_get_chapters',
-                    'manga': yield this.getNumericId(mangaId)
-                }
+        }
+        else {
+            request = createRequestObject({
+                url: `${this.baseUrl}/`,
+                method: 'GET'
             });
-            const data = yield this.requestManager.schedule(request, 1);
-            this.CloudFlareError(data.status);
-            const $ = this.cheerio.load(data.data);
-            return this.parser.parseChapterList($, mangaId, this);
+        }
+        const data = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        return this.parser.parseTags($, this.hasAdvancedSearchPage);
+    }
+    async getSearchResults(query, metadata) {
+        // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
+        const page = metadata?.page ?? 1;
+        const request = this.constructSearchRequest(page, query);
+        const data = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        const manga = this.parser.parseSearchResults($, this);
+        return createPagedResults({
+            results: await manga,
+            metadata: { page: (page + 1) }
         });
     }
-    getChapterDetails(mangaId, chapterId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
-                method: 'GET',
-                param: this.chapterDetailsParam
-            });
-            const data = yield this.requestManager.schedule(request, 1);
+    async filterUpdatedManga(mangaUpdatesFoundCallback, time, ids) {
+        // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
+        let page = 0;
+        let loadNextPage = true;
+        while (loadNextPage) {
+            const request = this.constructAjaxHomepageRequest(page, 50, '_latest_update');
+            const data = await this.requestManager.schedule(request, 1);
             this.CloudFlareError(data.status);
             const $ = this.cheerio.load(data.data);
-            return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector);
-        });
-    }
-    getTags() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let request;
-            if (this.hasAdvancedSearchPage) {
-                request = createRequestObject({
-                    url: `${this.baseUrl}/?s=&post_type=wp-manga`,
-                    method: 'GET'
-                });
+            const updatedManga = this.parser.filterUpdatedManga($, time, ids, this);
+            loadNextPage = updatedManga.loadNextPage;
+            if (loadNextPage) {
+                page++;
             }
-            else {
-                request = createRequestObject({
-                    url: `${this.baseUrl}/`,
-                    method: 'GET'
-                });
+            if (updatedManga.updates.length > 0) {
+                mangaUpdatesFoundCallback(createMangaUpdates({
+                    ids: updatedManga.updates
+                }));
             }
-            const data = yield this.requestManager.schedule(request, 1);
-            this.CloudFlareError(data.status);
-            const $ = this.cheerio.load(data.data);
-            return this.parser.parseTags($, this.hasAdvancedSearchPage);
-        });
-    }
-    getSearchResults(query, metadata) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
-            const request = this.constructSearchRequest(page, query);
-            const data = yield this.requestManager.schedule(request, 1);
-            this.CloudFlareError(data.status);
-            const $ = this.cheerio.load(data.data);
-            const manga = this.parser.parseSearchResults($, this);
-            return createPagedResults({
-                results: yield manga,
-                metadata: { page: (page + 1) }
-            });
-        });
-    }
-    filterUpdatedManga(mangaUpdatesFoundCallback, time, ids) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
-            let page = 0;
-            let loadNextPage = true;
-            while (loadNextPage) {
-                const request = this.constructAjaxHomepageRequest(page, 50, '_latest_update');
-                const data = yield this.requestManager.schedule(request, 1);
-                this.CloudFlareError(data.status);
-                const $ = this.cheerio.load(data.data);
-                const updatedManga = this.parser.filterUpdatedManga($, time, ids, this);
-                loadNextPage = updatedManga.loadNextPage;
-                if (loadNextPage) {
-                    page++;
-                }
-                if (updatedManga.updates.length > 0) {
-                    mangaUpdatesFoundCallback(createMangaUpdates({
-                        ids: updatedManga.updates
-                    }));
-                }
-            }
-            mangaUpdatesFoundCallback(createMangaUpdates({ ids: [] }));
-        });
+        }
+        mangaUpdatesFoundCallback(createMangaUpdates({ ids: [] }));
     }
     /**
      * It's hard to capture a default logic for homepages. So for Madara sources,
@@ -19613,123 +19590,115 @@ class Madara extends paperback_extensions_common_1.Source {
      * This supports having paged views in almost all cases.
      * @param sectionCallback
      */
-    getHomePageSections(sectionCallback) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const sections = [
-                {
-                    request: this.constructAjaxHomepageRequest(0, 10, '_latest_update'),
-                    section: createHomeSection({
-                        id: '0',
-                        title: 'Recently Updated',
-                        view_more: true,
-                    }),
-                },
-                {
-                    request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_week_views_value'),
-                    section: createHomeSection({
-                        id: '1',
-                        title: 'Currently Trending',
-                        view_more: true,
-                    })
-                },
-                {
-                    request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_views'),
-                    section: createHomeSection({
-                        id: '2',
-                        title: 'Most Popular',
-                        view_more: true,
-                    })
-                },
-                {
-                    request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_status', 'end'),
-                    section: createHomeSection({
-                        id: '3',
-                        title: 'Completed',
-                        view_more: true,
-                    })
-                },
-            ];
-            const promises = [];
-            for (const section of sections) {
-                // Let the app load empty sections
+    async getHomePageSections(sectionCallback) {
+        const sections = [
+            {
+                request: this.constructAjaxHomepageRequest(0, 10, '_latest_update'),
+                section: createHomeSection({
+                    id: '0',
+                    title: 'Recently Updated',
+                    view_more: true,
+                }),
+            },
+            {
+                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_week_views_value'),
+                section: createHomeSection({
+                    id: '1',
+                    title: 'Currently Trending',
+                    view_more: true,
+                })
+            },
+            {
+                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_views'),
+                section: createHomeSection({
+                    id: '2',
+                    title: 'Most Popular',
+                    view_more: true,
+                })
+            },
+            {
+                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_status', 'end'),
+                section: createHomeSection({
+                    id: '3',
+                    title: 'Completed',
+                    view_more: true,
+                })
+            },
+        ];
+        const promises = [];
+        for (const section of sections) {
+            // Let the app load empty sections
+            sectionCallback(section.section);
+            // Get the section data
+            promises.push(this.requestManager.schedule(section.request, 1).then(async (response) => {
+                this.CloudFlareError(response.status);
+                const $ = this.cheerio.load(response.data);
+                section.section.items = await this.parser.parseHomeSection($, this);
                 sectionCallback(section.section);
-                // Get the section data
-                promises.push(this.requestManager.schedule(section.request, 1).then((response) => __awaiter(this, void 0, void 0, function* () {
-                    this.CloudFlareError(response.status);
-                    const $ = this.cheerio.load(response.data);
-                    section.section.items = yield this.parser.parseHomeSection($, this);
-                    sectionCallback(section.section);
-                })));
+            }));
+        }
+        // Make sure the function completes
+        await Promise.all(promises);
+    }
+    async getViewMoreItems(homepageSectionId, metadata) {
+        // We only have one homepage section ID, so we don't need to worry about handling that any
+        const page = metadata?.page ?? 0; // Default to page 0
+        let sortBy = [];
+        switch (homepageSectionId) {
+            case '0': {
+                sortBy = ['_latest_update'];
+                break;
             }
-            // Make sure the function completes
-            yield Promise.all(promises);
+            case '1': {
+                sortBy = ['_wp_manga_week_views_value'];
+                break;
+            }
+            case '2': {
+                sortBy = ['_wp_manga_views'];
+                break;
+            }
+            case '3': {
+                sortBy = ['_wp_manga_status', 'end'];
+                break;
+            }
+        }
+        const request = this.constructAjaxHomepageRequest(page, 50, sortBy[0], sortBy[1]);
+        const data = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        const items = await this.parser.parseHomeSection($, this);
+        // Set up to go to the next page. If we are on the last page, remove the logic.
+        let mData = { page: (page + 1) };
+        if (items.length < 50) {
+            mData = undefined;
+        }
+        return createPagedResults({
+            results: items,
+            metadata: mData
         });
     }
-    getViewMoreItems(homepageSectionId, metadata) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            // We only have one homepage section ID, so we don't need to worry about handling that any
-            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 0; // Default to page 0
-            let sortBy = [];
-            switch (homepageSectionId) {
-                case '0': {
-                    sortBy = ['_latest_update'];
-                    break;
-                }
-                case '1': {
-                    sortBy = ['_wp_manga_week_views_value'];
-                    break;
-                }
-                case '2': {
-                    sortBy = ['_wp_manga_views'];
-                    break;
-                }
-                case '3': {
-                    sortBy = ['_wp_manga_status', 'end'];
-                    break;
-                }
-            }
-            const request = this.constructAjaxHomepageRequest(page, 50, sortBy[0], sortBy[1]);
-            const data = yield this.requestManager.schedule(request, 1);
-            this.CloudFlareError(data.status);
-            const $ = this.cheerio.load(data.data);
-            const items = yield this.parser.parseHomeSection($, this);
-            // Set up to go to the next page. If we are on the last page, remove the logic.
-            let mData = { page: (page + 1) };
-            if (items.length < 50) {
-                mData = undefined;
-            }
-            return createPagedResults({
-                results: items,
-                metadata: mData
-            });
+    async getNumericId(mangaId) {
+        const request = createRequestObject({
+            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
+            method: 'GET'
         });
-    }
-    getNumericId(mangaId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const request = createRequestObject({
-                url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-                method: 'GET'
-            });
-            const data = yield this.requestManager.schedule(request, 1);
-            this.CloudFlareError(data.status);
-            const $ = this.cheerio.load(data.data);
-            const numericId = this.parser.parsePostId($);
-            return numericId;
-        });
+        const data = await this.requestManager.schedule(request, 1);
+        this.CloudFlareError(data.status);
+        const $ = this.cheerio.load(data.data);
+        const numericId = this.parser.parsePostId($);
+        return numericId;
     }
     /**
      * Constructs requests to be sent to the search page.
      */
     constructSearchRequest(page, query) {
-        var _a, _b;
         return createRequestObject({
             url: new MadaraHelper_1.URLBuilder(this.baseUrl)
                 .addPathComponent(this.searchPagePathName)
                 .addPathComponent(page.toString())
-                .addQueryParameter('s', encodeURIComponent((_a = query === null || query === void 0 ? void 0 : query.title) !== null && _a !== void 0 ? _a : ''))
+                .addQueryParameter('s', encodeURIComponent(query?.title ?? ''))
                 .addQueryParameter('post_type', 'wp-manga')
-                .addQueryParameter('genre', (_b = query === null || query === void 0 ? void 0 : query.includedTags) === null || _b === void 0 ? void 0 : _b.map((x) => x.id))
+                .addQueryParameter('genre', query?.includedTags?.map((x) => x.id))
                 .buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
             method: 'GET'
         });
@@ -19763,7 +19732,9 @@ class Madara extends paperback_extensions_common_1.Source {
         return createRequestObject({
             url: `${this.baseUrl}`,
             method: 'GET',
-            headers: Object.assign({}, (globalUA && { 'user-agent': globalUA }))
+            headers: {
+                ...(globalUA && { 'user-agent': globalUA }),
+            }
         });
     }
     CloudFlareError(status) {
@@ -19820,15 +19791,6 @@ exports.URLBuilder = URLBuilder;
 
 },{}],62:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
@@ -19839,10 +19801,9 @@ const MadaraSettings_1 = require("./MadaraSettings");
 class Parser {
     constructor() {
         this.parseDate = (date) => {
-            var _a;
             date = date.toUpperCase();
             let time;
-            const number = Number(((_a = /\d*/.exec(date)) !== null && _a !== void 0 ? _a : [])[0]);
+            const number = Number((/\d*/.exec(date) ?? [])[0]);
             if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
                 time = new Date(Date.now());
             }
@@ -19876,56 +19837,52 @@ class Parser {
             return time;
         };
     }
-    parseMangaDetails($, mangaId, source) {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            const numericId = this.parsePostId($);
-            const title = this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim());
-            const author = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown');
-            const artist = this.decodeHTMLEntity($('div.artist-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown');
-            const summary = this.decodeHTMLEntity($('div.description-summary').first().text()).replace('Show more', '').trim();
-            const image = encodeURI(yield this.getImageSrc($('div.summary_image img').first(), source));
-            const isOngoing = $('div.summary-content', $('div.post-content_item').last()).text().toLowerCase().trim() == 'ongoing';
-            const genres = [];
-            // Grab genres and check for smut tag
-            for (const obj of $('div.genres-content a').toArray()) {
-                const label = $(obj).text();
-                const id = (_b = (_a = $(obj).attr('href')) === null || _a === void 0 ? void 0 : _a.split('/')[4]) !== null && _b !== void 0 ? _b : label;
-                if (!label || !id)
-                    continue;
-                genres.push(createTag({ label: label, id: id }));
-            }
-            const tagSections = [createTagSection({ id: '0', label: 'genres', tags: genres })];
-            // If we cannot parse out the data-id for this title, we cannot complete subsequent requests
-            if (!numericId) {
-                throw new Error(`Could not parse out the data-id for ${mangaId} - This method might need overridden in the implementing source`);
-            }
-            return createManga({
-                id: mangaId,
-                titles: [title],
-                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
-                author: author,
-                artist: artist,
-                tags: tagSections,
-                desc: summary,
-                status: isOngoing ? paperback_extensions_common_1.MangaStatus.ONGOING : paperback_extensions_common_1.MangaStatus.COMPLETED
-            });
+    async parseMangaDetails($, mangaId, source) {
+        const numericId = this.parsePostId($);
+        const title = this.decodeHTMLEntity($('div.post-title h1, div#manga-title h1').children().remove().end().text().trim());
+        const author = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown');
+        const artist = this.decodeHTMLEntity($('div.artist-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown');
+        const summary = this.decodeHTMLEntity($('div.description-summary').first().text()).replace('Show more', '').trim();
+        const image = encodeURI(await this.getImageSrc($('div.summary_image img').first(), source));
+        const isOngoing = $('div.summary-content', $('div.post-content_item').last()).text().toLowerCase().trim() == 'ongoing';
+        const genres = [];
+        // Grab genres and check for smut tag
+        for (const obj of $('div.genres-content a').toArray()) {
+            const label = $(obj).text();
+            const id = $(obj).attr('href')?.split('/')[4] ?? label;
+            if (!label || !id)
+                continue;
+            genres.push(createTag({ label: label, id: id }));
+        }
+        const tagSections = [createTagSection({ id: '0', label: 'genres', tags: genres })];
+        // If we cannot parse out the data-id for this title, we cannot complete subsequent requests
+        if (!numericId) {
+            throw new Error(`Could not parse out the data-id for ${mangaId} - This method might need overridden in the implementing source`);
+        }
+        return createManga({
+            id: mangaId,
+            titles: [title],
+            image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+            author: author,
+            artist: artist,
+            tags: tagSections,
+            desc: summary,
+            status: isOngoing ? paperback_extensions_common_1.MangaStatus.ONGOING : paperback_extensions_common_1.MangaStatus.COMPLETED
         });
     }
     parseChapterList($, mangaId, source) {
-        var _a, _b, _c, _d;
         const chapters = [];
         let sortingIndex = 0;
         // For each available chapter..
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = ($('a', obj).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
-            const chapName = (_a = $('a', obj).first().text().trim()) !== null && _a !== void 0 ? _a : '';
-            const chapNum = Number((_c = (_b = decodeURIComponent(id).match(/\D*(\d*\-?\d*)\D*$/)) === null || _b === void 0 ? void 0 : _b.pop()) === null || _c === void 0 ? void 0 : _c.replace(/-/g, '.'));
+            const chapName = $('a', obj).first().text().trim() ?? '';
+            const chapNum = Number(decodeURIComponent(id).match(/\D*(\d*\-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'));
             let mangaTime;
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = this.parseDate(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
+                mangaTime = this.parseDate(timeSelector ?? '');
             }
             else {
                 //Else get the date from the info box
@@ -19940,7 +19897,7 @@ class Parser {
             chapters.push(createChapter({
                 id: id,
                 mangaId: mangaId,
-                langCode: (_d = source.languageCode) !== null && _d !== void 0 ? _d : paperback_extensions_common_1.LanguageCode.UNKNOWN,
+                langCode: source.languageCode ?? paperback_extensions_common_1.LanguageCode.UNKNOWN,
                 chapNum: isNaN(chapNum) ? 0 : chapNum,
                 name: chapName ? this.decodeHTMLEntity(chapName) : undefined,
                 time: mangaTime,
@@ -19951,104 +19908,94 @@ class Parser {
         }
         return chapters;
     }
-    parseChapterDetails($, mangaId, chapterId, selector) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const pages = [];
-            for (const obj of $(selector).toArray()) {
-                const page = this.getImageSrc($(obj));
-                if (!page) {
-                    throw new Error(`Could not parse page for ${mangaId}/${chapterId}`);
-                }
-                pages.push(encodeURI(yield page));
+    async parseChapterDetails($, mangaId, chapterId, selector) {
+        const pages = [];
+        for (const obj of $(selector).toArray()) {
+            const page = this.getImageSrc($(obj));
+            if (!page) {
+                throw new Error(`Could not parse page for ${mangaId}/${chapterId}`);
             }
-            return createChapterDetails({
-                id: chapterId,
-                mangaId: mangaId,
-                pages: pages,
-                longStrip: false
-            });
+            pages.push(encodeURI(await page));
+        }
+        return createChapterDetails({
+            id: chapterId,
+            mangaId: mangaId,
+            pages: pages,
+            longStrip: false
         });
     }
     parseTags($, advancedSearch) {
-        var _a, _b, _c;
         const genres = [];
         if (advancedSearch) {
             for (const obj of $('.checkbox-group div label').toArray()) {
                 const label = $(obj).text().trim();
-                const id = (_a = $(obj).attr('for')) !== null && _a !== void 0 ? _a : label;
+                const id = $(obj).attr('for') ?? label;
                 genres.push(createTag({ label: label, id: id }));
             }
         }
         else {
             for (const obj of $('.menu-item-object-wp-manga-genre a', $('.second-menu')).toArray()) {
                 const label = $(obj).text().trim();
-                const id = (_c = (_b = $(obj).attr('href')) === null || _b === void 0 ? void 0 : _b.split('/')[4]) !== null && _c !== void 0 ? _c : label;
+                const id = $(obj).attr('href')?.split('/')[4] ?? label;
                 genres.push(createTag({ label: label, id: id }));
             }
         }
         return [createTagSection({ id: '0', label: 'genres', tags: genres })];
     }
-    parseSearchResults($, source) {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            const results = [];
-            for (const obj of $(source.searchMangaSelector).toArray()) {
-                const id = ((_a = $('a', obj).attr('href')) !== null && _a !== void 0 ? _a : '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
-                const title = (_b = $('a', obj).attr('title')) !== null && _b !== void 0 ? _b : '';
-                const image = encodeURI(yield this.getImageSrc($('img', obj), source));
-                const subtitle = $('span.font-meta.chapter', obj).text().trim();
-                if (!id || !title) {
-                    if (id.includes(source.baseUrl.replace(/\/$/, '')))
-                        continue;
-                    // Something went wrong with our parsing, return a detailed error
-                    console.log(`Failed to parse searchResult for ${source.baseUrl} using ${source.searchMangaSelector} as a loop selector`);
+    async parseSearchResults($, source) {
+        const results = [];
+        for (const obj of $(source.searchMangaSelector).toArray()) {
+            const id = ($('a', obj).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
+            const title = $('a', obj).attr('title') ?? '';
+            const image = encodeURI(await this.getImageSrc($('img', obj), source));
+            const subtitle = $('span.font-meta.chapter', obj).text().trim();
+            if (!id || !title) {
+                if (id.includes(source.baseUrl.replace(/\/$/, '')))
                     continue;
-                }
-                results.push(createMangaTile({
-                    id: id,
-                    image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
-                    title: createIconText({ text: this.decodeHTMLEntity(title) }),
-                    subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
-                }));
+                // Something went wrong with our parsing, return a detailed error
+                console.log(`Failed to parse searchResult for ${source.baseUrl} using ${source.searchMangaSelector} as a loop selector`);
+                continue;
             }
-            return results;
-        });
+            results.push(createMangaTile({
+                id: id,
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
+            }));
+        }
+        return results;
     }
-    parseHomeSection($, source) {
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            const items = [];
-            for (const obj of $('div.page-item-detail').toArray()) {
-                const image = encodeURI((_a = yield this.getImageSrc($('img', obj), source)) !== null && _a !== void 0 ? _a : '');
-                const title = $('a', $('h3.h5', obj)).last().text();
-                const id = (_b = $('a', $('h3.h5', obj)).attr('href')) === null || _b === void 0 ? void 0 : _b.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
-                const subtitle = $('span.font-meta.chapter', obj).first().text().trim();
-                if (!id || !title) {
-                    console.log(`Failed to parse homepage sections for ${source.baseUrl}/`);
-                    continue;
-                }
-                items.push(createMangaTile({
-                    id: id,
-                    image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
-                    title: createIconText({ text: this.decodeHTMLEntity(title) }),
-                    subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
-                }));
+    async parseHomeSection($, source) {
+        const items = [];
+        for (const obj of $('div.page-item-detail').toArray()) {
+            const image = encodeURI(await this.getImageSrc($('img', obj), source) ?? '');
+            const title = $('a', $('h3.h5', obj)).last().text();
+            const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
+            const subtitle = $('span.font-meta.chapter', obj).first().text().trim();
+            if (!id || !title) {
+                console.log(`Failed to parse homepage sections for ${source.baseUrl}/`);
+                continue;
             }
-            return items;
-        });
+            items.push(createMangaTile({
+                id: id,
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
+            }));
+        }
+        return items;
     }
     filterUpdatedManga($, time, ids, source) {
-        var _a, _b;
         let passedReferenceTimePrior = false;
         let passedReferenceTimeCurrent = false;
         const updatedManga = [];
         for (const obj of $('div.page-item-detail').toArray()) {
-            const id = (_b = (_a = $('a', $('h3.h5', obj)).attr('href')) === null || _a === void 0 ? void 0 : _a.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')) !== null && _b !== void 0 ? _b : '';
+            const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '') ?? '';
             let mangaTime;
             const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = this.parseDate(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
+                mangaTime = this.parseDate(timeSelector ?? '');
             }
             else {
                 //Else get the date from the span
@@ -20081,42 +20028,41 @@ class Parser {
     decodeHTMLEntity(str) {
         return entities.decodeHTML(str);
     }
-    getImageSrc(imageObj, source) {
-        var _a, _b, _c;
-        return __awaiter(this, void 0, void 0, function* () {
-            let image;
-            if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-src'))) != 'undefined') {
-                image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-src');
+    async getImageSrc(imageObj, source) {
+        let image;
+        if ((typeof imageObj?.attr('data-src')) != 'undefined') {
+            image = imageObj?.attr('data-src');
+        }
+        else if ((typeof imageObj?.attr('data-lazy-src')) != 'undefined') {
+            image = imageObj?.attr('data-lazy-src');
+        }
+        else if ((typeof imageObj?.attr('srcset')) != 'undefined') {
+            image = imageObj?.attr('srcset')?.split(' ')[0] ?? '';
+        }
+        else if ((typeof imageObj?.attr('src')) != 'undefined') {
+            image = imageObj?.attr('src');
+        }
+        else if ((typeof imageObj?.attr('data-cfsrc')) != 'undefined') {
+            image = imageObj?.attr('data-cfsrc');
+        }
+        else {
+            image = 'https://i.imgur.com/GYUxEX8.png'; // Fallback image
+        }
+        if (source?.stateManager) {
+            const HQthumb = await MadaraSettings_1.getHQThumbnailSetting(source.stateManager);
+            if (HQthumb) {
+                image = image?.replace('-110x150', '')
+                    .replace('-175x238', '')
+                    .replace('-193x278', '')
+                    .replace('-350x476', '');
             }
-            else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-lazy-src'))) != 'undefined') {
-                image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-lazy-src');
-            }
-            else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('srcset'))) != 'undefined') {
-                image = (_b = (_a = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('srcset')) === null || _a === void 0 ? void 0 : _a.split(' ')[0]) !== null && _b !== void 0 ? _b : '';
-            }
-            else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('src'))) != 'undefined') {
-                image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('src');
-            }
-            else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-cfsrc'))) != 'undefined') {
-                image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-cfsrc');
-            }
-            else {
-                image = 'https://i.imgur.com/GYUxEX8.png'; // Fallback image
-            }
-            if (source === null || source === void 0 ? void 0 : source.stateManager) {
-                const HQthumb = yield MadaraSettings_1.getHQThumbnailSetting(source.stateManager);
-                if (HQthumb) {
-                    image = image === null || image === void 0 ? void 0 : image.replace('-110x150', '').replace('-175x238', '').replace('-193x278', '').replace('-350x476', '');
-                }
-            }
-            return decodeURI(this.decodeHTMLEntity((_c = image === null || image === void 0 ? void 0 : image.trim()) !== null && _c !== void 0 ? _c : ''));
-        });
+        }
+        return decodeURI(this.decodeHTMLEntity(image?.trim() ?? ''));
     }
     parsePostId($) {
-        var _a, _b, _c;
         let postId;
         // Step 1: Try to get postId from shortlink
-        postId = Number((_b = (_a = $('link[rel="shortlink"]')) === null || _a === void 0 ? void 0 : _a.attr('href')) === null || _b === void 0 ? void 0 : _b.split('/?p=')[1]);
+        postId = Number($('link[rel="shortlink"]')?.attr('href')?.split('/?p=')[1]);
         // Step 2: If no number has been found, try to parse from data-post
         if (isNaN(postId)) {
             postId = Number($('a.wp-manga-action-button').attr('data-post'));
@@ -20124,9 +20070,9 @@ class Parser {
         // Step 3: If no number has been found, try to parse from manga script
         if (isNaN(postId)) {
             const page = $.root().html();
-            const match = page === null || page === void 0 ? void 0 : page.match(/manga_id.*\D(\d+)/);
+            const match = page?.match(/manga_id.*\D(\d+)/);
             if (match && match[1]) {
-                postId = Number((_c = match[1]) === null || _c === void 0 ? void 0 : _c.trim());
+                postId = Number(match[1]?.trim());
             }
         }
         if (!postId || isNaN(postId)) {
@@ -20139,25 +20085,15 @@ exports.Parser = Parser;
 
 },{"./MadaraSettings":63,"entities":9,"paperback-extensions-common":14}],63:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sourceSettings = exports.getHQThumbnailSetting = void 0;
 const random_useragent_1 = __importDefault(require("random-useragent"));
-const getHQThumbnailSetting = (stateManager) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    return (_a = (yield stateManager.retrieve('HQthumb'))) !== null && _a !== void 0 ? _a : false;
-});
+const getHQThumbnailSetting = async (stateManager) => {
+    return await stateManager.retrieve('HQthumb') ?? false;
+};
 exports.getHQThumbnailSetting = getHQThumbnailSetting;
 const sourceSettings = (stateManager, requestManager, source) => {
     return createNavigationButton({
@@ -20179,37 +20115,34 @@ const sourceSettings = (stateManager, requestManager, source) => {
                     createSection({
                         id: 'ua_section',
                         footer: 'If you\'re experiencing issues with CloudFlare, try randomizing your User Agent.\nPlease restart your app after doing so.\nNOTE! You might need to try this a couple of times for it to work!',
-                        rows: () => __awaiter(void 0, void 0, void 0, function* () {
-                            var _a;
-                            return [
-                                createLabel({
-                                    id: 'current_ua',
-                                    value: !source.userAgent ? 'Not allowed to change' :
-                                        (typeof source.userAgent == 'string') ? source.userAgent :
-                                            (_a = (yield stateManager.retrieve('userAgent'))) !== null && _a !== void 0 ? _a : 'Default',
-                                    label: 'Current User Agent: '
-                                }),
-                                createButton({
-                                    id: 'randomise_ua',
-                                    label: 'Randomise UserAgent & Clear Cookies',
-                                    value: undefined,
-                                    onTap: () => __awaiter(void 0, void 0, void 0, function* () {
-                                        try {
-                                            // Clear Cookies
-                                            // @ts-ignore
-                                            requestManager.cookieStore.getAllCookies().forEach(x => { requestManager.cookieStore.removeCookie(x); });
-                                            // Use set UserAgent unless one is manually set in the source
-                                            if (typeof source.userAgent !== 'string') {
-                                                stateManager.store('userAgent', random_useragent_1.default.getRandom());
-                                            }
+                        rows: async () => [
+                            createLabel({
+                                id: 'current_ua',
+                                value: !source.userAgent ? 'Not allowed to change' :
+                                    (typeof source.userAgent == 'string') ? source.userAgent :
+                                        await stateManager.retrieve('userAgent') ?? 'Default',
+                                label: 'Current User Agent: '
+                            }),
+                            createButton({
+                                id: 'randomise_ua',
+                                label: 'Randomise UserAgent & Clear Cookies',
+                                value: undefined,
+                                onTap: async () => {
+                                    try {
+                                        // Clear Cookies
+                                        // @ts-ignore
+                                        requestManager.cookieStore.getAllCookies().forEach(x => { requestManager.cookieStore.removeCookie(x); });
+                                        // Use set UserAgent unless one is manually set in the source
+                                        if (typeof source.userAgent !== 'string') {
+                                            stateManager.store('userAgent', random_useragent_1.default.getRandom());
                                         }
-                                        catch (error) {
-                                            console.log(error);
-                                        }
-                                    })
-                                })
-                            ];
-                        })
+                                    }
+                                    catch (error) {
+                                        console.log(error);
+                                    }
+                                }
+                            })
+                        ]
                     }),
                     // HQ Thumbnail Section
                     createSection({
@@ -20218,7 +20151,7 @@ const sourceSettings = (stateManager, requestManager, source) => {
                         rows: () => {
                             return Promise.all([
                                 exports.getHQThumbnailSetting(stateManager)
-                            ]).then((values) => __awaiter(void 0, void 0, void 0, function* () {
+                            ]).then(async (values) => {
                                 return [
                                     createSwitch({
                                         id: 'HQthumb',
@@ -20226,7 +20159,7 @@ const sourceSettings = (stateManager, requestManager, source) => {
                                         value: values[0]
                                     }),
                                 ];
-                            }));
+                            });
                         }
                     })
                 ]);
@@ -20280,17 +20213,16 @@ const MadaraParser_1 = require("../MadaraParser");
 const parser = new MadaraParser_1.Parser();
 class TeenManhuaParser extends MadaraParser_1.Parser {
     filterUpdatedManga($, time, ids, source) {
-        var _a, _b;
         let passedReferenceTimePrior = false;
         let passedReferenceTimeCurrent = false;
         const updatedManga = [];
         for (const obj of $('div.page-item-detail').toArray()) {
-            const id = (_b = (_a = $('a', $('h3.h5', obj)).attr('href')) === null || _a === void 0 ? void 0 : _a.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')) !== null && _b !== void 0 ? _b : '';
+            const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '') ?? '';
             let mangaTime;
             const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = parser.parseDate(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
+                mangaTime = parser.parseDate(timeSelector ?? '');
             }
             else {
                 //Else get the date from the span

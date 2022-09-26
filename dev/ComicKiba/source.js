@@ -983,6 +983,15 @@ exports.ComicKiba = ComicKiba;
 
 },{"../Madara":57,"paperback-extensions-common":13}],57:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Madara = exports.getExportVersion = void 0;
 /* eslint-disable no-useless-escape */
@@ -1004,19 +1013,14 @@ class Madara extends paperback_extensions_common_1.Source {
             requestsPerSecond: 3,
             requestTimeout: 15000,
             interceptor: {
-                interceptRequest: async (request) => {
-                    request.headers = {
-                        ...(request.headers ?? {}),
-                        ...{
-                            ...(this.userAgent && { 'user-agent': this.userAgent }),
-                            'referer': `${this.baseUrl}/`
-                        }
-                    };
+                interceptRequest: (request) => __awaiter(this, void 0, void 0, function* () {
+                    var _a;
+                    request.headers = Object.assign(Object.assign({}, ((_a = request.headers) !== null && _a !== void 0 ? _a : {})), Object.assign(Object.assign({}, (this.userAgent && { 'user-agent': this.userAgent })), { 'referer': `${this.baseUrl}/` }));
                     return request;
-                },
-                interceptResponse: async (response) => {
+                }),
+                interceptResponse: (response) => __awaiter(this, void 0, void 0, function* () {
                     return response;
-                }
+                })
             }
         });
         this.stateManager = createSourceStateManager({});
@@ -1064,116 +1068,133 @@ class Madara extends paperback_extensions_common_1.Source {
         this.userAgent = '';
         this.parser = new MadaraParser_1.Parser();
     }
-    async getSourceMenu() {
-        return Promise.resolve(createSection({
-            id: 'main',
-            header: 'Source Settings',
-            rows: async () => [
-                MadaraSettings_1.clearCookies(this.requestManager)
-            ]
-        }));
+    getSourceMenu() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.resolve(createSection({
+                id: 'main',
+                header: 'Source Settings',
+                rows: () => __awaiter(this, void 0, void 0, function* () {
+                    return [
+                        MadaraSettings_1.clearCookies(this.requestManager)
+                    ];
+                })
+            }));
+        });
     }
     getMangaShareUrl(mangaId) {
         return `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`;
     }
-    async getMangaDetails(mangaId) {
-        if (!isNaN(Number(mangaId))) {
-            throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
-        }
-        const request = createRequestObject({
-            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-            method: 'GET'
-        });
-        const data = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(data.status);
-        const $ = this.cheerio.load(data.data);
-        return this.parser.parseMangaDetails($, mangaId);
-    }
-    async getChapters(mangaId) {
-        if (!isNaN(Number(mangaId))) {
-            throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
-        }
-        const request = createRequestObject({
-            url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
-            method: 'POST',
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded'
-            },
-            data: {
-                'action': 'manga_get_chapters',
-                'manga': await this.getNumericId(mangaId)
+    getMangaDetails(mangaId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!isNaN(Number(mangaId))) {
+                throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
             }
-        });
-        const data = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(data.status);
-        const $ = this.cheerio.load(data.data);
-        return this.parser.parseChapterList($, mangaId, this);
-    }
-    async getChapterDetails(mangaId, chapterId) {
-        const request = createRequestObject({
-            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
-            method: 'GET',
-            cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })],
-            param: this.chapterDetailsParam
-        });
-        const data = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(data.status);
-        const $ = this.cheerio.load(data.data);
-        return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector);
-    }
-    async getTags() {
-        let request;
-        if (this.hasAdvancedSearchPage) {
-            request = createRequestObject({
-                url: `${this.baseUrl}/?s=&post_type=wp-manga`,
+            const request = createRequestObject({
+                url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
                 method: 'GET'
             });
-        }
-        else {
-            request = createRequestObject({
-                url: `${this.baseUrl}/`,
-                method: 'GET'
-            });
-        }
-        const data = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(data.status);
-        const $ = this.cheerio.load(data.data);
-        return this.parser.parseTags($, this.hasAdvancedSearchPage);
-    }
-    async getSearchResults(query, metadata) {
-        // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
-        const page = metadata?.page ?? 1;
-        const request = this.constructSearchRequest(page, query);
-        const data = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(data.status);
-        const $ = this.cheerio.load(data.data);
-        const manga = this.parser.parseSearchResults($, this);
-        return createPagedResults({
-            results: manga,
-            metadata: { page: (page + 1) }
-        });
-    }
-    async filterUpdatedManga(mangaUpdatesFoundCallback, time, ids) {
-        // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
-        let page = 0;
-        let loadNextPage = true;
-        while (loadNextPage) {
-            const request = this.constructAjaxHomepageRequest(page, 50, '_latest_update');
-            const data = await this.requestManager.schedule(request, 1);
+            const data = yield this.requestManager.schedule(request, 1);
             this.CloudFlareError(data.status);
             const $ = this.cheerio.load(data.data);
-            const updatedManga = this.parser.filterUpdatedManga($, time, ids, this);
-            loadNextPage = updatedManga.loadNextPage;
-            if (loadNextPage) {
-                page++;
+            return this.parser.parseMangaDetails($, mangaId);
+        });
+    }
+    getChapters(mangaId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!isNaN(Number(mangaId))) {
+                throw new Error('Migrate your source to the same source but make sure to select include migrated manga. Then while it is migrating, press "Mark All" and Replace.');
             }
-            if (updatedManga.updates.length > 0) {
-                mangaUpdatesFoundCallback(createMangaUpdates({
-                    ids: updatedManga.updates
-                }));
+            const request = createRequestObject({
+                url: !this.alternativeChapterAjaxEndpoint ? `${this.baseUrl}/wp-admin/admin-ajax.php` : `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/ajax/chapters`,
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/x-www-form-urlencoded'
+                },
+                data: {
+                    'action': 'manga_get_chapters',
+                    'manga': yield this.getNumericId(mangaId)
+                }
+            });
+            const data = yield this.requestManager.schedule(request, 1);
+            this.CloudFlareError(data.status);
+            const $ = this.cheerio.load(data.data);
+            return this.parser.parseChapterList($, mangaId, this);
+        });
+    }
+    getChapterDetails(mangaId, chapterId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const request = createRequestObject({
+                url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/`,
+                method: 'GET',
+                cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })],
+                param: this.chapterDetailsParam
+            });
+            const data = yield this.requestManager.schedule(request, 1);
+            this.CloudFlareError(data.status);
+            const $ = this.cheerio.load(data.data);
+            return this.parser.parseChapterDetails($, mangaId, chapterId, this.chapterDetailsSelector);
+        });
+    }
+    getTags() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let request;
+            if (this.hasAdvancedSearchPage) {
+                request = createRequestObject({
+                    url: `${this.baseUrl}/?s=&post_type=wp-manga`,
+                    method: 'GET'
+                });
             }
-        }
-        mangaUpdatesFoundCallback(createMangaUpdates({ ids: [] }));
+            else {
+                request = createRequestObject({
+                    url: `${this.baseUrl}/`,
+                    method: 'GET'
+                });
+            }
+            const data = yield this.requestManager.schedule(request, 1);
+            this.CloudFlareError(data.status);
+            const $ = this.cheerio.load(data.data);
+            return this.parser.parseTags($, this.hasAdvancedSearchPage);
+        });
+    }
+    getSearchResults(query, metadata) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
+            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 1;
+            const request = this.constructSearchRequest(page, query);
+            const data = yield this.requestManager.schedule(request, 1);
+            this.CloudFlareError(data.status);
+            const $ = this.cheerio.load(data.data);
+            const manga = this.parser.parseSearchResults($, this);
+            return createPagedResults({
+                results: manga,
+                metadata: { page: (page + 1) }
+            });
+        });
+    }
+    filterUpdatedManga(mangaUpdatesFoundCallback, time, ids) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
+            let page = 0;
+            let loadNextPage = true;
+            while (loadNextPage) {
+                const request = this.constructAjaxHomepageRequest(page, 50, '_latest_update');
+                const data = yield this.requestManager.schedule(request, 1);
+                this.CloudFlareError(data.status);
+                const $ = this.cheerio.load(data.data);
+                const updatedManga = this.parser.filterUpdatedManga($, time, ids, this);
+                loadNextPage = updatedManga.loadNextPage;
+                if (loadNextPage) {
+                    page++;
+                }
+                if (updatedManga.updates.length > 0) {
+                    mangaUpdatesFoundCallback(createMangaUpdates({
+                        ids: updatedManga.updates
+                    }));
+                }
+            }
+            mangaUpdatesFoundCallback(createMangaUpdates({ ids: [] }));
+        });
     }
     /**
      * It's hard to capture a default logic for homepages. So for Madara sources,
@@ -1181,127 +1202,133 @@ class Madara extends paperback_extensions_common_1.Source {
      * This supports having paged views in almost all cases.
      * @param sectionCallback
      */
-    async getHomePageSections(sectionCallback) {
-        const sections = [
-            {
-                request: this.constructAjaxHomepageRequest(0, 10, '_latest_update'),
-                section: createHomeSection({
-                    id: '0',
-                    title: 'Recently Updated',
-                    view_more: true,
-                }),
-            },
-            {
-                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_week_views_value'),
-                section: createHomeSection({
-                    id: '1',
-                    title: 'Currently Trending',
-                    view_more: true,
-                })
-            },
-            {
-                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_views'),
-                section: createHomeSection({
-                    id: '2',
-                    title: 'Most Popular',
-                    view_more: true,
-                })
-            },
-            {
-                request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_status', 'end'),
-                section: createHomeSection({
-                    id: '3',
-                    title: 'Completed',
-                    view_more: true,
-                })
-            },
-        ];
-        const promises = [];
-        for (const section of sections) {
-            // Let the app load empty sections
-            sectionCallback(section.section);
-            // Get the section data
-            promises.push(this.requestManager.schedule(section.request, 1).then(response => {
-                this.CloudFlareError(response.status);
-                const $ = this.cheerio.load(response.data);
-                section.section.items = this.parser.parseHomeSection($, this);
+    getHomePageSections(sectionCallback) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sections = [
+                {
+                    request: this.constructAjaxHomepageRequest(0, 10, '_latest_update'),
+                    section: createHomeSection({
+                        id: '0',
+                        title: 'Recently Updated',
+                        view_more: true,
+                    }),
+                },
+                {
+                    request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_week_views_value'),
+                    section: createHomeSection({
+                        id: '1',
+                        title: 'Currently Trending',
+                        view_more: true,
+                    })
+                },
+                {
+                    request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_views'),
+                    section: createHomeSection({
+                        id: '2',
+                        title: 'Most Popular',
+                        view_more: true,
+                    })
+                },
+                {
+                    request: this.constructAjaxHomepageRequest(0, 10, '_wp_manga_status', 'end'),
+                    section: createHomeSection({
+                        id: '3',
+                        title: 'Completed',
+                        view_more: true,
+                    })
+                },
+            ];
+            const promises = [];
+            for (const section of sections) {
+                // Let the app load empty sections
                 sectionCallback(section.section);
-            }));
-        }
-        // Make sure the function completes
-        await Promise.all(promises);
+                // Get the section data
+                promises.push(this.requestManager.schedule(section.request, 1).then(response => {
+                    this.CloudFlareError(response.status);
+                    const $ = this.cheerio.load(response.data);
+                    section.section.items = this.parser.parseHomeSection($, this);
+                    sectionCallback(section.section);
+                }));
+            }
+            // Make sure the function completes
+            yield Promise.all(promises);
+        });
     }
-    async getViewMoreItems(homepageSectionId, metadata) {
-        // We only have one homepage section ID, so we don't need to worry about handling that any
-        const page = metadata?.page ?? 0; // Default to page 0
-        let sortBy = [];
-        switch (homepageSectionId) {
-            case '0': {
-                sortBy = ['_latest_update'];
-                break;
+    getViewMoreItems(homepageSectionId, metadata) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            // We only have one homepage section ID, so we don't need to worry about handling that any
+            const page = (_a = metadata === null || metadata === void 0 ? void 0 : metadata.page) !== null && _a !== void 0 ? _a : 0; // Default to page 0
+            let sortBy = [];
+            switch (homepageSectionId) {
+                case '0': {
+                    sortBy = ['_latest_update'];
+                    break;
+                }
+                case '1': {
+                    sortBy = ['_wp_manga_week_views_value'];
+                    break;
+                }
+                case '2': {
+                    sortBy = ['_wp_manga_views'];
+                    break;
+                }
+                case '3': {
+                    sortBy = ['_wp_manga_status', 'end'];
+                    break;
+                }
             }
-            case '1': {
-                sortBy = ['_wp_manga_week_views_value'];
-                break;
+            const request = this.constructAjaxHomepageRequest(page, 50, sortBy[0], sortBy[1]);
+            const data = yield this.requestManager.schedule(request, 1);
+            this.CloudFlareError(data.status);
+            const $ = this.cheerio.load(data.data);
+            const items = this.parser.parseHomeSection($, this);
+            // Set up to go to the next page. If we are on the last page, remove the logic.
+            let mData = { page: (page + 1) };
+            if (items.length < 50) {
+                mData = undefined;
             }
-            case '2': {
-                sortBy = ['_wp_manga_views'];
-                break;
-            }
-            case '3': {
-                sortBy = ['_wp_manga_status', 'end'];
-                break;
-            }
-        }
-        const request = this.constructAjaxHomepageRequest(page, 50, sortBy[0], sortBy[1]);
-        const data = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(data.status);
-        const $ = this.cheerio.load(data.data);
-        const items = this.parser.parseHomeSection($, this);
-        // Set up to go to the next page. If we are on the last page, remove the logic.
-        let mData = { page: (page + 1) };
-        if (items.length < 50) {
-            mData = undefined;
-        }
-        return createPagedResults({
-            results: items,
-            metadata: mData
+            return createPagedResults({
+                results: items,
+                metadata: mData
+            });
         });
     }
     getCloudflareBypassRequest() {
         return createRequestObject({
             url: `${this.baseUrl}`,
             method: 'GET',
-            headers: {
-                ...(this.userAgent && { 'user-agent': this.userAgent }),
-            }
+            headers: Object.assign({}, (this.userAgent && { 'user-agent': this.userAgent }))
         });
     }
-    async getNumericId(mangaId) {
-        const request = createRequestObject({
-            url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
-            method: 'GET'
+    getNumericId(mangaId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const request = createRequestObject({
+                url: `${this.baseUrl}/${this.sourceTraversalPathName}/${mangaId}/`,
+                method: 'GET'
+            });
+            const data = yield this.requestManager.schedule(request, 1);
+            this.CloudFlareError(data.status);
+            const $ = this.cheerio.load(data.data);
+            const numericId = $('script#wp-manga-js-extra').get()[0].children[0].data.match('"manga_id":"(\\d+)"')[1];
+            if (!numericId) {
+                throw new Error(`Failed to parse the numeric ID for ${mangaId}`);
+            }
+            return numericId;
         });
-        const data = await this.requestManager.schedule(request, 1);
-        this.CloudFlareError(data.status);
-        const $ = this.cheerio.load(data.data);
-        const numericId = $('script#wp-manga-js-extra').get()[0].children[0].data.match('"manga_id":"(\\d+)"')[1];
-        if (!numericId) {
-            throw new Error(`Failed to parse the numeric ID for ${mangaId}`);
-        }
-        return numericId;
     }
     /**
      * Constructs requests to be sent to the search page.
      */
     constructSearchRequest(page, query) {
+        var _a, _b;
         return createRequestObject({
             url: new MadaraHelper_1.URLBuilder(this.baseUrl)
                 .addPathComponent(this.searchPagePathName)
                 .addPathComponent(page.toString())
-                .addQueryParameter('s', encodeURIComponent(query?.title ?? ''))
+                .addQueryParameter('s', encodeURIComponent((_a = query === null || query === void 0 ? void 0 : query.title) !== null && _a !== void 0 ? _a : ''))
                 .addQueryParameter('post_type', 'wp-manga')
-                .addQueryParameter('genre', query?.includedTags?.map((x) => x.id))
+                .addQueryParameter('genre', (_b = query === null || query === void 0 ? void 0 : query.includedTags) === null || _b === void 0 ? void 0 : _b.map((x) => x.id))
                 .buildUrl({ addTrailingSlash: true, includeUndefinedParameters: false }),
             method: 'GET',
             cookies: [createCookie({ name: 'wpmanga-adault', value: '1', domain: this.baseUrl })]
@@ -1396,9 +1423,10 @@ const entities = require("entities");
 class Parser {
     constructor() {
         this.parseDate = (date) => {
+            var _a;
             date = date.toUpperCase();
             let time;
-            const number = Number((/\d*/.exec(date) ?? [])[0]);
+            const number = Number(((_a = /\d*/.exec(date)) !== null && _a !== void 0 ? _a : [])[0]);
             if (date.includes('LESS THAN AN HOUR') || date.includes('JUST NOW')) {
                 time = new Date(Date.now());
             }
@@ -1433,6 +1461,7 @@ class Parser {
         };
     }
     parseMangaDetails($, mangaId) {
+        var _a, _b;
         const numericId = $('script#wp-manga-js-extra').get()[0].children[0].data.match('"manga_id":"(\\d+)"')[1];
         const title = this.decodeHTMLEntity($('div.post-title h1').children().remove().end().text().trim());
         const author = this.decodeHTMLEntity($('div.author-content').first().text().replace('\\n', '').trim()).replace('Updating', 'Unknown');
@@ -1444,7 +1473,7 @@ class Parser {
         // Grab genres and check for smut tag
         for (const obj of $('div.genres-content a').toArray()) {
             const label = $(obj).text();
-            const id = $(obj).attr('href')?.split('/')[4] ?? label;
+            const id = (_b = (_a = $(obj).attr('href')) === null || _a === void 0 ? void 0 : _a.split('/')[4]) !== null && _b !== void 0 ? _b : label;
             if (!label || !id)
                 continue;
             genres.push(createTag({ label: label, id: id }));
@@ -1466,18 +1495,19 @@ class Parser {
         });
     }
     parseChapterList($, mangaId, source) {
+        var _a, _b, _c, _d;
         const chapters = [];
         let sortingIndex = 0;
         // For each available chapter..
         for (const obj of $('li.wp-manga-chapter  ').toArray()) {
             const id = ($('a', obj).first().attr('href') || '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
-            const chapName = $('a', obj).first().text().trim() ?? '';
-            const chapNum = Number(decodeURIComponent(id).match(/\D*(\d*\-?\d*)\D*$/)?.pop()?.replace(/-/g, '.'));
+            const chapName = (_a = $('a', obj).first().text().trim()) !== null && _a !== void 0 ? _a : '';
+            const chapNum = Number((_c = (_b = decodeURIComponent(id).match(/\D*(\d*\-?\d*)\D*$/)) === null || _b === void 0 ? void 0 : _b.pop()) === null || _c === void 0 ? void 0 : _c.replace(/-/g, '.'));
             let mangaTime;
             const timeSelector = $('span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = this.parseDate(timeSelector ?? '');
+                mangaTime = this.parseDate(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
             }
             else {
                 //Else get the date from the info box
@@ -1492,7 +1522,7 @@ class Parser {
             chapters.push(createChapter({
                 id: id,
                 mangaId: mangaId,
-                langCode: source.languageCode ?? paperback_extensions_common_1.LanguageCode.UNKNOWN,
+                langCode: (_d = source.languageCode) !== null && _d !== void 0 ? _d : paperback_extensions_common_1.LanguageCode.UNKNOWN,
                 chapNum: isNaN(chapNum) ? 0 : chapNum,
                 name: chapName ? this.decodeHTMLEntity(chapName) : undefined,
                 time: mangaTime,
@@ -1520,28 +1550,30 @@ class Parser {
         });
     }
     parseTags($, advancedSearch) {
+        var _a, _b, _c;
         const genres = [];
         if (advancedSearch) {
             for (const obj of $('.checkbox-group div label').toArray()) {
                 const label = $(obj).text().trim();
-                const id = $(obj).attr('for') ?? label;
+                const id = (_a = $(obj).attr('for')) !== null && _a !== void 0 ? _a : label;
                 genres.push(createTag({ label: label, id: id }));
             }
         }
         else {
             for (const obj of $('.menu-item-object-wp-manga-genre a', $('.second-menu')).toArray()) {
                 const label = $(obj).text().trim();
-                const id = $(obj).attr('href')?.split('/')[4] ?? label;
+                const id = (_c = (_b = $(obj).attr('href')) === null || _b === void 0 ? void 0 : _b.split('/')[4]) !== null && _c !== void 0 ? _c : label;
                 genres.push(createTag({ label: label, id: id }));
             }
         }
         return [createTagSection({ id: '0', label: 'genres', tags: genres })];
     }
     parseSearchResults($, source) {
+        var _a, _b;
         const results = [];
         for (const obj of $(source.searchMangaSelector).toArray()) {
-            const id = ($('a', obj).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
-            const title = $('a', obj).attr('title') ?? '';
+            const id = ((_a = $('a', obj).attr('href')) !== null && _a !== void 0 ? _a : '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
+            const title = (_b = $('a', obj).attr('title')) !== null && _b !== void 0 ? _b : '';
             const image = encodeURI(this.getImageSrc($('img', obj)));
             const subtitle = $('span.font-meta.chapter', obj).text().trim();
             if (!id || !title) {
@@ -1561,11 +1593,12 @@ class Parser {
         return results;
     }
     parseHomeSection($, source) {
+        var _a, _b;
         const items = [];
         for (const obj of $('div.page-item-detail').toArray()) {
-            const image = encodeURI(this.getImageSrc($('img', obj)) ?? '');
+            const image = encodeURI((_a = this.getImageSrc($('img', obj))) !== null && _a !== void 0 ? _a : '');
             const title = $('a', $('h3.h5', obj)).text();
-            const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
+            const id = (_b = $('a', $('h3.h5', obj)).attr('href')) === null || _b === void 0 ? void 0 : _b.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '');
             const subtitle = $('span.font-meta.chapter', obj).first().text().trim();
             if (!id || !title) {
                 console.log(`Failed to parse homepage sections for ${source.baseUrl}/`);
@@ -1584,16 +1617,17 @@ class Parser {
         return entities.decodeHTML(str);
     }
     filterUpdatedManga($, time, ids, source) {
+        var _a, _b;
         let passedReferenceTimePrior = false;
         let passedReferenceTimeCurrent = false;
         const updatedManga = [];
         for (const obj of $('div.page-item-detail').toArray()) {
-            const id = $('a', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '') ?? '';
+            const id = (_b = (_a = $('a', $('h3.h5', obj)).attr('href')) === null || _a === void 0 ? void 0 : _a.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')) !== null && _b !== void 0 ? _b : '';
             let mangaTime;
             const timeSelector = $('span.post-on.font-meta > a, span.post-on.font-meta > span > a', obj).attr('title');
             if (typeof timeSelector !== 'undefined') {
                 //Firstly check if there is a NEW tag, if so parse the time from this
-                mangaTime = this.parseDate(timeSelector ?? '');
+                mangaTime = this.parseDate(timeSelector !== null && timeSelector !== void 0 ? timeSelector : '');
             }
             else {
                 //Else get the date from the span
@@ -1624,32 +1658,42 @@ class Parser {
     }
     // UTILITY METHODS
     getImageSrc(imageObj) {
+        var _a, _b, _c;
         let image;
-        if ((typeof imageObj?.attr('data-src')) != 'undefined') {
-            image = imageObj?.attr('data-src');
+        if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-src'))) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-src');
         }
-        else if ((typeof imageObj?.attr('data-lazy-src')) != 'undefined') {
-            image = imageObj?.attr('data-lazy-src');
+        else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-lazy-src'))) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-lazy-src');
         }
-        else if ((typeof imageObj?.attr('srcset')) != 'undefined') {
-            image = imageObj?.attr('srcset')?.split(' ')[0] ?? '';
+        else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('srcset'))) != 'undefined') {
+            image = (_b = (_a = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('srcset')) === null || _a === void 0 ? void 0 : _a.split(' ')[0]) !== null && _b !== void 0 ? _b : '';
         }
-        else if ((typeof imageObj?.attr('src')) != 'undefined') {
-            image = imageObj?.attr('src');
+        else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('src'))) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('src');
         }
-        else if ((typeof imageObj?.attr('data-cfsrc')) != 'undefined') {
-            image = imageObj?.attr('data-cfsrc');
+        else if ((typeof (imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-cfsrc'))) != 'undefined') {
+            image = imageObj === null || imageObj === void 0 ? void 0 : imageObj.attr('data-cfsrc');
         }
         else {
             image = 'https://i.imgur.com/GYUxEX8.png'; // Fallback image
         }
-        return decodeURI(this.decodeHTMLEntity(image?.trim() ?? ''));
+        return decodeURI(this.decodeHTMLEntity((_c = image === null || image === void 0 ? void 0 : image.trim()) !== null && _c !== void 0 ? _c : ''));
     }
 }
 exports.Parser = Parser;
 
 },{"entities":9,"paperback-extensions-common":13}],60:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.clearCookies = void 0;
 const clearCookies = (requestManager) => {
@@ -1657,7 +1701,7 @@ const clearCookies = (requestManager) => {
         id: 'clear_madara_cookies',
         value: '',
         label: 'Clear Cookies',
-        onTap: async () => {
+        onTap: () => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 // @ts-ignore
                 requestManager.cookieStore.getAllCookies().forEach(x => { requestManager.cookieStore.removeCookie(x); });
@@ -1665,7 +1709,7 @@ const clearCookies = (requestManager) => {
             catch (error) {
                 console.log(error);
             }
-        }
+        })
     });
 };
 exports.clearCookies = clearCookies;

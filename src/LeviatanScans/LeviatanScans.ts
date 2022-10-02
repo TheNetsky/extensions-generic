@@ -10,7 +10,7 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://leviatanscans.com'
+const DOMAIN = 'https://en.leviatanscans.com'
 
 export const LeviatanScansInfo: SourceInfo = {
     version: getExportVersion('0.0.3'),
@@ -38,6 +38,7 @@ export class LeviatanScans extends Madara {
     override sourceTraversalPathName = ''
 
     override alternativeChapterAjaxEndpoint = true
+
 
     override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
         const getTraversalPathName = await this.getTraversalPathName()
@@ -109,7 +110,7 @@ export class LeviatanScans extends Madara {
         const data = await this.requestManager.schedule(request, 1)
         this.CloudFlareError(data.status)
         const $ = this.cheerio.load(data.data)
-        const path = $('.bottom-footer .font-nav a:contains("All Series")').attr('href')?.replace(`${this.baseUrl}/`,'').replace(/\/+$/, '') ?? ''
+        const path = $('.c-sub-nav_wrap ul li:contains(\'Manga\') a').attr('href')?.replace(`${this.baseUrl}/`,'').replace(/\/+$/, '') ?? ''
         return path
     }
 }

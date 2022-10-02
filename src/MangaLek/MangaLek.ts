@@ -1,3 +1,7 @@
+/* eslint-disable no-useless-escape */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
     ContentRating,
     SourceInfo,
@@ -10,10 +14,11 @@ import {
 
 import { MangaLekParser } from './MangaLekParser'
 
-const DOMAIN = 'https://mangalek.org'
+const DOMAIN = 'https://mangalek.com'
+let globalUA: string | null
 
 export const MangaLekInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'MangaLek',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -43,8 +48,18 @@ export class MangaLek extends Madara {
 
     override alternativeChapterAjaxEndpoint = true
 
-    override sourceTraversalPathName = 'comics'
+    override sourceTraversalPathName = 'manga'
 
     override readonly parser: MangaLekParser = new MangaLekParser();
+
+    override getCloudflareBypassRequest() {
+        return createRequestObject({
+            url: `${this.baseUrl}/?s=&post_type=wp-manga`,
+            method: 'GET',
+            headers: {
+                ...(globalUA && { 'user-agent': globalUA }),
+            }
+        })
+    }
 
 }

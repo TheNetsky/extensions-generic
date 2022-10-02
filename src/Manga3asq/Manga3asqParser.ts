@@ -1,8 +1,10 @@
+
+import { MangaTile } from 'paperback-extensions-common'
 import {
     Parser,
 } from '../MadaraParser'
 
-export class MangaLekParser extends Parser {
+export class Manga3asqParser extends Parser {
 
     override parseDate = (date: string): Date => {
         date = date.toUpperCase()
@@ -37,5 +39,55 @@ export class MangaLekParser extends Parser {
             time = new Date(date)
         }
         return time
+    }
+
+    override async parseHomeSection($: CheerioStatic, source: any): Promise<MangaTile[]> {
+        const items: MangaTile[] = []
+
+        for (const obj of $('div.page-item-detail').toArray()) {
+            const image = encodeURI(await this.getImageSrc($('img', obj), source) ?? '')
+            const title = $('a:not([target])', $('h3.h5', obj)).last().text()
+            const id = $('a:not([target])', $('h3.h5', obj)).attr('href')?.replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
+            const subtitle = $('span.font-meta.chapter', obj).first().text().trim()
+
+            if (!id || !title) {
+                console.log(`Failed to parse homepage sections for ${source.baseUrl}/`)
+                continue
+            }
+
+            items.push(createMangaTile({
+                id: id,
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
+            }))
+        }
+        return items
+    }
+
+    override async parseSearchResults($: CheerioSelector, source: any): Promise<MangaTile[]> {
+        const results: MangaTile[] = []
+        for (const obj of $(source.searchMangaSelector).toArray()) {
+            const id = ($('a:not([target])', obj).attr('href') ?? '').replace(`${source.baseUrl}/${source.sourceTraversalPathName}/`, '').replace(/\/$/, '')
+            const title = $('a:not([target])', obj).attr('title') ?? ''
+            const image = encodeURI(await this.getImageSrc($('img', obj), source))
+            const subtitle = $('span.font-meta.chapter', obj).text().trim()
+
+            if (!id || !title) {
+                if (id.includes(source.baseUrl.replace(/\/$/, ''))) continue
+                // Something went wrong with our parsing, return a detailed error
+                console.log(`Failed to parse searchResult for ${source.baseUrl} using ${source.searchMangaSelector} as a loop selector`)
+                continue
+            }
+
+            results.push(createMangaTile({
+                id: id,
+                image: image ? image : 'https://i.imgur.com/GYUxEX8.png',
+                title: createIconText({ text: this.decodeHTMLEntity(title) }),
+                subtitleText: createIconText({ text: this.decodeHTMLEntity(subtitle) })
+            }))
+        }
+
+        return results
     }
 }

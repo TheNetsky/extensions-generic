@@ -19374,7 +19374,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://en.leviatanscans.com';
 exports.LeviatanScansInfo = {
-    version: Madara_1.getExportVersion('0.0.3'),
+    version: Madara_1.getExportVersion('0.0.4'),
     name: 'LeviatanScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',

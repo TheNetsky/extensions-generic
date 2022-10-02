@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://en.leviatanscans.com'
 
 export const LeviatanScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.3'),
+    version: getExportVersion('0.0.4'),
     name: 'LeviatanScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',

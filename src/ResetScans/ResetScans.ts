@@ -13,7 +13,7 @@ import {
 const DOMAIN = 'https://reset-scans.com'
 
 export const ResetScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.1'),
+    version: getExportVersion('0.0.2'),
     name: 'ResetScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'darkdemon',
@@ -39,5 +39,5 @@ export class ResetScans extends Madara {
     
     override hasAdvancedSearchPage = true
 
-    override sourceTraversalPathName = 'devmax'
+    override sourceTraversalPathName = 'dev'
 }

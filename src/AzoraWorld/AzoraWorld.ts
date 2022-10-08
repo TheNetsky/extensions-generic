@@ -10,10 +10,10 @@ import {
 } from '../Madara'
 import { AzoraWorldParser } from './AzoraWorldParser'
 
-const DOMAIN = 'https://azoraworld.com'
+const DOMAIN = 'https://azoraworlds.net'
 
 export const AzoraWorldInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'AzoraWorld',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Ali Mohamed',

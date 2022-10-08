@@ -19374,9 +19374,9 @@ exports.AzoraWorld = exports.AzoraWorldInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const AzoraWorldParser_1 = require("./AzoraWorldParser");
-const DOMAIN = 'https://azoraworld.com';
+const DOMAIN = 'https://azoraworlds.net';
 exports.AzoraWorldInfo = {
-    version: Madara_1.getExportVersion('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.1'),
     name: 'AzoraWorld',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Ali Mohamed',

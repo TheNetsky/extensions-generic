@@ -81,7 +81,7 @@ export class Parser {
                 throw new Error(`Could not parse out ID when getting chapters for ${mangaId}`)
             }
 
-            chapters.push(createChapter({
+            chapters.push({
                 id: id,
                 mangaId: mangaId,
                 langCode: source.languageCode ?? LanguageCode.UNKNOWN,
@@ -90,11 +90,15 @@ export class Parser {
                 time: mangaTime,
                 // @ts-ignore
                 sortingIndex
-            }))
+            })
             sortingIndex--
         }
 
-        return chapters
+        return chapters.map(chapter => {
+            // @ts-ignore
+            chapter.sortingIndex += chapters.length
+            return createChapter(chapter)
+        })
     }
 
     async parseChapterDetails($: CheerioSelector, mangaId: string, chapterId: string, selector: string): Promise<ChapterDetails> {

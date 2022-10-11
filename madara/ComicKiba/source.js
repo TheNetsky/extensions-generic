@@ -19412,7 +19412,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
 const MadaraSettings_1 = require("./MadaraSettings");
-const BASE_VERSION = '2.2.4';
+const BASE_VERSION = '2.2.5';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -19929,7 +19929,7 @@ class Parser {
             if (typeof id === 'undefined') {
                 throw new Error(`Could not parse out ID when getting chapters for ${mangaId}`);
             }
-            chapters.push(createChapter({
+            chapters.push({
                 id: id,
                 mangaId: mangaId,
                 langCode: source.languageCode ?? paperback_extensions_common_1.LanguageCode.UNKNOWN,
@@ -19938,10 +19938,14 @@ class Parser {
                 time: mangaTime,
                 // @ts-ignore
                 sortingIndex
-            }));
+            });
             sortingIndex--;
         }
-        return chapters;
+        return chapters.map(chapter => {
+            // @ts-ignore
+            chapter.sortingIndex += chapters.length;
+            return createChapter(chapter);
+        });
     }
     async parseChapterDetails($, mangaId, chapterId, selector) {
         const pages = [];

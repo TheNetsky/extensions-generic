@@ -204,6 +204,9 @@ export abstract class Madara extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
             method: 'GET',
+            headers: {
+                'Accept': 'image/avif,image/webp,*/*'
+            },
             param: this.chapterDetailsParam
         })
 

@@ -19437,7 +19437,8 @@ class Madara extends paperback_extensions_common_1.Source {
                         ...(request.headers ?? {}),
                         ...{
                             ...(globalUA && { 'user-agent': await this.getUserAgent() }),
-                            'referer': `${this.baseUrl}/`
+                            'referer': `${this.baseUrl}/`,
+                            ...(request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' })
                         }
                     };
                     request.cookies = [
@@ -19565,9 +19566,6 @@ class Madara extends paperback_extensions_common_1.Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
             method: 'GET',
-            headers: {
-                'Accept': 'image/avif,image/webp,*/*'
-            },
             param: this.chapterDetailsParam
         });
         const data = await this.requestManager.schedule(request, 1);

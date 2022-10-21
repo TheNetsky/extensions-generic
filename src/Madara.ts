@@ -44,7 +44,8 @@ export abstract class Madara extends Source {
                     ...(request.headers ?? {}),
                     ...{
                         ...(globalUA && { 'user-agent': await this.getUserAgent() }), // Set globalUA intially
-                        'referer': `${this.baseUrl}/`
+                        'referer': `${this.baseUrl}/`,
+                        ...(request.url.includes('wordpress.com') && { 'Accept': 'image/avif,image/webp,*/*' })
                     }
                 }
                 request.cookies = [
@@ -204,9 +205,6 @@ export abstract class Madara extends Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
             method: 'GET',
-            headers: {
-                'Accept': 'image/avif,image/webp,*/*'
-            },
             param: this.chapterDetailsParam
         })
 

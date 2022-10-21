@@ -12,7 +12,7 @@ import {
 const DOMAIN = 'https://manhuaplus.com'
 
 export const ManhuaPlusInfo: SourceInfo = {
-    version: getExportVersion('0.0.4'),
+    version: getExportVersion('0.0.5'),
     name: 'ManhuaPlus',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',

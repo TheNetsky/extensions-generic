@@ -19620,6 +19620,9 @@ class Madara extends paperback_extensions_common_1.Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
             method: 'GET',
+            headers: {
+                'Accept': 'image/avif,image/webp,*/*'
+            },
             param: this.chapterDetailsParam
         });
         const data = await this.requestManager.schedule(request, 1);

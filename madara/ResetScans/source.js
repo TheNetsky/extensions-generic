@@ -19523,6 +19523,9 @@ class Madara extends paperback_extensions_common_1.Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
             method: 'GET',
+            headers: {
+                'Accept': 'image/avif,image/webp,*/*'
+            },
             param: this.chapterDetailsParam
         });
         const data = await this.requestManager.schedule(request, 1);
@@ -20181,7 +20184,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://reset-scans.com';
 exports.ResetScansInfo = {
-    version: Madara_1.getExportVersion('0.0.2'),
+    version: Madara_1.getExportVersion('0.0.3'),
     name: 'ResetScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'darkdemon',
@@ -20203,7 +20206,7 @@ class ResetScans extends Madara_1.Madara {
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.alternativeChapterAjaxEndpoint = true;
         this.hasAdvancedSearchPage = true;
-        this.sourceTraversalPathName = 'dev';
+        this.sourceTraversalPathName = 'manga';
     }
 }
 exports.ResetScans = ResetScans;

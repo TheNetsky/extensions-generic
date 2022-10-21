@@ -19523,6 +19523,9 @@ class Madara extends paperback_extensions_common_1.Source {
         const request = createRequestObject({
             url: `${this.baseUrl}/${this.sourceTraversalPathName}/${chapterId}/?style=list`,
             method: 'GET',
+            headers: {
+                'Accept': 'image/avif,image/webp,*/*'
+            },
             param: this.chapterDetailsParam
         });
         const data = await this.requestManager.schedule(request, 1);
@@ -20181,7 +20184,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://manhuaplus.com';
 exports.ManhuaPlusInfo = {
-    version: Madara_1.getExportVersion('0.0.3'),
+    version: Madara_1.getExportVersion('0.0.4'),
     name: 'ManhuaPlus',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'GameFuzzy',

@@ -12,7 +12,7 @@ import {
 const DOMAIN = 'https://coloredmanga.com'
 
 export const ColoredMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'ColoredManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -35,6 +35,8 @@ export class ColoredManga extends Madara {
     languageCode: LanguageCode = LanguageCode.ENGLISH
 
     override hasAdvancedSearchPage = true
+
+    override sourceTraversalPathName = 'manhwa'
     
     override alternativeChapterAjaxEndpoint = true
 }

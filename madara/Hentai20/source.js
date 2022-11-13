@@ -19372,9 +19372,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Hentai20 = exports.Hentai20Info = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://hentai20s.com';
+const DOMAIN = 'https://hentai20.io';
 exports.Hentai20Info = {
-    version: Madara_1.getExportVersion('0.0.2'),
+    version: Madara_1.getExportVersion('0.0.3'),
     name: 'Hentai20',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',

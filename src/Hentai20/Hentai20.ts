@@ -9,10 +9,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://hentai20s.com'
+const DOMAIN = 'https://hentai20.io'
 
 export const Hentai20Info: SourceInfo = {
-    version: getExportVersion('0.0.2'),
+    version: getExportVersion('0.0.3'),
     name: 'Hentai20',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',

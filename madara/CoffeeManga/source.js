@@ -19372,9 +19372,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CoffeeManga = exports.CoffeeMangaInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://coffeemanga.com';
+const DOMAIN = 'https://coffeemanga.love';
 exports.CoffeeMangaInfo = {
-    version: Madara_1.getExportVersion('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.1'),
     name: 'CoffeeManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',

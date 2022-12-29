@@ -19374,7 +19374,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://coloredmanga.com';
 exports.ColoredMangaInfo = {
-    version: Madara_1.getExportVersion('0.0.1'),
+    version: Madara_1.getExportVersion('0.0.2'),
     name: 'ColoredManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -19395,7 +19395,7 @@ class ColoredManga extends Madara_1.Madara {
         this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
-        this.sourceTraversalPathName = 'manhwa';
+        this.sourceTraversalPathName = 'mangas';
         this.alternativeChapterAjaxEndpoint = true;
     }
 }

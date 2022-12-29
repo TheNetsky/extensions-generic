@@ -38,8 +38,6 @@ export class HentaiRox extends Bentai {
 
     languageCode: LanguageCode = LanguageCode.ENGLISH
 
-    override imageCDN = 'https://m6.hentairox.com'
-
     override directorySubtitleSelector = 'a.thumb_cat'
 
 }

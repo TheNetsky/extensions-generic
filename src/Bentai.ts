@@ -19,7 +19,7 @@ import {
 import { Parser } from './BentaiParser'
 
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '1.0.1'
+const BASE_VERSION = '1.1.0'
 export const getExportVersion = (EXTENSION_VERSION: string): string => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.')
 }
@@ -65,8 +65,6 @@ export abstract class Bentai extends Source {
 
     fallbackImage = 'https://i.imgur.com/GYUxEX8.png'
 
-    imageCDN = ''
-
     directoryGallerySelector = 'div.row.galleries'
 
     directorySubtitleSelector = 'h3.gallery_cat' 
@@ -110,9 +108,6 @@ export abstract class Bentai extends Source {
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
-        if (!this.imageCDN) {
-            throw new Error('No CDN provided for chapterDetails')
-        }
 
         const request = createRequestObject({
             url: `${this.baseUrl}/gallery/${mangaId}`,

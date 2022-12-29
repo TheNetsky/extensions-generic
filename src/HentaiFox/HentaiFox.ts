@@ -38,8 +38,6 @@ export class HentaiFox extends Bentai {
 
     languageCode: LanguageCode = LanguageCode.ENGLISH
 
-    override imageCDN = 'https://i2.hentaifox.com'
-
     override directoryGallerySelector = 'div.lc_galleries'
 
     override directoryPageParam = 'pag/'

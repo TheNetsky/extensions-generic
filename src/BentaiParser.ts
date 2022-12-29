@@ -94,8 +94,16 @@ export class Parser {
             throw new Error(`Unable to parse imgId (found: ${imgId}) for mangaId:${mangaId}`)
         }
 
+        const domain = this.getImageSrc($('img.lazy, div.cover > img').first())
+        const subdomainRegex = domain.match(/\/\/([^.]+)/)
+
+        let subdomain = null
+        if (subdomainRegex && subdomainRegex[1]) subdomain = subdomainRegex[1]
+
+        const domainSplit = source.baseUrl.split('//')
+
         for (let i = 1; i < pageCount; i++) {
-            pages.push(`${source.imageCDN}/${imgDir}/${imgId}/${i}.jpg`)
+            pages.push(`${domainSplit[0]}//${subdomain}.${domainSplit[1]}/${imgDir}/${imgId}/${i}.jpg`)
         }
 
         return createChapterDetails({
@@ -106,7 +114,7 @@ export class Parser {
         })
     }
 
-    parseTags($: CheerioStatic, source: any) {
+    parseTags($: CheerioStatic, source: any): TagSection[] {
         const arrayTags: Tag[] = []
 
         for (const tag of $('div.col.col', source.tagBoxSelector).toArray()) {

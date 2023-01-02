@@ -12,7 +12,7 @@ import {
 const DOMAIN = 'https://nitroscans.com'
 
 export const NitroScansInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'NitroScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -36,5 +36,5 @@ export class NitroScans extends Madara {
 
     override hasAdvancedSearchPage = true
     
-    override alternativeChapterAjaxEndpoint = false
+    override alternativeChapterAjaxEndpoint = true
 }

@@ -20182,7 +20182,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
 const DOMAIN = 'https://nitroscans.com';
 exports.NitroScansInfo = {
-    version: Madara_1.getExportVersion('0.0.0'),
+    version: Madara_1.getExportVersion('0.0.1'),
     name: 'NitroScans',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',
@@ -20203,7 +20203,7 @@ class NitroScans extends Madara_1.Madara {
         this.baseUrl = DOMAIN;
         this.languageCode = paperback_extensions_common_1.LanguageCode.ENGLISH;
         this.hasAdvancedSearchPage = true;
-        this.alternativeChapterAjaxEndpoint = false;
+        this.alternativeChapterAjaxEndpoint = true;
     }
 }
 exports.NitroScans = NitroScans;

@@ -9,10 +9,10 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://pianmanga.com'
+const DOMAIN = 'https://pianmanga.me'
 
 export const PianMangaInfo: SourceInfo = {
-    version: getExportVersion('0.0.0'),
+    version: getExportVersion('0.0.1'),
     name: 'PianManga',
     description: `Extension that pulls manga from ${DOMAIN}`,
     author: 'Netsky',

@@ -9,7 +9,7 @@ import {
     Madara
 } from '../Madara'
 
-const DOMAIN = 'https://hiperdex.com'
+const DOMAIN = 'https://1sthiperdex.com'
 
 export const HiperDexInfo: SourceInfo = {
     version: getExportVersion('0.0.2'),

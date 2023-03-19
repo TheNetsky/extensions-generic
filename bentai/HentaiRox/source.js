@@ -956,7 +956,7 @@ exports.Bentai = exports.getExportVersion = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const BentaiParser_1 = require("./BentaiParser");
 // Set the version for the base, changing this version will change the versions of all sources
-const BASE_VERSION = '1.1.0';
+const BASE_VERSION = '1.1.1';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -1224,8 +1224,8 @@ class Parser {
         if (subdomainRegex && subdomainRegex[1])
             subdomain = subdomainRegex[1];
         const domainSplit = source.baseUrl.split('//');
-        for (let i = 1; i < pageCount; i++) {
-            pages.push(`${domainSplit[0]}//${subdomain}.${domainSplit[1]}/${imgDir}/${imgId}/${i}.jpg`);
+        for (let i = 0; i < pageCount; i++) {
+            pages.push(`${domainSplit[0]}//${subdomain}.${domainSplit[1]}/${imgDir}/${imgId}/${i + 1}.jpg`);
         }
         return createChapterDetails({
             id: chapterId,

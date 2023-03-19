@@ -102,8 +102,8 @@ export class Parser {
 
         const domainSplit = source.baseUrl.split('//')
 
-        for (let i = 1; i < pageCount; i++) {
-            pages.push(`${domainSplit[0]}//${subdomain}.${domainSplit[1]}/${imgDir}/${imgId}/${i}.jpg`)
+        for (let i = 0; i < pageCount; i++) {
+            pages.push(`${domainSplit[0]}//${subdomain}.${domainSplit[1]}/${imgDir}/${imgId}/${i + 1}.jpg`)
         }
 
         return createChapterDetails({

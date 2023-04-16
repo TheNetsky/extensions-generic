@@ -19418,7 +19418,7 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const MadaraParser_1 = require("./MadaraParser");
 const MadaraHelper_1 = require("./MadaraHelper");
 const MadaraSettings_1 = require("./MadaraSettings");
-const BASE_VERSION = '2.2.5';
+const BASE_VERSION = '2.2.6';
 const getExportVersion = (EXTENSION_VERSION) => {
     return BASE_VERSION.split('.').map((x, index) => Number(x) + Number(EXTENSION_VERSION.split('.')[index])).join('.');
 };
@@ -20103,6 +20103,9 @@ class Parser {
                     .replace('-350x476', '');
             }
         }
+        // Malforumed url fix (Turns https:///example.com into https://example.com (or the http:// equivalent))
+        image = image?.replace(/https:\/\/\//g, 'https://'); // only changes urls with https protocol
+        image = image?.replace(/http:\/\/\//g, 'http://'); // only changes urls with http protocol
         return decodeURI(this.decodeHTMLEntity(image?.trim() ?? ''));
     }
     parsePostId($) {

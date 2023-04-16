@@ -109,7 +109,6 @@ export class Parser {
             if (!page) {
                 throw new Error(`Could not parse page for ${mangaId}/${chapterId}`)
             }
-
             pages.push(encodeURI(await page))
         }
 
@@ -264,6 +263,11 @@ export class Parser {
                     .replace('-350x476', '')
             }
         }
+
+        // Malforumed url fix (Turns https:///example.com into https://example.com (or the http:// equivalent))
+        image = image?.replace(/https:\/\/\//g, 'https://') // only changes urls with https protocol
+        image = image?.replace(/http:\/\/\//g, 'http://') // only changes urls with http protocol
+
         return decodeURI(this.decodeHTMLEntity(image?.trim() ?? ''))
     }
 

@@ -19372,7 +19372,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HiperDex = exports.HiperDexInfo = void 0;
 const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Madara_1 = require("../Madara");
-const DOMAIN = 'https://hiperdex.net';
+const DOMAIN = 'https://hiperdex.com';
 exports.HiperDexInfo = {
     version: Madara_1.getExportVersion('0.0.4'),
     name: 'HiperDex',

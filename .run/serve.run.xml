@@ -5,7 +5,7 @@
     <scripts>
       <script value="serve" />
     </scripts>
-    <node-interpreter value="wsl://Arch@/usr/sbin/node" />
+    <node-interpreter value="project" />
     <envs />
     <method v="2" />
   </configuration>

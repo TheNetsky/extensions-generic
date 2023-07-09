@@ -2,104 +2,102 @@ import {
     Chapter,
     ChapterDetails,
     HomeSection,
-    Manga,
-    MangaUpdates,
+    SourceManga,
     PagedResults,
-    RequestHeaders,
     SearchRequest,
-    Source,
     TagSection,
     Request,
-    SearchField
-} from 'paperback-extensions-common'
-import { Parser } from './Parser'
+    Response,
+    SearchField,
+    ChapterProviding,
+    HomePageSectionsProviding,
+    MangaProviding,
+    SearchResultsProviding
+} from '@paperback/types'
 
-const headers = { 'content-type': 'application/x-www-form-urlencoded' }
-const method = 'GET'
+import {Parser} from './Parser'
 
-export abstract class NepNep extends Source {
+const headers = {'content-type': 'application/x-www-form-urlencoded'}
 
-    abstract baseUrl: string
+export abstract class NepNep implements SearchResultsProviding, MangaProviding, ChapterProviding, HomePageSectionsProviding {
+    abstract baseUrl: string;
+    parser = new Parser();
 
-    parser = new Parser()
+    constructor(private cheerio: CheerioAPI) { }
 
-    requestManager = createRequestManager({
+    requestManager = App.createRequestManager({
         requestsPerSecond: 0.5,
-        requestTimeout: 15000
-    })
+        requestTimeout: 15000,
+        interceptor: {
+            interceptRequest: async (request: Request): Promise<Request> => {
+                request.headers = {
+                    ...(request.headers ?? {}),
+                    ...{
+                        'referer': `${this.baseUrl}/`,
+                        'user-agent': await this.requestManager.getDefaultUserAgent()
+                    }
+                }
+                return request
+            },
+            interceptResponse: async (response: Response): Promise<Response> => {
+                return response
+            }
+        }
+    });
 
-    override getMangaShareUrl(mangaId: string): string {
+    getMangaShareUrl(mangaId: string): string {
         return `${this.baseUrl}/manga/${mangaId}`
     }
 
-    async getMangaDetails(mangaId: string): Promise<Manga> {
-        const request = createRequestObject({
+    async getMangaDetails(mangaId: string): Promise<SourceManga> {
+        const request = App.createRequest({
             url: `${this.baseUrl}/manga/`,
-            method,
+            method: 'GET',
             param: mangaId
         })
-
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
+        const $ = this.cheerio.load(response.data as string)
         return this.parser.parseMangaDetails($, mangaId)
     }
 
     async getChapters(mangaId: string): Promise<Chapter[]> {
-        const request = createRequestObject({
+        const request = App.createRequest({
             url: `${this.baseUrl}/manga/`,
-            method,
+            method: 'GET',
             headers,
             param: mangaId
         })
-
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
+        const $ = this.cheerio.load(response.data as string)
         return this.parser.parseChapters($, mangaId)
     }
 
     async getChapterDetails(mangaId: string, chapterId: string): Promise<ChapterDetails> {
-        const request = createRequestObject({
+        const request = App.createRequest({
             url: `${this.baseUrl}/read-online/`,
             headers,
-            method,
+            method: 'GET',
             param: chapterId
         })
-
         const response = await this.requestManager.schedule(request, 1)
         return this.parser.parseChapterDetails(response.data, mangaId, chapterId)
     }
 
-    override async filterUpdatedManga(mangaUpdatesFoundCallback: (updates: MangaUpdates) => void, time: Date, ids: string[]): Promise<void> {
-        const request = createRequestObject({
-            url: `${this.baseUrl}/`,
-            headers,
-            method,
-        })
-
-        const response = await this.requestManager.schedule(request, 1)
-        const returnObject = this.parser.parseUpdatedManga(response.data, time, ids)
-        mangaUpdatesFoundCallback(createMangaUpdates(returnObject))
-    }
-
-    override async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
-        if(!metadata) { 
-            const request = createRequestObject({
+    async getSearchResults(query: SearchRequest, metadata: any): Promise<PagedResults> {
+        if (!metadata) {
+            const request = App.createRequest({
                 url: `${this.baseUrl}/search/`,
                 headers,
-                method,
+                method: 'GET'
             })
-
             const searchMetadata = this.parser.searchMetadata(query)
-
             const response = await this.requestManager.schedule(request, 1)
-
             metadata = {
                 manga: this.parser.parseSearch(response.data, searchMetadata),
                 offset: 0
             }
         }
-        
-        return createPagedResults({
+        return App.createPagedResults({
             results: metadata.manga.slice(metadata.offset, metadata.offset + 100),
             metadata: {
                 manga: metadata.manga,
@@ -108,52 +106,49 @@ export abstract class NepNep extends Source {
         })
     }
 
-    override async getSearchTags(): Promise<TagSection[]> {
-        const request = createRequestObject({
+    async getSearchTags(): Promise<TagSection[]> {
+        const request = App.createRequest({
             url: `${this.baseUrl}/search/`,
             headers,
-            method,
+            method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
         return this.parser.parseSearchTags(response.data)
     }
 
-    override async supportsTagExclusion(): Promise<boolean> {
+    async supportsTagExclusion(): Promise<boolean> {
         return true
     }
 
-    override async getSearchFields(): Promise<SearchField[]> {
-        // Uncomment when this actually works in-app
-        //return this.parser.parseSearchFields()
+    async getSearchFields(): Promise<SearchField[]> {
+    // Uncomment when this actually works in-app
+    //return this.parser.parseSearchFields()
         return []
     }
 
-    override async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
-        const request = createRequestObject({
+    async getHomePageSections(sectionCallback: (section: HomeSection) => void): Promise<void> {
+        const request = App.createRequest({
             url: `${this.baseUrl}`,
-            method,
+            method: 'GET'
         })
-
         const response = await this.requestManager.schedule(request, 1)
-        const $ = this.cheerio.load(response.data)
+        const $ = this.cheerio.load(response.data as string)
         this.parser.parseHomeSections($, response.data, sectionCallback)
     }
 
-    override async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
-        if(!metadata) { 
-            const request = createRequestObject({
+    async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<PagedResults> {
+        if (!metadata) {
+            const request = App.createRequest({
                 url: this.baseUrl,
-                method,
+                method: 'GET'
             })
             const response = await this.requestManager.schedule(request, 1)
-
             metadata = {
                 manga: this.parser.parseViewMore(response.data, homepageSectionId),
                 offset: 0
             }
         }
-        return createPagedResults({
+        return App.createPagedResults({
             results: metadata.manga.slice(metadata.offset, metadata.offset + 100),
             metadata: {
                 manga: metadata.manga,
@@ -162,16 +157,10 @@ export abstract class NepNep extends Source {
         })
     }
 
-    override globalRequestHeaders(): RequestHeaders {
-        return {
-            referer: this.baseUrl + '/'
-        }
-    }
-
-    override getCloudflareBypassRequest(): Request {
-        return createRequestObject({
+    getCloudflareBypassRequest(): Request {
+        return App.createRequest({
             url: `${this.baseUrl}`,
-            method: 'GET',
+            method: 'GET'
         })
     }
 }
